@@ -128,7 +128,7 @@ export default function TelemetryDashboard({
                 : "text-white/40 hover:text-white/70"
             }`}
           >
-            kph
+            KPH
           </button>
           <button
             onClick={() => setSpeedUnit("mph")}
@@ -138,7 +138,7 @@ export default function TelemetryDashboard({
                 : "text-white/40 hover:text-white/70"
             }`}
           >
-            mph
+            MPH
           </button>
         </div>
 

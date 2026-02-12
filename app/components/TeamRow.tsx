@@ -14,16 +14,17 @@ export default function TeamRow({ team, onSelectDriver }: TeamRowProps) {
     <div className="group">
       <div className="mb-3 flex items-center gap-3">
         <div
-          className="flex h-6 w-6 items-center justify-center rounded-md"
+          className="flex h-8 w-8 items-center justify-center rounded-md"
           style={{ backgroundColor: team.color }}
         >
           {team.logoUrl ? (
             <Image
               src={team.logoUrl}
               alt={team.name}
-              width={18}
-              height={18}
-              className="brightness-0 invert"
+              width={24}
+              height={24}
+              className="h-5 w-auto object-contain"
+              unoptimized
             />
           ) : null}
         </div>

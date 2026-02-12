@@ -6,7 +6,7 @@
       "id": "red-bull",
       "name": "Red Bull Racing",
       "color": "#3671C6",
-      "logoUrl": "/logos/red-bull.svg",
+      "logoUrl": "https://media.formula1.com/image/upload/c_fit,h_64/q_auto/v1740000000/common/f1/2026/redbullracing/2026redbullracinglogowhite.webp",
       "reserveDrivers": [
         { "name": "Yuki Tsunoda", "nationality": "JPN", "role": "reserve" }
       ],
@@ -42,7 +42,7 @@
       "id": "mclaren",
       "name": "McLaren",
       "color": "#FF8000",
-      "logoUrl": "/logos/mclaren.svg",
+      "logoUrl": "https://media.formula1.com/image/upload/c_fit,h_64/q_auto/v1740000000/common/f1/2026/mclaren/2026mclarenlogowhite.webp",
       "reserveDrivers": [
         { "name": "Leonardo Fornaroli", "nationality": "ITA", "role": "reserve" }
       ],
@@ -71,7 +71,7 @@
       "id": "ferrari",
       "name": "Ferrari",
       "color": "#E8002D",
-      "logoUrl": "/logos/ferrari.svg",
+      "logoUrl": "https://media.formula1.com/image/upload/c_fit,h_64/q_auto/v1740000000/common/f1/2026/ferrari/2026ferrarilogowhite.webp",
       "reserveDrivers": [
         { "name": "Antonio Giovinazzi", "nationality": "ITA", "role": "reserve" }
       ],
@@ -113,7 +113,7 @@
       "id": "mercedes",
       "name": "Mercedes",
       "color": "#27F4D2",
-      "logoUrl": "/logos/mercedes.svg",
+      "logoUrl": "https://media.formula1.com/image/upload/c_fit,h_64/q_auto/v1740000000/common/f1/2026/mercedes/2026mercedeslogowhite.webp",
       "reserveDrivers": [
         { "name": "Frederik Vesti", "nationality": "DEN", "role": "reserve" }
       ],
@@ -156,7 +156,7 @@
       "id": "aston-martin",
       "name": "Aston Martin",
       "color": "#229971",
-      "logoUrl": "/logos/aston-martin.svg",
+      "logoUrl": "https://media.formula1.com/image/upload/c_fit,h_64/q_auto/v1740000000/common/f1/2026/astonmartin/2026astonmartinlogowhite.webp",
       "reserveDrivers": [
         { "name": "Stoffel Vandoorne", "nationality": "BEL", "role": "reserve" }
       ],
@@ -198,7 +198,7 @@
       "id": "alpine",
       "name": "Alpine",
       "color": "#FF87BC",
-      "logoUrl": "/logos/alpine.svg",
+      "logoUrl": "https://media.formula1.com/image/upload/c_fit,h_64/q_auto/v1740000000/common/f1/2026/alpine/2026alpinelogowhite.webp",
       "reserveDrivers": [
         { "name": "Paul Aron", "nationality": "EST", "role": "reserve" },
         { "name": "Kush Maini", "nationality": "IND", "role": "reserve" }
@@ -235,7 +235,7 @@
       "id": "williams",
       "name": "Williams",
       "color": "#64C4FF",
-      "logoUrl": "/logos/williams.svg",
+      "logoUrl": "https://media.formula1.com/image/upload/c_fit,h_64/q_auto/v1740000000/common/f1/2026/williams/2026williamslogowhite.webp",
       "reserveDrivers": [
         { "name": "Luke Browning", "nationality": "GBR", "role": "reserve" },
         { "name": "Victor Martins", "nationality": "FRA", "role": "test" }
@@ -272,7 +272,7 @@
       "id": "racing-bulls",
       "name": "Racing Bulls",
       "color": "#6692FF",
-      "logoUrl": "/logos/racing-bulls.svg",
+      "logoUrl": "https://media.formula1.com/image/upload/c_fit,h_64/q_auto/v1740000000/common/f1/2026/racingbulls/2026racingbullslogowhite.webp",
       "reserveDrivers": [
         { "name": "Yuki Tsunoda", "nationality": "JPN", "role": "reserve" }
       ],
@@ -315,7 +315,7 @@
       "id": "audi",
       "name": "Audi",
       "color": "#52E252",
-      "logoUrl": "/logos/audi.svg",
+      "logoUrl": "https://media.formula1.com/image/upload/c_fit,h_64/q_auto/v1740000000/common/f1/2026/audi/2026audilogowhite.webp",
       "reserveDrivers": [],
       "seat1": {
         "id": "hulkenberg",
@@ -342,7 +342,7 @@
       "id": "haas",
       "name": "Haas",
       "color": "#B6BABD",
-      "logoUrl": "/logos/haas.svg",
+      "logoUrl": "https://media.formula1.com/image/upload/c_fit,h_64/q_auto/v1740000000/common/f1/2026/haasf1team/2026haasf1teamlogowhite.webp",
       "reserveDrivers": [
         { "name": "Jack Doohan", "nationality": "AUS", "role": "reserve" },
         { "name": "Ryo Hirakawa", "nationality": "JPN", "role": "reserve" }
@@ -379,7 +379,7 @@
       "id": "cadillac",
       "name": "Cadillac F1",
       "color": "#1E1E1E",
-      "logoUrl": "/logos/cadillac.svg",
+      "logoUrl": "https://media.formula1.com/image/upload/c_fit,h_64/q_auto/v1740000000/common/f1/2026/cadillac/2026cadillaclogowhite.webp",
       "reserveDrivers": [
         { "name": "Guanyu Zhou", "nationality": "CHN", "role": "reserve" },
         { "name": "Colton Herta", "nationality": "USA", "role": "test" }

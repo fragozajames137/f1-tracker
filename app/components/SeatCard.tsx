@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Driver, ContractStatus } from "@/app/types";
+import { nationalityToFlag } from "@/app/lib/flags";
 
 const statusConfig: Record<ContractStatus, { label: string; className: string }> = {
   locked: { label: "Locked", className: "bg-green-500/20 text-green-400 border-green-500/30" },
@@ -79,7 +80,9 @@ export default function SeatCard({ driver, teamColor, seatLabel, onClick }: Seat
             {driver.number && (
               <span className="text-sm font-mono text-white/50">#{driver.number}</span>
             )}
-            <span className="text-xs text-white/40">{driver.nationality}</span>
+            <span className="text-xs text-white/40">
+              {nationalityToFlag(driver.nationality)} {driver.nationality}
+            </span>
             <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase ${status.className}`}>
               {status.label}
             </span>
@@ -91,18 +94,16 @@ export default function SeatCard({ driver, teamColor, seatLabel, onClick }: Seat
             </p>
           )}
 
-          {driver.rumors.length > 0 && (
-            <div className="mt-2 flex items-center gap-1 text-xs text-yellow-400/70">
-              <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              {driver.rumors.length} rumor{driver.rumors.length > 1 ? "s" : ""}
-            </div>
-          )}
+          <div className={`mt-2 flex items-center gap-1 text-xs ${driver.rumors.length > 0 ? "text-yellow-400/70" : "text-white/20"}`}>
+            <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z"
+                clipRule="evenodd"
+              />
+            </svg>
+            {driver.rumors.length} rumor{driver.rumors.length !== 1 ? "s" : ""}
+          </div>
         </div>
       </div>
 

@@ -24,9 +24,6 @@ export default function Header({ season, lastUpdated, isHome }: HeaderProps) {
                 </Link>
               </p>
             )}
-            <p className="mt-1 text-sm text-white/40">
-              F1 {season} Silly Season Tracker
-            </p>
             <nav className="mt-3 flex gap-3 sm:gap-4">
               <NavLink href="/">Grid</NavLink>
               <NavLink href="/schedule">Schedule</NavLink>

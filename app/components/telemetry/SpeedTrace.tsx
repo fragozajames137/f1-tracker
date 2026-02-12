@@ -12,7 +12,8 @@ import {
 import type { TelemetrySpeedTrace, TelemetryDriver } from "@/app/types/telemetry";
 
 const MONO_FONT = "'Space Mono', ui-monospace, monospace";
-const KMH_TO_MPH = 0.621371;
+const KPH_TO_MPH = 0.621371;
+const KM_TO_MI = 0.621371;
 
 interface SpeedTraceProps {
   traces: TelemetrySpeedTrace[];
@@ -22,7 +23,7 @@ interface SpeedTraceProps {
 
 export default function SpeedTrace({ traces, drivers, speedUnit = "kph" }: SpeedTraceProps) {
   const isMph = speedUnit === "mph";
-  const unitLabel = isMph ? "mph" : "kph";
+  const unitLabel = isMph ? "MPH" : "KPH";
 
   if (traces.length === 0) {
     return (
@@ -44,7 +45,7 @@ export default function SpeedTrace({ traces, drivers, speedUnit = "kph" }: Speed
       const driver = drivers.find((d) => d.number === trace.driverNumber);
       const key = driver?.abbreviation ?? `#${trace.driverNumber}`;
       const raw = trace.speed[i] ?? 0;
-      point[key] = isMph ? Math.round(raw * KMH_TO_MPH) : raw;
+      point[key] = isMph ? Math.round(raw * KPH_TO_MPH) : raw;
     }
     return point;
   });
@@ -68,7 +69,12 @@ export default function SpeedTrace({ traces, drivers, speedUnit = "kph" }: Speed
             dataKey="distance"
             stroke="#666"
             tick={{ fontSize: 10, fill: "#666", fontFamily: MONO_FONT }}
-            tickFormatter={(v) => `${(v / 1000).toFixed(1)}km`}
+            tickFormatter={(v) => {
+              const dist = v / 1000;
+              return isMph
+                ? `${(dist * KM_TO_MI).toFixed(1)}mi`
+                : `${dist.toFixed(1)}km`;
+            }}
           />
           <YAxis
             stroke="#666"
@@ -85,7 +91,12 @@ export default function SpeedTrace({ traces, drivers, speedUnit = "kph" }: Speed
               fontSize: 12,
               fontFamily: MONO_FONT,
             }}
-            labelFormatter={(v) => `${(Number(v) / 1000).toFixed(2)} km`}
+            labelFormatter={(v) => {
+              const dist = Number(v) / 1000;
+              return isMph
+                ? `${(dist * KM_TO_MI).toFixed(2)} mi`
+                : `${dist.toFixed(2)} km`;
+            }}
             formatter={(value) => [`${value} ${unitLabel}`]}
           />
           <Legend

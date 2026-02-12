@@ -77,7 +77,7 @@ export default function Home() {
       <Header season={data.season} lastUpdated={data.lastUpdated} isHome />
 
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-6 flex items-center gap-4 text-sm text-white/40">
+        <div className="mb-6 flex flex-wrap items-center gap-4 text-sm text-white/40">
           <span className="flex items-center gap-1.5">
             <span className="inline-block h-2 w-2 rounded-full bg-green-500" />
             Locked
@@ -89,6 +89,14 @@ export default function Home() {
           <span className="flex items-center gap-1.5">
             <span className="inline-block h-2 w-2 rounded-full bg-red-500" />
             Open
+          </span>
+          <span className="ml-auto text-xs text-white/30">
+            Last Updated:{" "}
+            {new Date(data.lastUpdated + "T00:00:00").toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
           </span>
         </div>
 

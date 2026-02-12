@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Driver, Team, ContractStatus } from "@/app/types";
+import { nationalityToFlag } from "@/app/lib/flags";
 
 const statusConfig: Record<ContractStatus, { label: string; className: string }> = {
   locked: { label: "Locked In", className: "bg-green-500/20 text-green-400 border-green-500/30" },
@@ -103,7 +104,9 @@ export default function DetailPanel({ driver, team, onClose }: DetailPanelProps)
                     #{driver.number}
                   </span>
                 )}
-                <span className="text-sm text-white/50">{driver.nationality}</span>
+                <span className="text-sm text-white/50">
+                  {nationalityToFlag(driver.nationality)} {driver.nationality}
+                </span>
               </div>
             </div>
           </div>
