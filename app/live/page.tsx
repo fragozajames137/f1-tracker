@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
+import Footer from "@/app/components/Footer";
 import LiveDashboard from "@/app/components/live/LiveDashboard";
 
 export const metadata: Metadata = {
@@ -64,9 +65,7 @@ export default function LivePage() {
         <LiveDashboard />
       </main>
 
-      <footer className="border-t border-white/10 px-4 py-4 text-center text-xs text-white/20 sm:px-6">
-        Pole to Paddock &mdash; Live data powered by OpenF1
-      </footer>
+      <Footer />
     </div>
   );
 }

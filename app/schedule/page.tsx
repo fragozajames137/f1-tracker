@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
+import Footer from "@/app/components/Footer";
 import RaceSchedule from "@/app/components/RaceSchedule";
 import { fetchRaceSchedule } from "@/app/lib/schedule";
 import type { Race } from "@/app/types";
@@ -77,9 +78,7 @@ export default async function SchedulePage() {
         <RaceSchedule races={races} />
       </main>
 
-      <footer className="border-t border-white/10 px-4 py-4 text-center text-xs text-white/20 sm:px-6">
-        Pole to Paddock &mdash; F1 2026 Race Schedule
-      </footer>
+      <Footer />
     </div>
   );
 }

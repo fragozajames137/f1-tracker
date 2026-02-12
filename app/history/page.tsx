@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
+import Footer from "@/app/components/Footer";
 import HistoryDashboard from "@/app/components/history/HistoryDashboard";
 import { fetchHistoryData, fetchAvailableSeasons } from "@/app/lib/history";
 
@@ -77,9 +78,7 @@ export default async function HistoryPage() {
         <HistoryDashboard seasons={allSeasons} initialData={initialData} />
       </main>
 
-      <footer className="border-t border-white/10 px-4 py-4 text-center text-xs text-white/20 sm:px-6">
-        Pole to Paddock &mdash; Data via Jolpica (Ergast) API
-      </footer>
+      <Footer />
     </div>
   );
 }

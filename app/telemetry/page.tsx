@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
+import Footer from "@/app/components/Footer";
 import TelemetryDashboard from "@/app/components/telemetry/TelemetryDashboard";
 import { listTelemetryFiles, loadTelemetrySession } from "@/app/lib/telemetry";
 
@@ -69,9 +70,7 @@ export default async function TelemetryPage() {
         <TelemetryDashboard files={files} initialSession={initialSession} />
       </main>
 
-      <footer className="border-t border-white/10 px-4 py-4 text-center text-xs text-white/20 sm:px-6">
-        Pole to Paddock &mdash; Telemetry powered by FastF1
-      </footer>
+      <Footer />
     </div>
   );
 }

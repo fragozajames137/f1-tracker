@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Header from "@/app/components/Header";
+import Footer from "@/app/components/Footer";
 import SeatMap from "@/app/components/SeatMap";
 import gridData from "@/app/data/grid-2026.json";
 import { GridData } from "@/app/types";
@@ -103,9 +104,7 @@ export default function Home() {
         <SeatMap data={data} />
       </main>
 
-      <footer className="border-t border-white/10 px-4 py-4 text-center text-xs text-white/20 sm:px-6">
-        Pole to Paddock &mdash; F1 {data.season} Silly Season Tracker
-      </footer>
+      <Footer />
     </div>
   );
 }
