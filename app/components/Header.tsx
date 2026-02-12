@@ -28,6 +28,7 @@ export default function Header({ season, isHome }: HeaderProps) {
               <NavLink href="/schedule">Schedule</NavLink>
               <NavLink href="/live">Live</NavLink>
               <NavLink href="/telemetry">Telemetry</NavLink>
+              <NavLink href="/history">History</NavLink>
             </nav>
           </div>
         </div>

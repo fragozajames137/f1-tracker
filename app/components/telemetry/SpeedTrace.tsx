@@ -83,6 +83,7 @@ export default function SpeedTrace({ traces, drivers, speedUnit = "kph" }: Speed
         <LineChart data={data}>
           <XAxis
             dataKey="distance"
+            type="number"
             stroke="#666"
             tick={{ fontSize: 10, fill: "#666", fontFamily: MONO_FONT }}
             ticks={xTicks}

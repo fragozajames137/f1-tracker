@@ -84,6 +84,22 @@ export default function LapTimeChart({
     };
   });
 
+  // Compute tight Y-axis bounds from actual data, excluding outliers
+  const allTimes = filteredLaps
+    .map((l) => l.lapTime)
+    .filter((t): t is number => t !== null);
+  const [minY, maxY] = (() => {
+    if (allTimes.length === 0) return [0, 120];
+    const sorted = [...allTimes].sort((a, b) => a - b);
+    const median = sorted[Math.floor(sorted.length / 2)];
+    // Exclude laps slower than 1.5x the median (safety cars, slow laps)
+    const reasonable = sorted.filter((t) => t <= median * 1.5);
+    const min = reasonable[0] ?? sorted[0];
+    const max = reasonable[reasonable.length - 1] ?? sorted[sorted.length - 1];
+    const padding = Math.max((max - min) * 0.15, 1);
+    return [Math.max(0, min - padding), max + padding];
+  })();
+
   return (
     <div className="rounded-lg border border-white/10 bg-white/5 p-4">
       <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-white/40">
@@ -99,8 +115,8 @@ export default function LapTimeChart({
           <YAxis
             stroke="#666"
             tick={{ fontSize: 10, fill: "#666", fontFamily: MONO_FONT }}
-            width={45}
-            domain={["auto", "auto"]}
+            width={50}
+            domain={[minY, maxY]}
             tickFormatter={formatTime}
             reversed
           />
