@@ -22,7 +22,7 @@ export default function SeasonSelector({
     >
       {seasons.map((year) => (
         <option key={year} value={year} className="bg-[#111]">
-          {year} Season
+          {year}
         </option>
       ))}
     </select>

@@ -1,7 +1,77 @@
 "use client";
 
+import { useState } from "react";
+import Image from "next/image";
 import type { DriverStanding, ConstructorStanding } from "@/app/types/history";
 import dominantEngines from "@/app/data/dominant-engines.json";
+
+// Map Jolpica constructorId to our local logo filename
+function constructorLogoSrc(constructorId: string): string | null {
+  const mapped = constructorId.replace(/_/g, "-");
+  const known = [
+    "red-bull", "mclaren", "ferrari", "mercedes", "aston-martin",
+    "alpine", "williams", "racing-bulls", "audi", "haas", "cadillac",
+    "rb-f1-team", "alphatauri", "alfa-romeo", "sauber",
+  ];
+  // Handle common aliases
+  const aliases: Record<string, string> = {
+    "rb-f1-team": "racing-bulls",
+    "alphatauri": "racing-bulls",
+    "alfa-romeo": "audi",
+    "sauber": "audi",
+    "kick-sauber": "audi",
+  };
+  const resolved = aliases[mapped] ?? mapped;
+  if (known.includes(resolved) || known.includes(mapped)) {
+    return `/logos/${resolved}.webp`;
+  }
+  return null;
+}
+
+// Map Jolpica driver familyName to our local headshot
+function driverHeadshotSrc(familyName: string): string {
+  return `/drivers/${familyName.toLowerCase().replace(/\s+/g, "-")}.webp`;
+}
+
+function DriverImg({ familyName, name }: { familyName: string; name: string }) {
+  const [err, setErr] = useState(false);
+  const src = driverHeadshotSrc(familyName);
+  if (err) {
+    return (
+      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-[9px] font-bold text-white/40">
+        {name.charAt(0)}
+      </span>
+    );
+  }
+  return (
+    <Image
+      src={src}
+      alt={name}
+      width={24}
+      height={24}
+      className="h-6 w-6 shrink-0 rounded-full object-cover"
+      onError={() => setErr(true)}
+    />
+  );
+}
+
+function TeamLogo({ constructorId, name }: { constructorId: string; name: string }) {
+  const [err, setErr] = useState(false);
+  const src = constructorLogoSrc(constructorId);
+  if (!src || err) {
+    return null;
+  }
+  return (
+    <Image
+      src={src}
+      alt={name}
+      width={20}
+      height={20}
+      className="h-5 w-auto shrink-0 object-contain"
+      onError={() => setErr(true)}
+    />
+  );
+}
 
 interface StandingsViewProps {
   season: number;
@@ -68,14 +138,22 @@ export default function StandingsView({
                       {s.position}
                     </td>
                     <td className="py-2 pr-3">
-                      <span className="font-medium text-white">
-                        {s.Driver.givenName} {s.Driver.familyName}
-                      </span>
-                      {s.Driver.code && (
-                        <span className="ml-1.5 text-xs text-white/30">
-                          {s.Driver.code}
+                      <span className="flex items-center gap-2">
+                        <DriverImg
+                          familyName={s.Driver.familyName}
+                          name={`${s.Driver.givenName} ${s.Driver.familyName}`}
+                        />
+                        <span>
+                          <span className="font-medium text-white">
+                            {s.Driver.givenName} {s.Driver.familyName}
+                          </span>
+                          {s.Driver.code && (
+                            <span className="ml-1.5 text-xs text-white/30">
+                              {s.Driver.code}
+                            </span>
+                          )}
                         </span>
-                      )}
+                      </span>
                     </td>
                     <td className="hidden py-2 pr-3 text-white/40 sm:table-cell">
                       {s.Constructors[0]?.name ?? "—"}
@@ -126,8 +204,14 @@ export default function StandingsView({
                     <td className="py-2 pr-3 font-mono text-xs text-white/40">
                       {s.position}
                     </td>
-                    <td className="py-2 pr-3 font-medium text-white">
-                      {s.Constructor.name}
+                    <td className="py-2 pr-3">
+                      <span className="flex items-center gap-2 font-medium text-white">
+                        <TeamLogo
+                          constructorId={s.Constructor.constructorId}
+                          name={s.Constructor.name}
+                        />
+                        {s.Constructor.name}
+                      </span>
                     </td>
                     <td className="hidden py-2 pr-3 text-white/40 sm:table-cell">
                       {s.Constructor.nationality}

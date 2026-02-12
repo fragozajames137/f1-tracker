@@ -1,7 +1,67 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import type { RaceWithResults } from "@/app/types/history";
+
+function driverHeadshotSrc(familyName: string): string {
+  return `/drivers/${familyName.toLowerCase().replace(/\s+/g, "-")}.webp`;
+}
+
+function DriverImg({ familyName, name }: { familyName: string; name: string }) {
+  const [err, setErr] = useState(false);
+  if (err) {
+    return (
+      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-[9px] font-bold text-white/40">
+        {name.charAt(0)}
+      </span>
+    );
+  }
+  return (
+    <Image
+      src={driverHeadshotSrc(familyName)}
+      alt={name}
+      width={24}
+      height={24}
+      className="h-6 w-6 shrink-0 rounded-full object-cover"
+      onError={() => setErr(true)}
+    />
+  );
+}
+
+function constructorLogoSrc(constructorId: string): string | null {
+  const mapped = constructorId.replace(/_/g, "-");
+  const aliases: Record<string, string> = {
+    "rb-f1-team": "racing-bulls",
+    "alphatauri": "racing-bulls",
+    "alfa-romeo": "audi",
+    "sauber": "audi",
+    "kick-sauber": "audi",
+  };
+  const resolved = aliases[mapped] ?? mapped;
+  const known = [
+    "red-bull", "mclaren", "ferrari", "mercedes", "aston-martin",
+    "alpine", "williams", "racing-bulls", "audi", "haas", "cadillac",
+  ];
+  if (known.includes(resolved)) return `/logos/${resolved}.webp`;
+  return null;
+}
+
+function TeamLogo({ constructorId, name }: { constructorId: string; name: string }) {
+  const [err, setErr] = useState(false);
+  const src = constructorLogoSrc(constructorId);
+  if (!src || err) return null;
+  return (
+    <Image
+      src={src}
+      alt={name}
+      width={16}
+      height={16}
+      className="h-4 w-auto shrink-0 object-contain"
+      onError={() => setErr(true)}
+    />
+  );
+}
 
 interface RaceResultsViewProps {
   races: RaceWithResults[];
@@ -72,17 +132,31 @@ export default function RaceResultsView({ races }: RaceResultsViewProps) {
                     {r.positionText}
                   </td>
                   <td className="py-2 pr-3">
-                    <span className="font-medium text-white">
-                      {r.Driver.givenName} {r.Driver.familyName}
-                    </span>
-                    {r.Driver.code && (
-                      <span className="ml-1.5 text-xs text-white/30">
-                        {r.Driver.code}
+                    <span className="flex items-center gap-2">
+                      <DriverImg
+                        familyName={r.Driver.familyName}
+                        name={`${r.Driver.givenName} ${r.Driver.familyName}`}
+                      />
+                      <span>
+                        <span className="font-medium text-white">
+                          {r.Driver.givenName} {r.Driver.familyName}
+                        </span>
+                        {r.Driver.code && (
+                          <span className="ml-1.5 text-xs text-white/30">
+                            {r.Driver.code}
+                          </span>
+                        )}
                       </span>
-                    )}
+                    </span>
                   </td>
-                  <td className="hidden py-2 pr-3 text-white/40 sm:table-cell">
-                    {r.Constructor.name}
+                  <td className="hidden py-2 pr-3 sm:table-cell">
+                    <span className="flex items-center gap-1.5 text-white/40">
+                      <TeamLogo
+                        constructorId={r.Constructor.constructorId}
+                        name={r.Constructor.name}
+                      />
+                      {r.Constructor.name}
+                    </span>
                   </td>
                   <td className="py-2 pr-3 text-right font-mono text-xs">
                     {r.grid}
