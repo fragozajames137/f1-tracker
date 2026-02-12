@@ -6,6 +6,13 @@ interface WeatherBarProps {
   weather: OpenF1Weather | null;
 }
 
+const CARDINALS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"] as const;
+
+function degreesToCardinal(deg: number): string {
+  const idx = Math.round(((deg % 360) + 360) % 360 / 45) % 8;
+  return CARDINALS[idx];
+}
+
 export default function WeatherBar({ weather }: WeatherBarProps) {
   if (!weather) {
     return (
@@ -31,10 +38,26 @@ export default function WeatherBar({ weather }: WeatherBarProps) {
         <span className="text-white/40">Humidity </span>
         <span className="font-medium text-white">{weather.humidity}%</span>
       </div>
-      <div>
+      <div className="flex items-center gap-1.5">
         <span className="text-white/40">Wind </span>
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 14 14"
+          className="shrink-0"
+          style={{ transform: `rotate(${weather.wind_direction}deg)` }}
+        >
+          <path
+            d="M7 1 L10 11 L7 8.5 L4 11 Z"
+            fill="currentColor"
+            className="text-white/60"
+          />
+        </svg>
         <span className="font-medium text-white">
-          {weather.wind_speed.toFixed(1)} km/h
+          {weather.wind_speed.toFixed(1)} km/h{" "}
+          <span className="text-white/40">
+            {degreesToCardinal(weather.wind_direction)}
+          </span>
         </span>
       </div>
       {weather.rainfall > 0 && (

@@ -7,6 +7,7 @@ import type {
   OpenF1Interval,
   OpenF1RaceControl,
   OpenF1Weather,
+  OpenF1TeamRadio,
   OpenF1Stint,
 } from "@/app/types/openf1";
 
@@ -93,6 +94,16 @@ export async function getWeather(
   options?: { signal?: AbortSignal },
 ): Promise<OpenF1Weather[]> {
   return fetchOpenF1<OpenF1Weather>("/weather", { session_key: sessionKey }, options);
+}
+
+export async function getTeamRadio(
+  sessionKey: number,
+  driverNumber?: number,
+  options?: { signal?: AbortSignal },
+): Promise<OpenF1TeamRadio[]> {
+  const params: Record<string, string | number> = { session_key: sessionKey };
+  if (driverNumber !== undefined) params.driver_number = driverNumber;
+  return fetchOpenF1<OpenF1TeamRadio>("/team_radio", params, options);
 }
 
 export async function getStints(

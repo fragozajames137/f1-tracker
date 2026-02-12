@@ -41,6 +41,9 @@ function LiveJsonLd() {
       "Tire compound strategy",
       "Race control messages",
       "Weather conditions",
+      "Track limit violation tracking",
+      "Rain radar weather map",
+      "Live championship predictions",
     ],
   };
 

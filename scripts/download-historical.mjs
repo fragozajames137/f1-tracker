@@ -53,8 +53,8 @@ async function downloadImage(url, dest) {
     // Reject HTML responses (error pages)
     if (ct.includes("text/html")) return false;
     const buf = Buffer.from(await res.arrayBuffer());
-    // Skip tiny files (likely a fallback/error page)
-    if (buf.length < 1000) return false;
+    // Skip tiny files (likely a fallback/error page or generic silhouette)
+    if (buf.length < 2000) return false;
     await writeFile(dest, buf);
     return true;
   } catch {
@@ -64,7 +64,8 @@ async function downloadImage(url, dest) {
 
 /**
  * Build old F1 CDN URLs for a driver (multiple variations).
- * Pattern: /content/dam/fom-website/drivers/{LETTER}/{CODE}_{First}_{Last}/{code}.png.transform/1col/image.png
+ * CDN folder letter = first letter of the driver CODE (= first name initial).
+ * Tries both old DAM path and Cloudinary-proxied DAM path.
  */
 function oldCdnUrls(givenName, familyName) {
   const cleanFirst = stripAccents(givenName);
@@ -72,52 +73,51 @@ function oldCdnUrls(givenName, familyName) {
 
   const urls = [];
 
-  // Build variations of the driver code
+  // Build code base: first3 of given + first3 of family
+  const codeBase = (cleanFirst.slice(0, 3) + cleanLast.slice(0, 3)).toUpperCase();
+
+  // Try suffixes 01 and 02 (02 for drivers sharing a surname, e.g. Schumacher)
   const codeVariations = new Set();
+  codeVariations.add(codeBase + "01");
+  codeVariations.add(codeBase + "02");
 
-  // Standard: first3 of given + first3 of family + "01"
-  const std = (cleanFirst.slice(0, 3) + cleanLast.slice(0, 3) + "01").toUpperCase();
-  codeVariations.add(std);
-
-  // For compound last names ("de Vries", "van der Garde", etc.), try stripping prefix
+  // For compound last names ("de Vries", "van der Garde"), strip prefix
   const compoundPrefixes = ["de ", "di ", "van ", "da ", "von ", "le ", "la "];
   for (const prefix of compoundPrefixes) {
     if (cleanLast.toLowerCase().startsWith(prefix)) {
       const stripped = cleanLast.slice(prefix.length);
-      const alt = (cleanFirst.slice(0, 3) + stripped.slice(0, 3) + "01").toUpperCase();
-      codeVariations.add(alt);
+      const alt = (cleanFirst.slice(0, 3) + stripped.slice(0, 3)).toUpperCase();
+      codeVariations.add(alt + "01");
     }
   }
 
-  // For names with apostrophes (d'Ambrosio), try without
+  // For apostrophe names (d'Ambrosio), try without
   if (cleanLast.includes("'")) {
     const noapos = cleanLast.replace(/'/g, "");
-    const alt = (cleanFirst.slice(0, 3) + noapos.slice(0, 3) + "01").toUpperCase();
-    codeVariations.add(alt);
+    const alt = (cleanFirst.slice(0, 3) + noapos.slice(0, 3)).toUpperCase();
+    codeVariations.add(alt + "01");
   }
 
-  const letter = cleanLast.charAt(0).toUpperCase();
+  // CDN folder letter = first letter of code = first letter of given name
+  const letter = cleanFirst.charAt(0).toUpperCase();
 
   for (const code of codeVariations) {
-    // Try with stripped accents in folder/file names
+    // Cloudinary-proxied DAM path (confirmed working pattern)
+    urls.push(
+      `https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/drivers/${letter}/${code}_${cleanFirst}_${cleanLast}/${code.toLowerCase()}.png`
+    );
+    // Old transform path as fallback
     urls.push(
       `https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/${letter}/${code}_${cleanFirst}_${cleanLast}/${code.toLowerCase()}.png.transform/1col/image.png`
     );
-    // Try with spaces replaced by underscores for compound names
+    // Spaces → underscores for compound names
     const underscoreFirst = cleanFirst.replace(/\s+/g, "_");
     const underscoreLast = cleanLast.replace(/\s+/g, "_");
     if (underscoreLast !== cleanLast) {
       urls.push(
-        `https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/${letter}/${code}_${underscoreFirst}_${underscoreLast}/${code.toLowerCase()}.png.transform/1col/image.png`
+        `https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/drivers/${letter}/${code}_${underscoreFirst}_${underscoreLast}/${code.toLowerCase()}.png`
       );
     }
-  }
-
-  // Also try 2col transform and different sizes
-  for (const code of codeVariations) {
-    urls.push(
-      `https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/${letter}/${code}_${cleanFirst}_${cleanLast}/${code.toLowerCase()}.png.transform/2col/image.png`
-    );
   }
 
   return urls;
@@ -237,21 +237,19 @@ for (const [key, d] of allDrivers) {
 
   if (ok) { await sleep(200); continue; }
 
-  // Try Cloudinary URLs for recent drivers (2024+)
-  if (d.year >= 2024) {
-    const teamSlug = TEAM_SLUGS[d.constructorId] ?? d.constructorId?.replace(/_/g, "");
-    if (teamSlug) {
-      const cloudUrls = cloudinaryUrls(d.year, teamSlug, d.givenName, d.familyName);
-      for (const url of cloudUrls) {
-        const dest = path.join(DRIVERS_DIR, `${key}.webp`);
-        ok = await downloadImage(url, dest);
-        if (ok) {
-          downloaded++;
-          console.log(" OK (cloudinary)");
-          break;
-        }
-        await sleep(100);
+  // Try Cloudinary URLs for any year with a known team slug
+  const teamSlug = TEAM_SLUGS[d.constructorId] ?? d.constructorId?.replace(/_/g, "");
+  if (teamSlug) {
+    const cloudUrls = cloudinaryUrls(d.year, teamSlug, d.givenName, d.familyName);
+    for (const url of cloudUrls) {
+      const dest = path.join(DRIVERS_DIR, `${key}.webp`);
+      ok = await downloadImage(url, dest);
+      if (ok) {
+        downloaded++;
+        console.log(" OK (cloudinary)");
+        break;
       }
+      await sleep(100);
     }
   }
 

@@ -10,6 +10,7 @@ import type {
   OpenF1Interval,
   OpenF1RaceControl,
   OpenF1Weather,
+  OpenF1TeamRadio,
   OpenF1Stint,
   DriverWithDetails,
 } from "@/app/types/openf1";
@@ -22,15 +23,28 @@ import {
   getIntervals,
   getRaceControl,
   getWeather,
+  getTeamRadio,
   getStints,
 } from "@/app/lib/openf1";
 
+import dynamic from "next/dynamic";
 import SessionSelector from "./SessionSelector";
 import PositionTable from "./PositionTable";
 import LapTimesPanel from "./LapTimesPanel";
 import PitStopsPanel from "./PitStopsPanel";
 import RaceControlFeed from "./RaceControlFeed";
+import TeamRadioFeed from "./TeamRadioFeed";
+import SpeedTrapPanel from "./SpeedTrapPanel";
 import WeatherBar from "./WeatherBar";
+import TrackLimitsPanel from "./TrackLimitsPanel";
+import ChampionshipImpact from "./ChampionshipImpact";
+
+const RainRadar = dynamic(() => import("./RainRadar"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[200px] animate-pulse rounded-lg bg-white/5" />
+  ),
+});
 
 const CURRENT_YEAR = 2026;
 const FAST_POLL_MS = 5_000;
@@ -49,6 +63,7 @@ export default function LiveDashboard() {
   const [pitStops, setPitStops] = useState<OpenF1Pit[]>([]);
   const [intervals, setIntervals] = useState<OpenF1Interval[]>([]);
   const [raceControl, setRaceControl] = useState<OpenF1RaceControl[]>([]);
+  const [teamRadio, setTeamRadio] = useState<OpenF1TeamRadio[]>([]);
   const [weather, setWeather] = useState<OpenF1Weather[]>([]);
   const [stints, setStints] = useState<OpenF1Stint[]>([]);
 
@@ -104,6 +119,7 @@ export default function LiveDashboard() {
           pitsData,
           intervalsData,
           rcData,
+          radioData,
           weatherData,
           stintsData,
         ] = await Promise.all([
@@ -113,6 +129,7 @@ export default function LiveDashboard() {
           getPitStops(selectedSessionKey!, { signal }),
           getIntervals(selectedSessionKey!, { signal }).catch(() => []),
           getRaceControl(selectedSessionKey!, { signal }).catch(() => []),
+          getTeamRadio(selectedSessionKey!, undefined, { signal }).catch(() => []),
           getWeather(selectedSessionKey!, { signal }).catch(() => []),
           getStints(selectedSessionKey!, { signal }),
         ]);
@@ -125,6 +142,7 @@ export default function LiveDashboard() {
         setPitStops(pitsData);
         setIntervals(intervalsData);
         setRaceControl(rcData);
+        setTeamRadio(radioData);
         setWeather(weatherData);
         setStints(stintsData);
       } catch (err) {
@@ -164,14 +182,16 @@ export default function LiveDashboard() {
       if (slowPollingRef.current || signal.aborted) return;
       slowPollingRef.current = true;
       try {
-        const [rcData, weatherData, pitsData] = await Promise.all([
+        const [rcData, radioData, weatherData, pitsData] = await Promise.all([
           getRaceControl(selectedSessionKey!, { signal }).catch(() => []),
+          getTeamRadio(selectedSessionKey!, undefined, { signal }).catch(() => []),
           getWeather(selectedSessionKey!, { signal }).catch(() => []),
           getPitStops(selectedSessionKey!, { signal }),
         ]);
         if (signal.aborted) return;
         startTransition(() => {
           setRaceControl(rcData);
+          setTeamRadio(radioData);
           setWeather(weatherData);
           setPitStops(pitsData);
         });
@@ -228,49 +248,37 @@ export default function LiveDashboard() {
     return () => abortController.abort();
   }, [selectedSessionKey, selectedDriverNumber]);
 
-  // Memoize the combined driver data to avoid re-filtering on every render
+  // Memoize the combined driver data — single-pass Map lookups instead of
+  // nested .filter() to avoid O(drivers × entries) on every polling cycle.
   const driversWithDetails = useMemo((): DriverWithDetails[] => {
-    const combined = drivers.map((driver) => {
-      const driverPositions = positions.filter(
-        (p) => p.driver_number === driver.driver_number,
-      );
-      const latestPosition =
-        driverPositions.length > 0
-          ? driverPositions[driverPositions.length - 1]
-          : null;
+    // Build latest-entry-per-driver Maps in one pass each
+    const latestPosition = new Map<number, OpenF1Position>();
+    for (const p of positions) {
+      latestPosition.set(p.driver_number, p);
+    }
 
-      const driverIntervals = intervals.filter(
-        (i) => i.driver_number === driver.driver_number,
-      );
-      const latestInterval =
-        driverIntervals.length > 0
-          ? driverIntervals[driverIntervals.length - 1]
-          : null;
+    const latestInterval = new Map<number, OpenF1Interval>();
+    for (const i of intervals) {
+      latestInterval.set(i.driver_number, i);
+    }
 
-      const driverLapsAll = laps.filter(
-        (l) => l.driver_number === driver.driver_number,
-      );
-      const latestLap =
-        driverLapsAll.length > 0
-          ? driverLapsAll[driverLapsAll.length - 1]
-          : null;
+    const latestLap = new Map<number, OpenF1Lap>();
+    for (const l of laps) {
+      latestLap.set(l.driver_number, l);
+    }
 
-      const driverStints = stints.filter(
-        (s) => s.driver_number === driver.driver_number,
-      );
-      const currentStint =
-        driverStints.length > 0
-          ? driverStints[driverStints.length - 1]
-          : null;
+    const latestStint = new Map<number, OpenF1Stint>();
+    for (const s of stints) {
+      latestStint.set(s.driver_number, s);
+    }
 
-      return {
-        driver,
-        position: latestPosition,
-        interval: latestInterval,
-        lastLap: latestLap,
-        currentStint,
-      };
-    });
+    const combined: DriverWithDetails[] = drivers.map((driver) => ({
+      driver,
+      position: latestPosition.get(driver.driver_number) ?? null,
+      interval: latestInterval.get(driver.driver_number) ?? null,
+      lastLap: latestLap.get(driver.driver_number) ?? null,
+      currentStint: latestStint.get(driver.driver_number) ?? null,
+    }));
 
     combined.sort((a, b) => {
       const posA = a.position?.position ?? 999;
@@ -282,6 +290,9 @@ export default function LiveDashboard() {
   }, [drivers, positions, intervals, laps, stints]);
 
   const latestWeather = weather.length > 0 ? weather[weather.length - 1] : null;
+  const selectedSession = sessions.find(s => s.session_key === selectedSessionKey) ?? null;
+  const isRaceOrSprint = selectedSession?.session_type === "Race" || selectedSession?.session_type === "Sprint";
+  const circuitShortName = selectedSession?.circuit_short_name ?? null;
   const selectedDriver =
     selectedDriverNumber !== null
       ? drivers.find((d) => d.driver_number === selectedDriverNumber) ?? null
@@ -388,6 +399,8 @@ export default function LiveDashboard() {
         <>
           <WeatherBar weather={latestWeather} />
 
+          {circuitShortName && <RainRadar circuitShortName={circuitShortName} />}
+
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <div className="lg:col-span-2">
               <div className="rounded-lg border border-white/10 bg-white/5 p-4">
@@ -404,14 +417,31 @@ export default function LiveDashboard() {
 
             <div className="space-y-6">
               <LapTimesPanel laps={driverLaps} driver={selectedDriver} />
+              <SpeedTrapPanel laps={laps} drivers={drivers} />
+              <TrackLimitsPanel
+                raceControl={raceControl}
+                drivers={drivers}
+                positions={positions}
+                intervals={intervals}
+              />
               <PitStopsPanel
                 pitStops={pitStops}
                 stints={stints}
                 drivers={drivers}
               />
               <RaceControlFeed messages={raceControl} />
+              <TeamRadioFeed messages={teamRadio} drivers={drivers} />
             </div>
           </div>
+
+          {isRaceOrSprint && selectedSession && (
+            <ChampionshipImpact
+              drivers={drivers}
+              positions={positions}
+              sessionType={selectedSession.session_type}
+              year={year}
+            />
+          )}
         </>
       )}
     </div>

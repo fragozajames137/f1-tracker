@@ -87,6 +87,13 @@ export interface OpenF1Weather {
   wind_speed: number;
 }
 
+export interface OpenF1TeamRadio {
+  session_key: number;
+  driver_number: number;
+  date: string;
+  recording_url: string;
+}
+
 export interface OpenF1Stint {
   session_key: number;
   driver_number: number;
@@ -103,4 +110,52 @@ export interface DriverWithDetails {
   interval: OpenF1Interval | null;
   lastLap: OpenF1Lap | null;
   currentStint: OpenF1Stint | null;
+}
+
+// Track Limits
+
+export interface TrackLimitViolation {
+  driver_number: number;
+  lap_number: number | null;
+  date: string;
+  message: string;
+}
+
+export interface DriverTrackLimits {
+  driver_number: number;
+  name_acronym: string;
+  team_colour: string;
+  violations: TrackLimitViolation[];
+  count: number;
+  hasPenalty: boolean;
+  predictedPositionDelta: number | null;
+  predictedNewPosition: number | null;
+}
+
+// Championship Impact
+
+export interface ProjectedDriverStanding {
+  driverCode: string;
+  driverName: string;
+  teamName: string;
+  teamColor: string;
+  preRacePoints: number;
+  projectedPoints: number;
+  preRacePosition: number;
+  projectedPosition: number;
+  positionDelta: number;
+  pointsDelta: number;
+  currentRacePosition: number | null;
+}
+
+export interface ProjectedConstructorStanding {
+  constructorName: string;
+  constructorId: string;
+  teamColor: string;
+  preRacePoints: number;
+  projectedPoints: number;
+  preRacePosition: number;
+  projectedPosition: number;
+  positionDelta: number;
+  pointsDelta: number;
 }

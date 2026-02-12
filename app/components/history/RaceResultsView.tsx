@@ -4,12 +4,39 @@ import { useState } from "react";
 import Image from "next/image";
 import type { RaceWithResults } from "@/app/types/history";
 
+const NATIONALITY_TO_ISO: Record<string, string> = {
+  American: "us", Argentine: "ar", Australian: "au", Austrian: "at",
+  Belgian: "be", Brazilian: "br", British: "gb", Canadian: "ca",
+  Chinese: "cn", Colombian: "co", Danish: "dk", Dutch: "nl",
+  Estonian: "ee", Finnish: "fi", French: "fr", German: "de",
+  Hungarian: "hu", Indian: "in", Indonesian: "id", Italian: "it",
+  Japanese: "jp", Korean: "kr", Malaysian: "my", Mexican: "mx",
+  Monegasque: "mc", "New Zealander": "nz", Polish: "pl",
+  Portuguese: "pt", Russian: "ru", "Saudi Arabian": "sa",
+  "South African": "za", Spanish: "es", Swedish: "se", Swiss: "ch",
+  Thai: "th", Turkish: "tr", Venezuelan: "ve",
+};
+
 function stripAccents(s: string): string {
   return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
 function driverKey(familyName: string): string {
   return stripAccents(familyName).toLowerCase().replace(/\s+/g, "-");
+}
+
+function NationalityFlag({ nationality }: { nationality: string }) {
+  const code = NATIONALITY_TO_ISO[nationality];
+  if (!code) return null;
+  return (
+    <Image
+      src={`/flags/${code}.svg`}
+      alt={nationality}
+      width={16}
+      height={12}
+      className="h-3 w-4 shrink-0 rounded-[2px] object-cover"
+    />
+  );
 }
 
 function DriverImg({ familyName, name }: { familyName: string; name: string }) {
@@ -48,8 +75,13 @@ function constructorLogoSrc(constructorId: string): string | null {
   const known = [
     "red-bull", "mclaren", "ferrari", "mercedes", "aston-martin",
     "alpine", "williams", "racing-bulls", "audi", "haas", "cadillac",
+    "renault",
   ];
   if (known.includes(resolved)) return `/logos/${resolved}.webp`;
+  const pngTeams = ["renault", "alphatauri"];
+  if (pngTeams.includes(resolved) || pngTeams.includes(mapped)) {
+    return `/logos/${resolved}.png`;
+  }
   return null;
 }
 
@@ -139,6 +171,7 @@ export default function RaceResultsView({ races }: RaceResultsViewProps) {
                   </td>
                   <td className="py-2 pr-3">
                     <span className="flex items-center gap-2">
+                      <NationalityFlag nationality={r.Driver.nationality} />
                       <DriverImg
                         familyName={r.Driver.familyName}
                         name={`${r.Driver.givenName} ${r.Driver.familyName}`}

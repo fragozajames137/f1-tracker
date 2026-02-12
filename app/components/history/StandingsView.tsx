@@ -5,15 +5,55 @@ import Image from "next/image";
 import type { DriverStanding, ConstructorStanding } from "@/app/types/history";
 import dominantEngines from "@/app/data/dominant-engines.json";
 
+// Jolpica nationality string → ISO 3166-1 alpha-2 code (matching /public/flags/{code}.svg)
+const NATIONALITY_TO_ISO: Record<string, string> = {
+  American: "us",
+  Argentine: "ar",
+  Australian: "au",
+  Austrian: "at",
+  Belgian: "be",
+  Brazilian: "br",
+  British: "gb",
+  Canadian: "ca",
+  Chinese: "cn",
+  Colombian: "co",
+  Danish: "dk",
+  Dutch: "nl",
+  Estonian: "ee",
+  Finnish: "fi",
+  French: "fr",
+  German: "de",
+  Hungarian: "hu",
+  Indian: "in",
+  Indonesian: "id",
+  Italian: "it",
+  Japanese: "jp",
+  Korean: "kr",
+  Malaysian: "my",
+  Mexican: "mx",
+  Monegasque: "mc",
+  "New Zealander": "nz",
+  Polish: "pl",
+  Portuguese: "pt",
+  Russian: "ru",
+  "Saudi Arabian": "sa",
+  "South African": "za",
+  Spanish: "es",
+  Swedish: "se",
+  Swiss: "ch",
+  Thai: "th",
+  Turkish: "tr",
+  Venezuelan: "ve",
+};
+
 // Map Jolpica constructorId to our local logo filename
 function constructorLogoSrc(constructorId: string): string | null {
   const mapped = constructorId.replace(/_/g, "-");
   const known = [
     "red-bull", "mclaren", "ferrari", "mercedes", "aston-martin",
     "alpine", "williams", "racing-bulls", "audi", "haas", "cadillac",
-    "rb-f1-team", "alphatauri", "alfa-romeo", "sauber",
+    "rb-f1-team", "alphatauri", "alfa-romeo", "sauber", "renault",
   ];
-  // Handle common aliases
   const aliases: Record<string, string> = {
     "rb-f1-team": "racing-bulls",
     "alphatauri": "racing-bulls",
@@ -24,6 +64,11 @@ function constructorLogoSrc(constructorId: string): string | null {
   const resolved = aliases[mapped] ?? mapped;
   if (known.includes(resolved) || known.includes(mapped)) {
     return `/logos/${resolved}.webp`;
+  }
+  // Try PNG fallback for historical teams (e.g. renault.png)
+  const pngTeams = ["renault", "alphatauri"];
+  if (pngTeams.includes(resolved) || pngTeams.includes(mapped)) {
+    return `/logos/${resolved}.png`;
   }
   return null;
 }
@@ -59,20 +104,35 @@ function DriverImg({ familyName, name }: { familyName: string; name: string }) {
   );
 }
 
-function TeamLogo({ constructorId, name }: { constructorId: string; name: string }) {
+function TeamLogo({ constructorId, name, size = 20 }: { constructorId: string; name: string; size?: number }) {
   const [err, setErr] = useState(false);
   const src = constructorLogoSrc(constructorId);
   if (!src || err) {
     return null;
   }
+  const cls = size >= 20 ? "h-5 w-auto shrink-0 object-contain" : "h-4 w-auto shrink-0 object-contain";
   return (
     <Image
       src={src}
       alt={name}
-      width={20}
-      height={20}
-      className="h-5 w-auto shrink-0 object-contain"
+      width={size}
+      height={size}
+      className={cls}
       onError={() => setErr(true)}
+    />
+  );
+}
+
+function NationalityFlag({ nationality }: { nationality: string }) {
+  const code = NATIONALITY_TO_ISO[nationality];
+  if (!code) return null;
+  return (
+    <Image
+      src={`/flags/${code}.svg`}
+      alt={nationality}
+      width={16}
+      height={12}
+      className="h-3 w-4 shrink-0 rounded-[2px] object-cover"
     />
   );
 }
@@ -143,6 +203,7 @@ export default function StandingsView({
                     </td>
                     <td className="py-2 pr-3">
                       <span className="flex items-center gap-2">
+                        <NationalityFlag nationality={s.Driver.nationality} />
                         <DriverImg
                           familyName={s.Driver.familyName}
                           name={`${s.Driver.givenName} ${s.Driver.familyName}`}
@@ -159,8 +220,17 @@ export default function StandingsView({
                         </span>
                       </span>
                     </td>
-                    <td className="hidden py-2 pr-3 text-white/40 sm:table-cell">
-                      {s.Constructors[0]?.name ?? "—"}
+                    <td className="hidden py-2 pr-3 sm:table-cell">
+                      <span className="flex items-center gap-2 text-white/40">
+                        {s.Constructors[0] && (
+                          <TeamLogo
+                            constructorId={s.Constructors[0].constructorId}
+                            name={s.Constructors[0].name}
+                            size={16}
+                          />
+                        )}
+                        {s.Constructors[0]?.name ?? "—"}
+                      </span>
                     </td>
                     <td className="py-2 pr-3 text-right font-mono text-xs">
                       {s.wins}
@@ -217,8 +287,11 @@ export default function StandingsView({
                         {s.Constructor.name}
                       </span>
                     </td>
-                    <td className="hidden py-2 pr-3 text-white/40 sm:table-cell">
-                      {s.Constructor.nationality}
+                    <td className="hidden py-2 pr-3 sm:table-cell">
+                      <span className="flex items-center gap-2 text-white/40">
+                        <NationalityFlag nationality={s.Constructor.nationality} />
+                        {s.Constructor.nationality}
+                      </span>
                     </td>
                     <td className="py-2 pr-3 text-right font-mono text-xs">
                       {s.wins}
