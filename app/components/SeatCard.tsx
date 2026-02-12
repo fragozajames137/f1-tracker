@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Driver } from "@/app/types";
-import { nationalityToFlag } from "@/app/lib/flags";
+import { nationalityToIso } from "@/app/lib/flags";
+import Flag from "./Flag";
 import { STATUS_CONFIG, getInitials } from "@/app/lib/drivers";
 
 interface SeatCardProps {
@@ -65,8 +66,10 @@ export default function SeatCard({ driver, teamColor, seatLabel, onClick }: Seat
             {driver.number && (
               <span className="text-sm font-mono text-white/50">#{driver.number}</span>
             )}
-            <span className="inline-flex items-center gap-1 text-xs">
-              <span className="opacity-60">{nationalityToFlag(driver.nationality)}</span>
+            <span className="inline-flex items-center gap-1.5 text-xs">
+              {nationalityToIso(driver.nationality) && (
+                <Flag iso={nationalityToIso(driver.nationality)!} size={14} className="opacity-80" />
+              )}
               <span className="text-white/40">{driver.nationality}</span>
             </span>
             <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase ${status.className}`}>

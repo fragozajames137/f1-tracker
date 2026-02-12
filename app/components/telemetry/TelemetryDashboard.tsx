@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import type { TelemetrySession, TelemetryFileInfo } from "@/app/types/telemetry";
+import TrackMap from "./TrackMap";
 import SpeedTrace from "./SpeedTrace";
 import LapTimeChart from "./LapTimeChart";
 import TireStrategyChart from "./TireStrategyChart";
@@ -221,6 +222,13 @@ export default function TelemetryDashboard({
                 })}
             </div>
           </div>
+
+          <TrackMap
+            traces={session.telemetryData.filter((t) =>
+              selectedDriverNumbers.includes(t.driverNumber),
+            )}
+            drivers={session.drivers}
+          />
 
           <SpeedTrace
             traces={session.telemetryData.filter((t) =>

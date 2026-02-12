@@ -129,6 +129,8 @@ def fetch_telemetry(year: int, round_num: int, session_type: str = "R"):
                 "speed": sampled["Speed"].tolist(),
                 "throttle": sampled["Throttle"].tolist(),
                 "brake": [bool(b) for b in sampled["Brake"].tolist()],
+                "x": sampled["X"].tolist() if "X" in sampled.columns else [],
+                "y": sampled["Y"].tolist() if "Y" in sampled.columns else [],
             }
             output["telemetryData"].append(telemetry_entry)
         except Exception as e:

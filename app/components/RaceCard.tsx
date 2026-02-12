@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Race } from "@/app/types";
+import { countryToIso } from "@/app/lib/flags";
+import Flag from "./Flag";
 import SessionTime from "./SessionTime";
 
 interface RaceCardProps {
@@ -50,10 +52,13 @@ export default function RaceCard({ race, isNext }: RaceCardProps) {
         )}
         <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
           <div className="min-w-0">
-            <div className="flex items-baseline gap-2">
+            <div className="flex items-center gap-2">
               <span className="shrink-0 text-xs font-medium text-white/30">
                 R{race.round}
               </span>
+              {countryToIso(race.Circuit.Location.country) && (
+                <Flag iso={countryToIso(race.Circuit.Location.country)!} size={16} className="shrink-0" />
+              )}
               <h3 className="font-display truncate font-semibold text-white">
                 {race.raceName}
               </h3>

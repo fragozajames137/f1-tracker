@@ -29,6 +29,8 @@ export interface TelemetrySpeedTrace {
   speed: number[];
   throttle: number[];
   brake: boolean[];
+  x?: number[];
+  y?: number[];
 }
 
 export interface TelemetryStint {

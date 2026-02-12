@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Driver, Team } from "@/app/types";
-import { nationalityToFlag } from "@/app/lib/flags";
+import { nationalityToIso } from "@/app/lib/flags";
+import Flag from "./Flag";
 import { STATUS_CONFIG, getInitials } from "@/app/lib/drivers";
 
 interface DetailPanelProps {
@@ -14,6 +15,7 @@ interface DetailPanelProps {
 
 export default function DetailPanel({ driver, team, onClose }: DetailPanelProps) {
   const [imgError, setImgError] = useState(false);
+  const [logoError, setLogoError] = useState(false);
 
   if (!driver || !team) return null;
 
@@ -33,10 +35,21 @@ export default function DetailPanel({ driver, team, onClose }: DetailPanelProps)
         <div className="sticky top-0 z-10 border-b border-white/10 bg-[#111]/95 backdrop-blur-sm">
           <div className="flex items-center justify-between p-4 sm:p-5">
             <div className="flex items-center gap-3">
-              <div
-                className="h-4 w-4 rounded-sm"
-                style={{ backgroundColor: team.color }}
-              />
+              {team.logoUrl && !logoError ? (
+                <Image
+                  src={team.logoUrl}
+                  alt={team.name}
+                  width={20}
+                  height={20}
+                  className="h-5 w-auto shrink-0 object-contain"
+                  onError={() => setLogoError(true)}
+                />
+              ) : (
+                <div
+                  className="h-4 w-4 rounded-sm"
+                  style={{ backgroundColor: team.color }}
+                />
+              )}
               <span className="text-sm font-medium text-white/60">{team.name}</span>
             </div>
             <button
@@ -89,8 +102,11 @@ export default function DetailPanel({ driver, team, onClose }: DetailPanelProps)
                     #{driver.number}
                   </span>
                 )}
-                <span className="text-sm text-white/50">
-                  {nationalityToFlag(driver.nationality)} {driver.nationality}
+                <span className="inline-flex items-center gap-1.5 text-sm text-white/50">
+                  {nationalityToIso(driver.nationality) && (
+                    <Flag iso={nationalityToIso(driver.nationality)!} size={16} />
+                  )}
+                  {driver.nationality}
                 </span>
               </div>
             </div>
