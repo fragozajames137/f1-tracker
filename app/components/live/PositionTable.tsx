@@ -2,7 +2,7 @@
 
 import { memo } from "react";
 import { DriverWithDetails } from "@/app/types/openf1";
-import { COMPOUND_COLORS, formatLapTime, formatGap } from "@/app/lib/format";
+import { COMPOUNDS, formatLapTime, formatGap } from "@/app/lib/format";
 
 interface PositionTableProps {
   drivers: DriverWithDetails[];
@@ -35,7 +35,7 @@ export default memo(function PositionTable({
               selectedDriverNumber === d.driver.driver_number;
             const compound = d.currentStint?.compound ?? "";
             const dotColor =
-              COMPOUND_COLORS[compound.toUpperCase()] ?? "bg-white/30";
+              COMPOUNDS[compound.toUpperCase()]?.tw ?? "bg-white/30";
 
             return (
               <tr

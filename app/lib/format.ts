@@ -1,9 +1,10 @@
-export const COMPOUND_COLORS: Record<string, string> = {
-  SOFT: "bg-red-500",
-  MEDIUM: "bg-yellow-500",
-  HARD: "bg-white",
-  INTERMEDIATE: "bg-green-500",
-  WET: "bg-blue-500",
+export const COMPOUNDS: Record<string, { tw: string; hex: string }> = {
+  SOFT: { tw: "bg-red-500", hex: "#ef4444" },
+  MEDIUM: { tw: "bg-yellow-500", hex: "#eab308" },
+  HARD: { tw: "bg-white", hex: "#e5e5e5" },
+  INTERMEDIATE: { tw: "bg-green-500", hex: "#22c55e" },
+  WET: { tw: "bg-blue-500", hex: "#3b82f6" },
+  UNKNOWN: { tw: "bg-white/30", hex: "#666" },
 };
 
 export function formatLapTime(seconds: number | null): string {

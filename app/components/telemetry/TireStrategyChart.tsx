@@ -1,20 +1,12 @@
 "use client";
 
 import type { TelemetryStint, TelemetryDriver } from "@/app/types/telemetry";
+import { COMPOUNDS } from "@/app/lib/format";
 
 interface TireStrategyChartProps {
   stints: TelemetryStint[];
   drivers: TelemetryDriver[];
 }
-
-const COMPOUND_COLORS: Record<string, string> = {
-  SOFT: "#ef4444",
-  MEDIUM: "#eab308",
-  HARD: "#e5e5e5",
-  INTERMEDIATE: "#22c55e",
-  WET: "#3b82f6",
-  UNKNOWN: "#666",
-};
 
 export default function TireStrategyChart({
   stints,
@@ -61,8 +53,8 @@ export default function TireStrategyChart({
                   const width =
                     ((stint.lapEnd - stint.lapStart + 1) / maxLap) * 100;
                   const color =
-                    COMPOUND_COLORS[stint.compound.toUpperCase()] ??
-                    COMPOUND_COLORS.UNKNOWN;
+                    COMPOUNDS[stint.compound.toUpperCase()]?.hex ??
+                    COMPOUNDS.UNKNOWN.hex;
 
                   return (
                     <div
@@ -88,13 +80,13 @@ export default function TireStrategyChart({
       </div>
       {/* Legend */}
       <div className="mt-4 flex flex-wrap gap-3 text-xs text-white/50">
-        {Object.entries(COMPOUND_COLORS)
+        {Object.entries(COMPOUNDS)
           .filter(([key]) => key !== "UNKNOWN")
-          .map(([compound, color]) => (
+          .map(([compound, { hex }]) => (
             <span key={compound} className="flex items-center gap-1">
               <span
                 className="inline-block h-2.5 w-2.5 rounded-full"
-                style={{ backgroundColor: color }}
+                style={{ backgroundColor: hex }}
               />
               {compound.charAt(0) + compound.slice(1).toLowerCase()}
             </span>

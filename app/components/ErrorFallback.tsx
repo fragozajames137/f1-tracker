@@ -1,12 +1,16 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
+import Header from "./Header";
 
 interface ErrorFallbackProps {
   title?: string;
   message?: string;
   error?: Error & { digest?: string };
   reset?: () => void;
+  showShell?: boolean;
+  maxWidth?: string;
 }
 
 export default function ErrorFallback({
@@ -14,10 +18,33 @@ export default function ErrorFallback({
   message,
   error,
   reset,
+  showShell = false,
+  maxWidth = "max-w-7xl",
 }: ErrorFallbackProps) {
-  return (
-    <div className="flex min-h-[400px] flex-col items-center justify-center px-4 py-16 text-center">
-      <p className="font-display text-5xl font-bold text-red-500/20">Error</p>
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    containerRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    if (!reset) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") reset!();
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [reset]);
+
+  const content = (
+    <div
+      ref={containerRef}
+      role="alert"
+      aria-live="assertive"
+      tabIndex={-1}
+      className="flex min-h-[400px] flex-col items-center justify-center px-4 py-16 text-center outline-none"
+    >
+      <p aria-hidden="true" className="font-display text-5xl font-bold text-red-500/20">Error</p>
       <h2 className="font-display mt-4 text-lg font-semibold text-white">{title}</h2>
       <p className="mt-2 max-w-md text-sm text-white/40">
         {message || error?.message || "An unexpected error occurred."}
@@ -27,7 +54,7 @@ export default function ErrorFallback({
           ID: {error.digest}
         </p>
       )}
-      <div className="mt-6 flex gap-3">
+      <div className="mt-6 flex gap-3" role="group" aria-label="Error recovery actions">
         {reset && (
           <button
             onClick={reset}
@@ -43,6 +70,17 @@ export default function ErrorFallback({
           Go home
         </Link>
       </div>
+    </div>
+  );
+
+  if (!showShell) return content;
+
+  return (
+    <div className="flex min-h-screen flex-col">
+      <Header season={2026} />
+      <main className={`mx-auto w-full ${maxWidth} flex-1 px-4 sm:px-6 lg:px-8`}>
+        {content}
+      </main>
     </div>
   );
 }

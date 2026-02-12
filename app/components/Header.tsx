@@ -3,11 +3,10 @@ import NavLink from "./NavLink";
 
 interface HeaderProps {
   season: number;
-  lastUpdated?: string;
   isHome?: boolean;
 }
 
-export default function Header({ season, lastUpdated, isHome }: HeaderProps) {
+export default function Header({ season, isHome }: HeaderProps) {
   const brandClassName = "font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl";
 
   return (
@@ -31,11 +30,6 @@ export default function Header({ season, lastUpdated, isHome }: HeaderProps) {
               <NavLink href="/telemetry">Telemetry</NavLink>
             </nav>
           </div>
-          {lastUpdated && (
-            <p className="text-xs text-white/30">
-              Last updated: {lastUpdated}
-            </p>
-          )}
         </div>
       </div>
     </header>

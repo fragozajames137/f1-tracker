@@ -74,7 +74,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col">
       <JsonLd />
-      <Header season={data.season} lastUpdated={data.lastUpdated} isHome />
+      <Header season={data.season} isHome />
 
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
         <div className="mb-6 flex flex-wrap items-center gap-4 text-sm text-white/40">

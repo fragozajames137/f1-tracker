@@ -2,24 +2,9 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Driver, Team, ContractStatus } from "@/app/types";
+import { Driver, Team } from "@/app/types";
 import { nationalityToFlag } from "@/app/lib/flags";
-
-const statusConfig: Record<ContractStatus, { label: string; className: string }> = {
-  locked: { label: "Locked In", className: "bg-green-500/20 text-green-400 border-green-500/30" },
-  expiring: { label: "Contract Expiring", className: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" },
-  open: { label: "Open Seat", className: "bg-red-500/20 text-red-400 border-red-500/30" },
-};
-
-function getInitials(name: string): string {
-  if (name === "TBD") return "?";
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
+import { STATUS_CONFIG, getInitials } from "@/app/lib/drivers";
 
 interface DetailPanelProps {
   driver: Driver | null;
@@ -32,7 +17,7 @@ export default function DetailPanel({ driver, team, onClose }: DetailPanelProps)
 
   if (!driver || !team) return null;
 
-  const status = statusConfig[driver.contractStatus];
+  const status = STATUS_CONFIG[driver.contractStatus];
 
   return (
     <>
@@ -117,7 +102,7 @@ export default function DetailPanel({ driver, team, onClose }: DetailPanelProps)
               Contract Status
             </h3>
             <span className={`inline-block rounded-full border px-3 py-1 text-sm font-semibold ${status.className}`}>
-              {status.label}
+              {status.detailLabel}
             </span>
             {driver.contractEnd && (
               <p className="mt-2 text-sm text-white/50">

@@ -2,24 +2,9 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Driver, ContractStatus } from "@/app/types";
+import { Driver } from "@/app/types";
 import { nationalityToFlag } from "@/app/lib/flags";
-
-const statusConfig: Record<ContractStatus, { label: string; className: string }> = {
-  locked: { label: "Locked", className: "bg-green-500/20 text-green-400 border-green-500/30" },
-  expiring: { label: "Expiring", className: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" },
-  open: { label: "Open", className: "bg-red-500/20 text-red-400 border-red-500/30" },
-};
-
-function getInitials(name: string): string {
-  if (name === "TBD") return "?";
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
+import { STATUS_CONFIG, getInitials } from "@/app/lib/drivers";
 
 interface SeatCardProps {
   driver: Driver;
@@ -29,7 +14,7 @@ interface SeatCardProps {
 }
 
 export default function SeatCard({ driver, teamColor, seatLabel, onClick }: SeatCardProps) {
-  const status = statusConfig[driver.contractStatus];
+  const status = STATUS_CONFIG[driver.contractStatus];
   const isOpen = driver.contractStatus === "open";
   const [imgError, setImgError] = useState(false);
 
@@ -80,8 +65,9 @@ export default function SeatCard({ driver, teamColor, seatLabel, onClick }: Seat
             {driver.number && (
               <span className="text-sm font-mono text-white/50">#{driver.number}</span>
             )}
-            <span className="text-xs text-white/40">
-              {nationalityToFlag(driver.nationality)} {driver.nationality}
+            <span className="inline-flex items-center gap-1 text-xs">
+              <span className="opacity-60">{nationalityToFlag(driver.nationality)}</span>
+              <span className="text-white/40">{driver.nationality}</span>
             </span>
             <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase ${status.className}`}>
               {status.label}

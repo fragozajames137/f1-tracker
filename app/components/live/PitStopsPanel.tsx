@@ -2,7 +2,7 @@
 
 import { memo } from "react";
 import { OpenF1Pit, OpenF1Driver, OpenF1Stint } from "@/app/types/openf1";
-import { COMPOUND_COLORS } from "@/app/lib/format";
+import { COMPOUNDS } from "@/app/lib/format";
 
 interface PitStopsPanelProps {
   pitStops: OpenF1Pit[];
@@ -54,7 +54,7 @@ export default memo(function PitStopsPanel({
             );
             const compound = stintAfterPit?.compound ?? "";
             const dotColor =
-              COMPOUND_COLORS[compound.toUpperCase()] ?? "bg-white/30";
+              COMPOUNDS[compound.toUpperCase()]?.tw ?? "bg-white/30";
 
             return (
               <div
