@@ -1,0 +1,360 @@
+{
+  "season": 2026,
+  "lastUpdated": "2026-02-11",
+  "teams": [
+    {
+      "id": "red-bull",
+      "name": "Red Bull Racing",
+      "color": "#3671C6",
+      "seat1": {
+        "id": "verstappen",
+        "name": "Max Verstappen",
+        "number": 1,
+        "nationality": "NED",
+        "contractStatus": "locked",
+        "contractEnd": "2028",
+        "rumors": []
+      },
+      "seat2": {
+        "id": "lawson",
+        "name": "Liam Lawson",
+        "number": 30,
+        "nationality": "NZL",
+        "contractStatus": "locked",
+        "contractEnd": "2027",
+        "rumors": [
+          {
+            "text": "Lawson under pressure to deliver results alongside Verstappen",
+            "source": "The Race",
+            "url": "https://the-race.com",
+            "date": "2026-01-15"
+          }
+        ]
+      }
+    },
+    {
+      "id": "mclaren",
+      "name": "McLaren",
+      "color": "#FF8000",
+      "seat1": {
+        "id": "norris",
+        "name": "Lando Norris",
+        "number": 4,
+        "nationality": "GBR",
+        "contractStatus": "locked",
+        "contractEnd": "2028",
+        "rumors": []
+      },
+      "seat2": {
+        "id": "piastri",
+        "name": "Oscar Piastri",
+        "number": 81,
+        "nationality": "AUS",
+        "contractStatus": "locked",
+        "contractEnd": "2028",
+        "rumors": []
+      }
+    },
+    {
+      "id": "ferrari",
+      "name": "Ferrari",
+      "color": "#E8002D",
+      "seat1": {
+        "id": "leclerc",
+        "name": "Charles Leclerc",
+        "number": 16,
+        "nationality": "MON",
+        "contractStatus": "locked",
+        "contractEnd": "2029",
+        "rumors": []
+      },
+      "seat2": {
+        "id": "hamilton",
+        "name": "Lewis Hamilton",
+        "number": 44,
+        "nationality": "GBR",
+        "contractStatus": "expiring",
+        "contractEnd": "2026",
+        "rumors": [
+          {
+            "text": "Hamilton's multi-year Ferrari deal reportedly includes 2027 option",
+            "source": "Autosport",
+            "url": "https://autosport.com",
+            "date": "2026-01-20"
+          },
+          {
+            "text": "Ferrari evaluating junior drivers as potential 2027 replacement",
+            "source": "F1 Insider",
+            "url": "https://f1-insider.com",
+            "date": "2026-02-01"
+          }
+        ]
+      }
+    },
+    {
+      "id": "mercedes",
+      "name": "Mercedes",
+      "color": "#27F4D2",
+      "seat1": {
+        "id": "russell",
+        "name": "George Russell",
+        "number": 63,
+        "nationality": "GBR",
+        "contractStatus": "locked",
+        "contractEnd": "2028",
+        "rumors": []
+      },
+      "seat2": {
+        "id": "antonelli",
+        "name": "Kimi Antonelli",
+        "number": 12,
+        "nationality": "ITA",
+        "contractStatus": "locked",
+        "contractEnd": "2028",
+        "rumors": [
+          {
+            "text": "Antonelli tipped as future Mercedes team leader",
+            "source": "Sky Sports F1",
+            "url": "https://skysports.com/f1",
+            "date": "2026-01-10"
+          }
+        ]
+      }
+    },
+    {
+      "id": "aston-martin",
+      "name": "Aston Martin",
+      "color": "#229971",
+      "seat1": {
+        "id": "alonso",
+        "name": "Fernando Alonso",
+        "number": 14,
+        "nationality": "ESP",
+        "contractStatus": "expiring",
+        "contractEnd": "2026",
+        "rumors": [
+          {
+            "text": "Alonso considering retirement at end of 2026 season",
+            "source": "Marca",
+            "url": "https://marca.com",
+            "date": "2026-02-05"
+          },
+          {
+            "text": "Aston Martin in talks with multiple drivers for potential 2027 seat",
+            "source": "BBC Sport",
+            "url": "https://bbc.co.uk/sport/f1",
+            "date": "2026-01-28"
+          }
+        ]
+      },
+      "seat2": {
+        "id": "stroll",
+        "name": "Lance Stroll",
+        "number": 18,
+        "nationality": "CAN",
+        "contractStatus": "locked",
+        "contractEnd": "2030",
+        "rumors": []
+      }
+    },
+    {
+      "id": "alpine",
+      "name": "Alpine",
+      "color": "#FF87BC",
+      "seat1": {
+        "id": "gasly",
+        "name": "Pierre Gasly",
+        "number": 10,
+        "nationality": "FRA",
+        "contractStatus": "expiring",
+        "contractEnd": "2026",
+        "rumors": [
+          {
+            "text": "Gasly linked with Cadillac F1 move for 2027",
+            "source": "RaceFans",
+            "url": "https://racefans.net",
+            "date": "2026-02-03"
+          }
+        ]
+      },
+      "seat2": {
+        "id": "doohan",
+        "name": "Jack Doohan",
+        "number": 7,
+        "nationality": "AUS",
+        "contractStatus": "expiring",
+        "contractEnd": "2026",
+        "rumors": [
+          {
+            "text": "Doohan's seat under threat as Alpine evaluates driver market",
+            "source": "PlanetF1",
+            "url": "https://planetf1.com",
+            "date": "2026-01-22"
+          }
+        ]
+      }
+    },
+    {
+      "id": "williams",
+      "name": "Williams",
+      "color": "#64C4FF",
+      "seat1": {
+        "id": "albon",
+        "name": "Alex Albon",
+        "number": 23,
+        "nationality": "THA",
+        "contractStatus": "locked",
+        "contractEnd": "2027",
+        "rumors": [
+          {
+            "text": "Albon attracting interest from top teams for 2027",
+            "source": "Autosport",
+            "url": "https://autosport.com",
+            "date": "2026-01-18"
+          }
+        ]
+      },
+      "seat2": {
+        "id": "sainz",
+        "name": "Carlos Sainz",
+        "number": 55,
+        "nationality": "ESP",
+        "contractStatus": "locked",
+        "contractEnd": "2026",
+        "rumors": []
+      }
+    },
+    {
+      "id": "racing-bulls",
+      "name": "Racing Bulls",
+      "color": "#6692FF",
+      "seat1": {
+        "id": "tsunoda",
+        "name": "Yuki Tsunoda",
+        "number": 22,
+        "nationality": "JPN",
+        "contractStatus": "expiring",
+        "contractEnd": "2026",
+        "rumors": [
+          {
+            "text": "Tsunoda pushing for Red Bull promotion in 2027",
+            "source": "Motorsport.com",
+            "url": "https://motorsport.com",
+            "date": "2026-02-08"
+          }
+        ]
+      },
+      "seat2": {
+        "id": "hadjar",
+        "name": "Isack Hadjar",
+        "number": 6,
+        "nationality": "FRA",
+        "contractStatus": "locked",
+        "contractEnd": "2027",
+        "rumors": []
+      }
+    },
+    {
+      "id": "audi",
+      "name": "Audi",
+      "color": "#52E252",
+      "seat1": {
+        "id": "hulkenberg",
+        "name": "Nico Hulkenberg",
+        "number": 27,
+        "nationality": "GER",
+        "contractStatus": "locked",
+        "contractEnd": "2027",
+        "rumors": []
+      },
+      "seat2": {
+        "id": "bortoleto",
+        "name": "Gabriel Bortoleto",
+        "number": 5,
+        "nationality": "BRA",
+        "contractStatus": "locked",
+        "contractEnd": "2028",
+        "rumors": []
+      }
+    },
+    {
+      "id": "haas",
+      "name": "Haas",
+      "color": "#B6BABD",
+      "seat1": {
+        "id": "ocon",
+        "name": "Esteban Ocon",
+        "number": 31,
+        "nationality": "FRA",
+        "contractStatus": "expiring",
+        "contractEnd": "2026",
+        "rumors": [
+          {
+            "text": "Ocon eyeing top team move if strong 2026 results continue",
+            "source": "L'Equipe",
+            "url": "https://lequipe.fr",
+            "date": "2026-01-30"
+          }
+        ]
+      },
+      "seat2": {
+        "id": "bearman",
+        "name": "Oliver Bearman",
+        "number": 87,
+        "nationality": "GBR",
+        "contractStatus": "locked",
+        "contractEnd": "2028",
+        "rumors": []
+      }
+    },
+    {
+      "id": "cadillac",
+      "name": "Cadillac F1",
+      "color": "#1E1E1E",
+      "seat1": {
+        "id": "tbd-cadillac-1",
+        "name": "TBD",
+        "number": null,
+        "nationality": "—",
+        "contractStatus": "open",
+        "contractEnd": null,
+        "rumors": [
+          {
+            "text": "Cadillac reportedly in advanced talks with experienced driver",
+            "source": "ESPN F1",
+            "url": "https://espn.com/f1",
+            "date": "2026-02-06"
+          },
+          {
+            "text": "Valtteri Bottas linked with Cadillac F1 race seat",
+            "source": "Motorsport.com",
+            "url": "https://motorsport.com",
+            "date": "2026-01-25"
+          }
+        ]
+      },
+      "seat2": {
+        "id": "tbd-cadillac-2",
+        "name": "TBD",
+        "number": null,
+        "nationality": "—",
+        "contractStatus": "open",
+        "contractEnd": null,
+        "rumors": [
+          {
+            "text": "GM pushing for American driver in Cadillac lineup",
+            "source": "RACER",
+            "url": "https://racer.com",
+            "date": "2026-02-02"
+          },
+          {
+            "text": "Colton Herta top candidate for second Cadillac seat",
+            "source": "The Race",
+            "url": "https://the-race.com",
+            "date": "2026-01-19"
+          }
+        ]
+      }
+    }
+  ]
+}
