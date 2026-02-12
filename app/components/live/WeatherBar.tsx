@@ -41,6 +41,7 @@ export default function WeatherBar({ weather }: WeatherBarProps) {
       <div className="flex items-center gap-1.5">
         <span className="text-white/40">Wind </span>
         <svg
+          aria-hidden="true"
           width="14"
           height="14"
           viewBox="0 0 14 14"

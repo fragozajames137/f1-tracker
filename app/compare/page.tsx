@@ -26,7 +26,7 @@ export default async function ComparePage() {
     <div className="flex min-h-screen flex-col">
       <Header season={2026} />
 
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
+      <main id="main-content" className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
         <h1 className="font-display mb-6 text-xl font-bold text-white">
           Head-to-Head Comparison
         </h1>

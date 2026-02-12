@@ -1,31 +1,16 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef, startTransition } from "react";
+import { useMemo } from "react";
 import type {
-  OpenF1Session,
-  OpenF1Driver,
   OpenF1Position,
-  OpenF1Lap,
-  OpenF1Pit,
   OpenF1Interval,
-  OpenF1RaceControl,
-  OpenF1Weather,
-  OpenF1TeamRadio,
+  OpenF1Lap,
   OpenF1Stint,
   DriverWithDetails,
 } from "@/app/types/openf1";
-import {
-  getSessions,
-  getSessionDrivers,
-  getPositions,
-  getLaps,
-  getPitStops,
-  getIntervals,
-  getRaceControl,
-  getWeather,
-  getTeamRadio,
-  getStints,
-} from "@/app/lib/openf1";
+import { useLiveSessionStore } from "@/app/stores/liveSession";
+import { useLivePolling } from "@/app/hooks/useLivePolling";
+import { getSessions } from "@/app/lib/openf1";
 
 import dynamic from "next/dynamic";
 import SessionSelector from "./SessionSelector";
@@ -46,212 +31,41 @@ const RainRadar = dynamic(() => import("./RainRadar"), {
   ),
 });
 
-const CURRENT_YEAR = 2026;
-const FAST_POLL_MS = 5_000;
-const SLOW_POLL_MS = 15_000;
-
 export default function LiveDashboard() {
-  const [year, setYear] = useState(CURRENT_YEAR);
-  const [sessions, setSessions] = useState<OpenF1Session[]>([]);
-  const [selectedSessionKey, setSelectedSessionKey] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // Connect to store
+  const year = useLiveSessionStore((s) => s.year);
+  const sessions = useLiveSessionStore((s) => s.sessions);
+  const selectedSessionKey = useLiveSessionStore((s) => s.selectedSessionKey);
+  const loading = useLiveSessionStore((s) => s.loading);
+  const error = useLiveSessionStore((s) => s.error);
+  const drivers = useLiveSessionStore((s) => s.drivers);
+  const positions = useLiveSessionStore((s) => s.positions);
+  const laps = useLiveSessionStore((s) => s.laps);
+  const pitStops = useLiveSessionStore((s) => s.pitStops);
+  const intervals = useLiveSessionStore((s) => s.intervals);
+  const raceControl = useLiveSessionStore((s) => s.raceControl);
+  const teamRadio = useLiveSessionStore((s) => s.teamRadio);
+  const weather = useLiveSessionStore((s) => s.weather);
+  const stints = useLiveSessionStore((s) => s.stints);
+  const selectedDriverNumber = useLiveSessionStore(
+    (s) => s.selectedDriverNumber,
+  );
+  const driverLaps = useLiveSessionStore((s) => s.driverLaps);
 
-  const [drivers, setDrivers] = useState<OpenF1Driver[]>([]);
-  const [positions, setPositions] = useState<OpenF1Position[]>([]);
-  const [laps, setLaps] = useState<OpenF1Lap[]>([]);
-  const [pitStops, setPitStops] = useState<OpenF1Pit[]>([]);
-  const [intervals, setIntervals] = useState<OpenF1Interval[]>([]);
-  const [raceControl, setRaceControl] = useState<OpenF1RaceControl[]>([]);
-  const [teamRadio, setTeamRadio] = useState<OpenF1TeamRadio[]>([]);
-  const [weather, setWeather] = useState<OpenF1Weather[]>([]);
-  const [stints, setStints] = useState<OpenF1Stint[]>([]);
+  const setYear = useLiveSessionStore((s) => s.setYear);
+  const setSelectedSessionKey = useLiveSessionStore(
+    (s) => s.setSelectedSessionKey,
+  );
+  const setSelectedDriverNumber = useLiveSessionStore(
+    (s) => s.setSelectedDriverNumber,
+  );
 
-  const [selectedDriverNumber, setSelectedDriverNumber] = useState<number | null>(null);
-  const [driverLaps, setDriverLaps] = useState<OpenF1Lap[]>([]);
-
-  // Refs for polling guards
-  const fastPollingRef = useRef(false);
-  const slowPollingRef = useRef(false);
-
-  // Load sessions for selected year
-  useEffect(() => {
-    const abortController = new AbortController();
-    setLoading(true);
-    setError(null);
-
-    getSessions(year, { signal: abortController.signal })
-      .then((data) => {
-        const sorted = [...data].sort(
-          (a, b) =>
-            new Date(b.date_start).getTime() -
-            new Date(a.date_start).getTime(),
-        );
-        setSessions(sorted);
-        setSelectedSessionKey(sorted.length > 0 ? sorted[0].session_key : null);
-        setLoading(false);
-      })
-      .catch((err) => {
-        if (abortController.signal.aborted) return;
-        setError(err.message);
-        setLoading(false);
-      });
-
-    return () => abortController.abort();
-  }, [year]);
-
-  // Load full session data + set up polling when session changes
-  useEffect(() => {
-    if (!selectedSessionKey) return;
-
-    const abortController = new AbortController();
-    const signal = abortController.signal;
-    let fastTimer: ReturnType<typeof setInterval> | null = null;
-    let slowTimer: ReturnType<typeof setInterval> | null = null;
-
-    // Initial full load of all 8 endpoints
-    async function loadInitialData() {
-      try {
-        const [
-          driversData,
-          positionsData,
-          lapsData,
-          pitsData,
-          intervalsData,
-          rcData,
-          radioData,
-          weatherData,
-          stintsData,
-        ] = await Promise.all([
-          getSessionDrivers(selectedSessionKey!, { signal }),
-          getPositions(selectedSessionKey!, { signal }),
-          getLaps(selectedSessionKey!, undefined, { signal }),
-          getPitStops(selectedSessionKey!, { signal }),
-          getIntervals(selectedSessionKey!, { signal }).catch(() => []),
-          getRaceControl(selectedSessionKey!, { signal }).catch(() => []),
-          getTeamRadio(selectedSessionKey!, undefined, { signal }).catch(() => []),
-          getWeather(selectedSessionKey!, { signal }).catch(() => []),
-          getStints(selectedSessionKey!, { signal }),
-        ]);
-
-        if (signal.aborted) return;
-
-        setDrivers(driversData);
-        setPositions(positionsData);
-        setLaps(lapsData);
-        setPitStops(pitsData);
-        setIntervals(intervalsData);
-        setRaceControl(rcData);
-        setTeamRadio(radioData);
-        setWeather(weatherData);
-        setStints(stintsData);
-      } catch (err) {
-        if (signal.aborted) return;
-        console.error("Failed to fetch session data:", err);
-      }
-    }
-
-    // Fast polling: positions, laps, intervals, stints (every 5s)
-    async function fetchFastUpdates() {
-      if (fastPollingRef.current || signal.aborted) return;
-      fastPollingRef.current = true;
-      try {
-        const [positionsData, lapsData, intervalsData, stintsData] =
-          await Promise.all([
-            getPositions(selectedSessionKey!, { signal }),
-            getLaps(selectedSessionKey!, undefined, { signal }),
-            getIntervals(selectedSessionKey!, { signal }).catch(() => []),
-            getStints(selectedSessionKey!, { signal }),
-          ]);
-        if (signal.aborted) return;
-        startTransition(() => {
-          setPositions(positionsData);
-          setLaps(lapsData);
-          setIntervals(intervalsData);
-          setStints(stintsData);
-        });
-      } catch {
-        // Silently fail on polling errors (including abort)
-      } finally {
-        fastPollingRef.current = false;
-      }
-    }
-
-    // Slow polling: race control, weather, pit stops (every 15s)
-    async function fetchSlowUpdates() {
-      if (slowPollingRef.current || signal.aborted) return;
-      slowPollingRef.current = true;
-      try {
-        const [rcData, radioData, weatherData, pitsData] = await Promise.all([
-          getRaceControl(selectedSessionKey!, { signal }).catch(() => []),
-          getTeamRadio(selectedSessionKey!, undefined, { signal }).catch(() => []),
-          getWeather(selectedSessionKey!, { signal }).catch(() => []),
-          getPitStops(selectedSessionKey!, { signal }),
-        ]);
-        if (signal.aborted) return;
-        startTransition(() => {
-          setRaceControl(rcData);
-          setTeamRadio(radioData);
-          setWeather(weatherData);
-          setPitStops(pitsData);
-        });
-      } catch {
-        // Silently fail
-      } finally {
-        slowPollingRef.current = false;
-      }
-    }
-
-    // Load initial data, then start polling only after it completes
-    loadInitialData().then(() => {
-      if (signal.aborted) return;
-
-      // Only poll for current year's latest session
-      const isCurrentYear = year === CURRENT_YEAR;
-      const isLatestSession =
-        sessions.length > 0 &&
-        sessions[0].session_key === selectedSessionKey;
-
-      if (isCurrentYear && isLatestSession) {
-        fastTimer = setInterval(fetchFastUpdates, FAST_POLL_MS);
-        slowTimer = setInterval(fetchSlowUpdates, SLOW_POLL_MS);
-      }
-    });
-
-    return () => {
-      abortController.abort();
-      if (fastTimer) clearInterval(fastTimer);
-      if (slowTimer) clearInterval(slowTimer);
-      fastPollingRef.current = false;
-      slowPollingRef.current = false;
-    };
-    // Only re-run when the primitive values change, not on function/object identity
-  }, [selectedSessionKey, year, sessions]);
-
-  // Fetch laps for selected driver
-  useEffect(() => {
-    if (!selectedSessionKey || selectedDriverNumber === null) {
-      setDriverLaps([]);
-      return;
-    }
-
-    const abortController = new AbortController();
-
-    getLaps(selectedSessionKey, selectedDriverNumber, {
-      signal: abortController.signal,
-    })
-      .then(setDriverLaps)
-      .catch(() => {
-        if (!abortController.signal.aborted) setDriverLaps([]);
-      });
-
-    return () => abortController.abort();
-  }, [selectedSessionKey, selectedDriverNumber]);
+  // Start polling lifecycle
+  useLivePolling();
 
   // Memoize the combined driver data — single-pass Map lookups instead of
   // nested .filter() to avoid O(drivers × entries) on every polling cycle.
   const driversWithDetails = useMemo((): DriverWithDetails[] => {
-    // Build latest-entry-per-driver Maps in one pass each
     const latestPosition = new Map<number, OpenF1Position>();
     for (const p of positions) {
       latestPosition.set(p.driver_number, p);
@@ -289,13 +103,17 @@ export default function LiveDashboard() {
     return combined;
   }, [drivers, positions, intervals, laps, stints]);
 
-  const latestWeather = weather.length > 0 ? weather[weather.length - 1] : null;
-  const selectedSession = sessions.find(s => s.session_key === selectedSessionKey) ?? null;
-  const isRaceOrSprint = selectedSession?.session_type === "Race" || selectedSession?.session_type === "Sprint";
+  const latestWeather =
+    weather.length > 0 ? weather[weather.length - 1] : null;
+  const selectedSession =
+    sessions.find((s) => s.session_key === selectedSessionKey) ?? null;
+  const isRaceOrSprint =
+    selectedSession?.session_type === "Race" ||
+    selectedSession?.session_type === "Sprint";
   const circuitShortName = selectedSession?.circuit_short_name ?? null;
   const selectedDriver =
     selectedDriverNumber !== null
-      ? drivers.find((d) => d.driver_number === selectedDriverNumber) ?? null
+      ? (drivers.find((d) => d.driver_number === selectedDriverNumber) ?? null)
       : null;
 
   if (loading) {
@@ -316,8 +134,8 @@ export default function LiveDashboard() {
               Live data temporarily unavailable
             </p>
             <p className="mt-2 max-w-md text-sm text-white/30">
-              The OpenF1 API now requires authentication. Live session data
-              will be available once API access is configured.
+              The OpenF1 API now requires authentication. Live session data will
+              be available once API access is configured.
             </p>
             <div className="mt-6 flex gap-3">
               <a
@@ -339,8 +157,7 @@ export default function LiveDashboard() {
             <p className="text-sm text-red-400">{error}</p>
             <button
               onClick={() => {
-                setError(null);
-                setLoading(true);
+                useLiveSessionStore.setState({ error: null, loading: true });
                 getSessions(year)
                   .then((data) => {
                     const sorted = [...data].sort(
@@ -348,15 +165,18 @@ export default function LiveDashboard() {
                         new Date(b.date_start).getTime() -
                         new Date(a.date_start).getTime(),
                     );
-                    setSessions(sorted);
-                    setSelectedSessionKey(
-                      sorted.length > 0 ? sorted[0].session_key : null,
-                    );
-                    setLoading(false);
+                    useLiveSessionStore.setState({
+                      sessions: sorted,
+                      selectedSessionKey:
+                        sorted.length > 0 ? sorted[0].session_key : null,
+                      loading: false,
+                    });
                   })
                   .catch((err) => {
-                    setError(err.message);
-                    setLoading(false);
+                    useLiveSessionStore.setState({
+                      error: err.message,
+                      loading: false,
+                    });
                   });
               }}
               className="mt-4 cursor-pointer rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20"
@@ -399,7 +219,9 @@ export default function LiveDashboard() {
         <>
           <WeatherBar weather={latestWeather} />
 
-          {circuitShortName && <RainRadar circuitShortName={circuitShortName} />}
+          {circuitShortName && (
+            <RainRadar circuitShortName={circuitShortName} />
+          )}
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <div className="lg:col-span-2">

@@ -7,6 +7,7 @@ export default function NotFound() {
       <Header season={2026} />
 
       <main
+        id="main-content"
         role="alert"
         aria-live="polite"
         tabIndex={-1}

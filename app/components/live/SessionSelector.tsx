@@ -24,6 +24,7 @@ export default function SessionSelector({
       <select
         value={year}
         onChange={(e) => onYearChange(Number(e.target.value))}
+        aria-label="Select year"
         className="w-full cursor-pointer rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none focus:border-white/30 sm:w-auto"
       >
         {YEARS.map((y) => (
@@ -37,6 +38,7 @@ export default function SessionSelector({
         value={selectedSessionKey ?? ""}
         onChange={(e) => onSessionChange(Number(e.target.value))}
         disabled={sessions.length === 0}
+        aria-label="Select session"
         className="w-full cursor-pointer rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none focus:border-white/30 disabled:opacity-40 sm:w-auto sm:min-w-[200px]"
       >
         {sessions.length === 0 ? (

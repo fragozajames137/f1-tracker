@@ -71,7 +71,7 @@ export default async function SchedulePage() {
       <ScheduleJsonLd races={races} />
       <Header season={2026} />
 
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6">
+      <main id="main-content" className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6">
         <h1 className="font-display mb-6 text-xl font-bold text-white">
           2026 Race Schedule
         </h1>

@@ -15,6 +15,7 @@ export default function NavLink({ href, children }: NavLinkProps) {
   return (
     <Link
       href={href}
+      aria-current={isActive ? "page" : undefined}
       className={`text-sm font-medium transition-colors ${
         isActive
           ? "text-white"

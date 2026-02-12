@@ -2,12 +2,11 @@
 
 import { useState, useRef } from "react";
 import type { TelemetrySession, TelemetryFileInfo } from "@/app/types/telemetry";
+import { usePreferencesStore } from "@/app/stores/preferences";
 import TrackMap from "./TrackMap";
 import SpeedTrace from "./SpeedTrace";
 import LapTimeChart from "./LapTimeChart";
 import TireStrategyChart from "./TireStrategyChart";
-
-type SpeedUnit = "kph" | "mph";
 
 interface TelemetryDashboardProps {
   files: TelemetryFileInfo[];
@@ -35,7 +34,8 @@ export default function TelemetryDashboard({
   const [selectedDriverNumbers, setSelectedDriverNumbers] = useState<number[]>(
     () => (initialSession ? getTop3Drivers(initialSession) : []),
   );
-  const [speedUnit, setSpeedUnit] = useState<SpeedUnit>("kph");
+  const speedUnit = usePreferencesStore((s) => s.speedUnit);
+  const setSpeedUnit = usePreferencesStore((s) => s.setSpeedUnit);
 
   // Client-side cache to avoid re-fetching the same file
   const cacheRef = useRef(new Map<string, TelemetrySession>());

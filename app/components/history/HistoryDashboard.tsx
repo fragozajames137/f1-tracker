@@ -102,8 +102,10 @@ export default function HistoryDashboard({
         />
 
         {/* Standings / Results toggle */}
-        <div className="flex overflow-hidden rounded-lg border border-white/10">
+        <div role="tablist" aria-label="View mode" className="flex overflow-hidden rounded-lg border border-white/10">
           <button
+            role="tab"
+            aria-selected={activeTab === "standings"}
             onClick={() => setActiveTab("standings")}
             className={`cursor-pointer px-3 py-1.5 text-xs font-medium transition-colors ${
               activeTab === "standings"
@@ -114,6 +116,8 @@ export default function HistoryDashboard({
             Standings
           </button>
           <button
+            role="tab"
+            aria-selected={activeTab === "results"}
             onClick={() => setActiveTab("results")}
             className={`cursor-pointer px-3 py-1.5 text-xs font-medium transition-colors ${
               activeTab === "results"

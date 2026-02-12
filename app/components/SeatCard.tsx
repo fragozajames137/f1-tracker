@@ -6,6 +6,8 @@ import { Driver } from "@/app/types";
 import { nationalityToIso } from "@/app/lib/flags";
 import Flag from "./Flag";
 import { STATUS_CONFIG, getInitials } from "@/app/lib/drivers";
+import { driverSrc, extractSlug } from "@/app/lib/image-helpers";
+import { getBlurPlaceholder } from "@/app/lib/blur-placeholders";
 
 interface SeatCardProps {
   driver: Driver;
@@ -18,10 +20,13 @@ export default function SeatCard({ driver, teamColor, seatLabel, onClick }: Seat
   const status = STATUS_CONFIG[driver.contractStatus];
   const isOpen = driver.contractStatus === "open";
   const [imgError, setImgError] = useState(false);
+  const slug = extractSlug(driver.headshotUrl, "drivers");
+  const blur = slug ? getBlurPlaceholder(`drivers/${slug}`) : undefined;
 
   return (
     <button
       onClick={onClick}
+      aria-label={`${driver.name}, ${status.label}${driver.rumors.length > 0 ? `, ${driver.rumors.length} rumor${driver.rumors.length !== 1 ? "s" : ""}` : ""}`}
       className="group relative w-full rounded-xl border border-white/10 bg-white/5 p-4 text-left transition-all hover:bg-white/10 hover:border-white/20 cursor-pointer"
     >
       <div
@@ -35,13 +40,15 @@ export default function SeatCard({ driver, teamColor, seatLabel, onClick }: Seat
           className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full"
           style={{ backgroundColor: `${teamColor}20` }}
         >
-          {driver.headshotUrl && !imgError ? (
+          {slug && !imgError ? (
             <Image
-              src={driver.headshotUrl}
+              src={driverSrc(slug, 96)}
               alt={driver.name}
               width={48}
               height={48}
               className="h-12 w-12 rounded-full object-cover"
+              placeholder={blur ? "blur" : undefined}
+              blurDataURL={blur}
               onError={() => setImgError(true)}
             />
           ) : (
@@ -84,7 +91,7 @@ export default function SeatCard({ driver, teamColor, seatLabel, onClick }: Seat
           )}
 
           <div className={`mt-2 flex items-center gap-1 text-xs ${driver.rumors.length > 0 ? "text-yellow-400/70" : "text-white/20"}`}>
-            <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+            <svg aria-hidden="true" className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
                 d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z"
@@ -97,7 +104,7 @@ export default function SeatCard({ driver, teamColor, seatLabel, onClick }: Seat
       </div>
 
       <div className="absolute top-3 right-3 text-white/20 transition-colors group-hover:text-white/50">
-        <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+        <svg aria-hidden="true" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
       </div>

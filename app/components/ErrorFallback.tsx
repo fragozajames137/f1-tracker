@@ -78,7 +78,7 @@ export default function ErrorFallback({
   return (
     <div className="flex min-h-screen flex-col">
       <Header season={2026} />
-      <main className={`mx-auto w-full ${maxWidth} flex-1 px-4 sm:px-6 lg:px-8`}>
+      <main id="main-content" className={`mx-auto w-full ${maxWidth} flex-1 px-4 sm:px-6 lg:px-8`}>
         {content}
       </main>
     </div>

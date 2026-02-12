@@ -123,12 +123,14 @@ export default function ChampionshipImpact({
     <div className="rounded-lg border border-white/10 bg-white/5">
       <button
         onClick={() => setExpanded((e) => !e)}
+        aria-expanded={expanded}
         className="flex w-full cursor-pointer items-center justify-between px-4 py-3"
       >
         <h3 className="text-xs font-semibold uppercase tracking-wider text-white/40">
           Championship Impact
         </h3>
         <svg
+          aria-hidden="true"
           className={`h-4 w-4 text-white/40 transition-transform ${
             expanded ? "rotate-180" : ""
           }`}

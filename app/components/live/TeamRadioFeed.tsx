@@ -89,16 +89,17 @@ function RadioMessage({
         {/* Play/Pause button */}
         <button
           onClick={togglePlay}
+          aria-label={`${playing ? "Pause" : "Play"} radio from ${abbreviation}`}
           className="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-white/10"
           style={{ border: `1.5px solid ${teamColor}` }}
         >
           {playing ? (
-            <svg width="10" height="10" viewBox="0 0 10 10">
+            <svg aria-hidden="true" width="10" height="10" viewBox="0 0 10 10">
               <rect x="1.5" y="1" width="2.5" height="8" rx="0.5" fill={teamColor} />
               <rect x="6" y="1" width="2.5" height="8" rx="0.5" fill={teamColor} />
             </svg>
           ) : (
-            <svg width="10" height="10" viewBox="0 0 10 10">
+            <svg aria-hidden="true" width="10" height="10" viewBox="0 0 10 10">
               <path d="M2.5 1 L8.5 5 L2.5 9 Z" fill={teamColor} />
             </svg>
           )}

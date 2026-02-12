@@ -40,6 +40,8 @@ export default function RaceCard({ race, isNext }: RaceCardProps) {
   return (
     <button
       onClick={() => setExpanded(!expanded)}
+      aria-expanded={expanded}
+      aria-label={`Round ${race.round}: ${race.raceName}`}
       className={`w-full cursor-pointer text-left rounded-lg border transition-colors ${
         isNext
           ? "border-red-500/40 bg-red-500/[0.06]"
@@ -82,6 +84,7 @@ export default function RaceCard({ race, isNext }: RaceCardProps) {
             </div>
           </div>
           <svg
+            aria-hidden="true"
             className={`h-4 w-4 shrink-0 text-white/30 transition-transform ${
               expanded ? "rotate-180" : ""
             }`}

@@ -1,105 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import type { RaceWithResults } from "@/app/types/history";
-
-const NATIONALITY_TO_ISO: Record<string, string> = {
-  American: "us", Argentine: "ar", Australian: "au", Austrian: "at",
-  Belgian: "be", Brazilian: "br", British: "gb", Canadian: "ca",
-  Chinese: "cn", Colombian: "co", Danish: "dk", Dutch: "nl",
-  Estonian: "ee", Finnish: "fi", French: "fr", German: "de",
-  Hungarian: "hu", Indian: "in", Indonesian: "id", Italian: "it",
-  Japanese: "jp", Korean: "kr", Malaysian: "my", Mexican: "mx",
-  Monegasque: "mc", "New Zealander": "nz", Polish: "pl",
-  Portuguese: "pt", Russian: "ru", "Saudi Arabian": "sa",
-  "South African": "za", Spanish: "es", Swedish: "se", Swiss: "ch",
-  Thai: "th", Turkish: "tr", Venezuelan: "ve",
-};
-
-function stripAccents(s: string): string {
-  return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-}
-
-function driverKey(familyName: string): string {
-  return stripAccents(familyName).toLowerCase().replace(/\s+/g, "-");
-}
-
-function NationalityFlag({ nationality }: { nationality: string }) {
-  const code = NATIONALITY_TO_ISO[nationality];
-  if (!code) return null;
-  return (
-    <Image
-      src={`/flags/${code}.svg`}
-      alt={nationality}
-      width={16}
-      height={12}
-      className="h-3 w-4 shrink-0 rounded-[2px] object-cover"
-    />
-  );
-}
-
-function DriverImg({ familyName, name }: { familyName: string; name: string }) {
-  const [attempt, setAttempt] = useState(0);
-  const key = driverKey(familyName);
-  if (attempt >= 2) {
-    return (
-      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-[9px] font-bold text-white/40">
-        {name.charAt(0)}
-      </span>
-    );
-  }
-  const ext = attempt === 0 ? "webp" : "png";
-  return (
-    <Image
-      src={`/drivers/${key}.${ext}`}
-      alt={name}
-      width={24}
-      height={24}
-      className="h-6 w-6 shrink-0 rounded-full object-cover"
-      onError={() => setAttempt((a) => a + 1)}
-    />
-  );
-}
-
-function constructorLogoSrc(constructorId: string): string | null {
-  const mapped = constructorId.replace(/_/g, "-");
-  const aliases: Record<string, string> = {
-    "rb-f1-team": "racing-bulls",
-    "alphatauri": "racing-bulls",
-    "alfa-romeo": "audi",
-    "sauber": "audi",
-    "kick-sauber": "audi",
-  };
-  const resolved = aliases[mapped] ?? mapped;
-  const known = [
-    "red-bull", "mclaren", "ferrari", "mercedes", "aston-martin",
-    "alpine", "williams", "racing-bulls", "audi", "haas", "cadillac",
-    "renault",
-  ];
-  if (known.includes(resolved)) return `/logos/${resolved}.webp`;
-  const pngTeams = ["renault", "alphatauri"];
-  if (pngTeams.includes(resolved) || pngTeams.includes(mapped)) {
-    return `/logos/${resolved}.png`;
-  }
-  return null;
-}
-
-function TeamLogo({ constructorId, name }: { constructorId: string; name: string }) {
-  const [err, setErr] = useState(false);
-  const src = constructorLogoSrc(constructorId);
-  if (!src || err) return null;
-  return (
-    <Image
-      src={src}
-      alt={name}
-      width={16}
-      height={16}
-      className="h-4 w-auto shrink-0 object-contain"
-      onError={() => setErr(true)}
-    />
-  );
-}
+import { NationalityFlag, DriverImg, TeamLogo } from "./shared";
 
 interface RaceResultsViewProps {
   races: RaceWithResults[];
@@ -175,6 +78,7 @@ export default function RaceResultsView({ races }: RaceResultsViewProps) {
                       <DriverImg
                         familyName={r.Driver.familyName}
                         name={`${r.Driver.givenName} ${r.Driver.familyName}`}
+                        nationality={r.Driver.nationality}
                       />
                       <span>
                         <span className="font-medium text-white">

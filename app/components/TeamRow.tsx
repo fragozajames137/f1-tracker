@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { Team, Driver } from "@/app/types";
 import SeatCard from "./SeatCard";
+import { logoSrc, extractSlug } from "@/app/lib/image-helpers";
+import { getBlurPlaceholder } from "@/app/lib/blur-placeholders";
 
 interface TeamRowProps {
   team: Team;
@@ -10,6 +12,9 @@ interface TeamRowProps {
 }
 
 export default function TeamRow({ team, onSelectDriver }: TeamRowProps) {
+  const slug = extractSlug(team.logoUrl, "logos");
+  const blur = slug ? getBlurPlaceholder(`logos/${slug}`) : undefined;
+
   return (
     <div className="group">
       <div className="mb-3 flex items-center gap-3">
@@ -17,14 +22,15 @@ export default function TeamRow({ team, onSelectDriver }: TeamRowProps) {
           className="flex h-8 w-8 items-center justify-center rounded-md"
           style={{ backgroundColor: team.color }}
         >
-          {team.logoUrl ? (
+          {slug ? (
             <Image
-              src={team.logoUrl}
+              src={logoSrc(slug, 48)}
               alt={team.name}
               width={24}
               height={24}
               className="h-5 w-auto object-contain"
-              unoptimized
+              placeholder={blur ? "blur" : undefined}
+              blurDataURL={blur}
             />
           ) : null}
         </div>

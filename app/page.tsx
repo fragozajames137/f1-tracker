@@ -77,18 +77,18 @@ export default function Home() {
       <JsonLd />
       <Header season={data.season} isHome />
 
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-6 flex flex-wrap items-center gap-4 text-sm text-white/40">
-          <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2 w-2 rounded-full bg-green-500" />
+      <main id="main-content" className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
+        <div role="list" aria-label="Contract status legend" className="mb-6 flex flex-wrap items-center gap-4 text-sm text-white/40">
+          <span role="listitem" className="flex items-center gap-1.5">
+            <span aria-hidden="true" className="inline-block h-2 w-2 rounded-full bg-green-500" />
             Locked
           </span>
-          <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2 w-2 rounded-full bg-yellow-500" />
+          <span role="listitem" className="flex items-center gap-1.5">
+            <span aria-hidden="true" className="inline-block h-2 w-2 rounded-full bg-yellow-500" />
             Expiring
           </span>
-          <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2 w-2 rounded-full bg-red-500" />
+          <span role="listitem" className="flex items-center gap-1.5">
+            <span aria-hidden="true" className="inline-block h-2 w-2 rounded-full bg-red-500" />
             Open
           </span>
           <span className="ml-auto text-xs text-white/30">

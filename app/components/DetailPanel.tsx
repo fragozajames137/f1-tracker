@@ -6,6 +6,8 @@ import { Driver, Team } from "@/app/types";
 import { nationalityToIso } from "@/app/lib/flags";
 import Flag from "./Flag";
 import { STATUS_CONFIG, getInitials } from "@/app/lib/drivers";
+import { driverSrc, logoSrc, extractSlug } from "@/app/lib/image-helpers";
+import { getBlurPlaceholder } from "@/app/lib/blur-placeholders";
 
 interface DetailPanelProps {
   driver: Driver | null;
@@ -19,29 +21,42 @@ export default function DetailPanel({ driver, team, onClose }: DetailPanelProps)
 
   if (!driver || !team) return null;
 
+  const driverSlug = extractSlug(driver.headshotUrl, "drivers");
+  const teamSlug = extractSlug(team.logoUrl, "logos");
+  const driverBlur = driverSlug ? getBlurPlaceholder(`drivers/${driverSlug}`) : undefined;
+  const logoBlur = teamSlug ? getBlurPlaceholder(`logos/${teamSlug}`) : undefined;
+
   const status = STATUS_CONFIG[driver.contractStatus];
 
   return (
     <>
       {/* Backdrop */}
       <div
+        aria-hidden="true"
         className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
 
       {/* Panel */}
-      <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto border-l border-white/10 bg-[#111] shadow-2xl sm:max-w-md">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${driver.name} details`}
+        className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto border-l border-white/10 bg-[#111] shadow-2xl sm:max-w-md"
+      >
         {/* Header */}
         <div className="sticky top-0 z-10 border-b border-white/10 bg-[#111]/95 backdrop-blur-sm">
           <div className="flex items-center justify-between p-4 sm:p-5">
             <div className="flex items-center gap-3">
-              {team.logoUrl && !logoError ? (
+              {teamSlug && !logoError ? (
                 <Image
-                  src={team.logoUrl}
+                  src={logoSrc(teamSlug, 48)}
                   alt={team.name}
                   width={20}
                   height={20}
                   className="h-5 w-auto shrink-0 object-contain"
+                  placeholder={logoBlur ? "blur" : undefined}
+                  blurDataURL={logoBlur}
                   onError={() => setLogoError(true)}
                 />
               ) : (
@@ -54,9 +69,10 @@ export default function DetailPanel({ driver, team, onClose }: DetailPanelProps)
             </div>
             <button
               onClick={onClose}
+              aria-label="Close detail panel"
               className="rounded-lg p-1.5 text-white/40 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
             >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <svg aria-hidden="true" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -75,13 +91,15 @@ export default function DetailPanel({ driver, team, onClose }: DetailPanelProps)
                 boxShadow: `0 0 0 2px ${team.color}`,
               }}
             >
-              {driver.headshotUrl && !imgError ? (
+              {driverSlug && !imgError ? (
                 <Image
-                  src={driver.headshotUrl}
+                  src={driverSrc(driverSlug, 192)}
                   alt={driver.name}
                   width={80}
                   height={80}
                   className="h-20 w-20 rounded-full object-cover"
+                  placeholder={driverBlur ? "blur" : undefined}
+                  blurDataURL={driverBlur}
                   onError={() => setImgError(true)}
                 />
               ) : (
