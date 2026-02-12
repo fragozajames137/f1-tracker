@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import Image from "next/image";
 import { Driver, Team, ContractStatus } from "@/app/types";
 
 const statusConfig: Record<ContractStatus, { label: string; className: string }> = {
@@ -8,6 +10,16 @@ const statusConfig: Record<ContractStatus, { label: string; className: string }>
   open: { label: "Open Seat", className: "bg-red-500/20 text-red-400 border-red-500/30" },
 };
 
+function getInitials(name: string): string {
+  if (name === "TBD") return "?";
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
 interface DetailPanelProps {
   driver: Driver | null;
   team: Team | null;
@@ -15,6 +27,8 @@ interface DetailPanelProps {
 }
 
 export default function DetailPanel({ driver, team, onClose }: DetailPanelProps) {
+  const [imgError, setImgError] = useState(false);
+
   if (!driver || !team) return null;
 
   const status = statusConfig[driver.contractStatus];
@@ -53,15 +67,44 @@ export default function DetailPanel({ driver, team, onClose }: DetailPanelProps)
         {/* Content */}
         <div className="p-4 space-y-6 sm:p-5">
           {/* Driver Info */}
-          <div>
-            <h2 className="font-display text-2xl font-bold text-white">{driver.name}</h2>
-            <div className="mt-2 flex items-center gap-3 flex-wrap">
-              {driver.number && (
-                <span className="text-xl font-mono font-bold" style={{ color: team.color }}>
-                  #{driver.number}
+          <div className="flex items-center gap-4">
+            {/* Headshot */}
+            <div
+              className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full ring-2"
+              style={{
+                backgroundColor: `${team.color}20`,
+                boxShadow: `0 0 0 2px ${team.color}`,
+              }}
+            >
+              {driver.headshotUrl && !imgError ? (
+                <Image
+                  src={driver.headshotUrl}
+                  alt={driver.name}
+                  width={80}
+                  height={80}
+                  className="h-20 w-20 rounded-full object-cover"
+                  onError={() => setImgError(true)}
+                />
+              ) : (
+                <span
+                  className="text-xl font-bold"
+                  style={{ color: team.color }}
+                >
+                  {getInitials(driver.name)}
                 </span>
               )}
-              <span className="text-sm text-white/50">{driver.nationality}</span>
+            </div>
+
+            <div>
+              <h2 className="font-display text-2xl font-bold text-white">{driver.name}</h2>
+              <div className="mt-2 flex items-center gap-3 flex-wrap">
+                {driver.number && (
+                  <span className="text-xl font-mono font-bold" style={{ color: team.color }}>
+                    #{driver.number}
+                  </span>
+                )}
+                <span className="text-sm text-white/50">{driver.nationality}</span>
+              </div>
             </div>
           </div>
 

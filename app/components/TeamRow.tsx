@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Team, Driver } from "@/app/types";
 import SeatCard from "./SeatCard";
 
@@ -13,9 +14,19 @@ export default function TeamRow({ team, onSelectDriver }: TeamRowProps) {
     <div className="group">
       <div className="mb-3 flex items-center gap-3">
         <div
-          className="h-5 w-5 rounded-md"
+          className="flex h-6 w-6 items-center justify-center rounded-md"
           style={{ backgroundColor: team.color }}
-        />
+        >
+          {team.logoUrl ? (
+            <Image
+              src={team.logoUrl}
+              alt={team.name}
+              width={18}
+              height={18}
+              className="brightness-0 invert"
+            />
+          ) : null}
+        </div>
         <h2 className="font-display text-base font-bold text-white">{team.name}</h2>
       </div>
 

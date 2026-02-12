@@ -12,13 +12,18 @@ import {
 import type { TelemetrySpeedTrace, TelemetryDriver } from "@/app/types/telemetry";
 
 const MONO_FONT = "'Space Mono', ui-monospace, monospace";
+const KMH_TO_MPH = 0.621371;
 
 interface SpeedTraceProps {
   traces: TelemetrySpeedTrace[];
   drivers: TelemetryDriver[];
+  speedUnit?: "kph" | "mph";
 }
 
-export default function SpeedTrace({ traces, drivers }: SpeedTraceProps) {
+export default function SpeedTrace({ traces, drivers, speedUnit = "kph" }: SpeedTraceProps) {
+  const isMph = speedUnit === "mph";
+  const unitLabel = isMph ? "mph" : "kph";
+
   if (traces.length === 0) {
     return (
       <div className="rounded-lg border border-white/10 bg-white/5 p-4">
@@ -38,7 +43,8 @@ export default function SpeedTrace({ traces, drivers }: SpeedTraceProps) {
     for (const trace of traces) {
       const driver = drivers.find((d) => d.number === trace.driverNumber);
       const key = driver?.abbreviation ?? `#${trace.driverNumber}`;
-      point[key] = trace.speed[i] ?? 0;
+      const raw = trace.speed[i] ?? 0;
+      point[key] = isMph ? Math.round(raw * KMH_TO_MPH) : raw;
     }
     return point;
   });
@@ -80,7 +86,7 @@ export default function SpeedTrace({ traces, drivers }: SpeedTraceProps) {
               fontFamily: MONO_FONT,
             }}
             labelFormatter={(v) => `${(Number(v) / 1000).toFixed(2)} km`}
-            formatter={(value) => [`${value} km/h`]}
+            formatter={(value) => [`${value} ${unitLabel}`]}
           />
           <Legend
             wrapperStyle={{ fontSize: 12, color: "#999", fontFamily: MONO_FONT }}

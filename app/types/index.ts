@@ -14,7 +14,14 @@ export interface Driver {
   nationality: string;
   contractStatus: ContractStatus;
   contractEnd: string | null;
+  headshotUrl?: string;
   rumors: Rumor[];
+}
+
+export interface ReserveDriver {
+  name: string;
+  nationality: string;
+  role: "reserve" | "test" | "development";
 }
 
 export interface Team {
@@ -22,6 +29,7 @@ export interface Team {
   name: string;
   color: string;
   logoUrl?: string;
+  reserveDrivers?: ReserveDriver[];
   seat1: Driver;
   seat2: Driver;
 }

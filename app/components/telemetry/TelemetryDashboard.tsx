@@ -6,6 +6,8 @@ import SpeedTrace from "./SpeedTrace";
 import LapTimeChart from "./LapTimeChart";
 import TireStrategyChart from "./TireStrategyChart";
 
+type SpeedUnit = "kph" | "mph";
+
 interface TelemetryDashboardProps {
   files: TelemetryFileInfo[];
   initialSession: TelemetrySession | null;
@@ -32,6 +34,7 @@ export default function TelemetryDashboard({
   const [selectedDriverNumbers, setSelectedDriverNumbers] = useState<number[]>(
     () => (initialSession ? getTop3Drivers(initialSession) : []),
   );
+  const [speedUnit, setSpeedUnit] = useState<SpeedUnit>("kph");
 
   // Client-side cache to avoid re-fetching the same file
   const cacheRef = useRef(new Map<string, TelemetrySession>());
@@ -107,10 +110,38 @@ export default function TelemetryDashboard({
         >
           {files.map((f) => (
             <option key={f.filename} value={f.filename} className="bg-[#111]">
-              {f.year} Round {f.round} — {f.slug.replace(/-/g, " ")}
+              {f.year} Round {f.round} —{" "}
+              {f.slug
+                .replace(/-/g, " ")
+                .replace(/\b\w/g, (c) => c.toUpperCase())}
             </option>
           ))}
         </select>
+
+        {/* Speed unit toggle */}
+        <div className="flex rounded-lg border border-white/10 overflow-hidden">
+          <button
+            onClick={() => setSpeedUnit("kph")}
+            className={`cursor-pointer px-3 py-1.5 text-xs font-medium transition-colors ${
+              speedUnit === "kph"
+                ? "bg-white/10 text-white"
+                : "text-white/40 hover:text-white/70"
+            }`}
+          >
+            kph
+          </button>
+          <button
+            onClick={() => setSpeedUnit("mph")}
+            className={`cursor-pointer px-3 py-1.5 text-xs font-medium transition-colors ${
+              speedUnit === "mph"
+                ? "bg-white/10 text-white"
+                : "text-white/40 hover:text-white/70"
+            }`}
+          >
+            mph
+          </button>
+        </div>
+
         {loadingSession && (
           <span className="text-sm text-white/40">Loading...</span>
         )}
@@ -135,9 +166,26 @@ export default function TelemetryDashboard({
           </div>
 
           <div>
-            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-white/40">
-              Compare Drivers
-            </h3>
+            <div className="mb-2 flex items-center justify-between">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-white/40">
+                Compare Drivers
+              </h3>
+              {selectedDriverNumbers.length > 0 ? (
+                <button
+                  onClick={() => setSelectedDriverNumbers([])}
+                  className="cursor-pointer text-xs text-white/40 hover:text-white/70 transition-colors"
+                >
+                  Deselect All
+                </button>
+              ) : (
+                <button
+                  onClick={() => setSelectedDriverNumbers(getTop3Drivers(session))}
+                  className="cursor-pointer text-xs text-white/40 hover:text-white/70 transition-colors"
+                >
+                  Select Top 3
+                </button>
+              )}
+            </div>
             <div className="flex flex-wrap gap-2">
               {session.drivers
                 .filter((d) => d.position !== null)
@@ -179,6 +227,7 @@ export default function TelemetryDashboard({
               selectedDriverNumbers.includes(t.driverNumber),
             )}
             drivers={session.drivers}
+            speedUnit={speedUnit}
           />
 
           <LapTimeChart
