@@ -228,6 +228,8 @@ export default function TelemetryDashboard({
               selectedDriverNumbers.includes(t.driverNumber),
             )}
             drivers={session.drivers}
+            trackBoundary={session.trackBoundary}
+            drsZones={session.drsZones}
           />
 
           <SpeedTrace
@@ -236,6 +238,7 @@ export default function TelemetryDashboard({
             )}
             drivers={session.drivers}
             speedUnit={speedUnit}
+            drsZones={session.drsZones}
           />
 
           <LapTimeChart

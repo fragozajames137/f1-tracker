@@ -8,8 +8,9 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
+  ReferenceArea,
 } from "recharts";
-import type { TelemetrySpeedTrace, TelemetryDriver } from "@/app/types/telemetry";
+import type { TelemetrySpeedTrace, TelemetryDriver, DrsZone } from "@/app/types/telemetry";
 
 const MONO_FONT = "'Space Mono', ui-monospace, monospace";
 const KPH_TO_MPH = 0.621371;
@@ -19,9 +20,10 @@ interface SpeedTraceProps {
   traces: TelemetrySpeedTrace[];
   drivers: TelemetryDriver[];
   speedUnit?: "kph" | "mph";
+  drsZones?: DrsZone[];
 }
 
-export default function SpeedTrace({ traces, drivers, speedUnit = "kph" }: SpeedTraceProps) {
+export default function SpeedTrace({ traces, drivers, speedUnit = "kph", drsZones }: SpeedTraceProps) {
   const isMph = speedUnit === "mph";
   const chartUnit = isMph ? "mph" : "kph";
 
@@ -121,6 +123,25 @@ export default function SpeedTrace({ traces, drivers, speedUnit = "kph" }: Speed
           <Legend
             wrapperStyle={{ fontSize: 12, color: "#999", fontFamily: MONO_FONT }}
           />
+          {drsZones?.map((zone, i) => (
+            <ReferenceArea
+              key={`drs-${i}`}
+              x1={Math.round(zone.startDistance)}
+              x2={Math.round(zone.endDistance)}
+              fill="#22c55e"
+              fillOpacity={0.08}
+              stroke="#22c55e"
+              strokeOpacity={0.3}
+              strokeDasharray="4 4"
+              label={{
+                value: "DRS",
+                position: "insideTopRight",
+                fill: "#22c55e",
+                fontSize: 10,
+                opacity: 0.6,
+              }}
+            />
+          ))}
           {driverKeys.map(({ key, color }) => (
             <Line
               key={key}

@@ -7,6 +7,25 @@ export const COMPOUNDS: Record<string, { tw: string; hex: string }> = {
   UNKNOWN: { tw: "bg-white/30", hex: "#666" },
 };
 
+/** Approximate tyre degradation rates in seconds per lap */
+export const DEGRADATION: Record<string, number> = {
+  SOFT: 0.05,
+  MEDIUM: 0.03,
+  HARD: 0.01,
+  INTERMEDIATE: 0.04,
+  WET: 0.02,
+};
+
+/** Fuel burn effect on lap time */
+export const FUEL_EFFECT = {
+  /** kg of fuel burned per lap */
+  burnPerLap: 1.6,
+  /** seconds gained per kg of fuel burned */
+  timePerKg: 0.032,
+  /** net seconds gained per lap from fuel burn (~0.051 s/lap) */
+  perLap: 0.051,
+} as const;
+
 export function formatLapTime(seconds: number | null): string {
   if (seconds === null) return "—";
   const mins = Math.floor(seconds / 60);

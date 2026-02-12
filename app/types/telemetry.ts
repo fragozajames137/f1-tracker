@@ -29,8 +29,23 @@ export interface TelemetrySpeedTrace {
   speed: number[];
   throttle: number[];
   brake: boolean[];
+  drs?: boolean[];
   x?: number[];
   y?: number[];
+}
+
+export interface TrackBoundary {
+  inner: { x: number[]; y: number[] };
+  outer: { x: number[]; y: number[] };
+}
+
+export interface DrsZone {
+  startDistance: number;
+  endDistance: number;
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
 }
 
 export interface TelemetryStint {
@@ -48,6 +63,9 @@ export interface TelemetrySession {
   sessionType: string;
   circuitName: string;
   country: string;
+  rotation?: number;
+  trackBoundary?: TrackBoundary;
+  drsZones?: DrsZone[];
   drivers: TelemetryDriver[];
   lapData: TelemetryLap[];
   telemetryData: TelemetrySpeedTrace[];
