@@ -28,29 +28,33 @@ function constructorLogoSrc(constructorId: string): string | null {
   return null;
 }
 
-// Map Jolpica driver familyName to our local headshot
-function driverHeadshotSrc(familyName: string): string {
-  return `/drivers/${familyName.toLowerCase().replace(/\s+/g, "-")}.webp`;
+function stripAccents(s: string): string {
+  return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+function driverKey(familyName: string): string {
+  return stripAccents(familyName).toLowerCase().replace(/\s+/g, "-");
 }
 
 function DriverImg({ familyName, name }: { familyName: string; name: string }) {
-  const [err, setErr] = useState(false);
-  const src = driverHeadshotSrc(familyName);
-  if (err) {
+  const [attempt, setAttempt] = useState(0); // 0=webp, 1=png, 2=fallback
+  const key = driverKey(familyName);
+  if (attempt >= 2) {
     return (
       <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-[9px] font-bold text-white/40">
         {name.charAt(0)}
       </span>
     );
   }
+  const ext = attempt === 0 ? "webp" : "png";
   return (
     <Image
-      src={src}
+      src={`/drivers/${key}.${ext}`}
       alt={name}
       width={24}
       height={24}
       className="h-6 w-6 shrink-0 rounded-full object-cover"
-      onError={() => setErr(true)}
+      onError={() => setAttempt((a) => a + 1)}
     />
   );
 }
