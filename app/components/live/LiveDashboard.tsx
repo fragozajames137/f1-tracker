@@ -296,35 +296,64 @@ export default function LiveDashboard() {
   }
 
   if (error) {
+    const isAuthError = error.includes("401");
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center text-center">
-        <p className="text-sm text-red-400">{error}</p>
-        <button
-          onClick={() => {
-            setError(null);
-            setLoading(true);
-            getSessions(year)
-              .then((data) => {
-                const sorted = [...data].sort(
-                  (a, b) =>
-                    new Date(b.date_start).getTime() -
-                    new Date(a.date_start).getTime(),
-                );
-                setSessions(sorted);
-                setSelectedSessionKey(
-                  sorted.length > 0 ? sorted[0].session_key : null,
-                );
-                setLoading(false);
-              })
-              .catch((err) => {
-                setError(err.message);
-                setLoading(false);
-              });
-          }}
-          className="mt-4 cursor-pointer rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20"
-        >
-          Try again
-        </button>
+        {isAuthError ? (
+          <>
+            <p className="text-lg font-medium text-white/60">
+              Live data temporarily unavailable
+            </p>
+            <p className="mt-2 max-w-md text-sm text-white/30">
+              The OpenF1 API now requires authentication. Live session data
+              will be available once API access is configured.
+            </p>
+            <div className="mt-6 flex gap-3">
+              <a
+                href="/schedule"
+                className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20"
+              >
+                View race schedule
+              </a>
+              <a
+                href="/telemetry"
+                className="rounded-lg border border-white/10 px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:border-white/20 hover:text-white"
+              >
+                View telemetry
+              </a>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="text-sm text-red-400">{error}</p>
+            <button
+              onClick={() => {
+                setError(null);
+                setLoading(true);
+                getSessions(year)
+                  .then((data) => {
+                    const sorted = [...data].sort(
+                      (a, b) =>
+                        new Date(b.date_start).getTime() -
+                        new Date(a.date_start).getTime(),
+                    );
+                    setSessions(sorted);
+                    setSelectedSessionKey(
+                      sorted.length > 0 ? sorted[0].session_key : null,
+                    );
+                    setLoading(false);
+                  })
+                  .catch((err) => {
+                    setError(err.message);
+                    setLoading(false);
+                  });
+              }}
+              className="mt-4 cursor-pointer rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/20"
+            >
+              Try again
+            </button>
+          </>
+        )}
       </div>
     );
   }
