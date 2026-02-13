@@ -17,8 +17,8 @@ interface PreferencesState {
 export const usePreferencesStore = create<PreferencesState>()(
   persist(
     (set) => ({
-      speedUnit: "kph",
-      tempUnit: "C",
+      speedUnit: "mph",
+      tempUnit: "F",
       setSpeedUnit: (unit) => set({ speedUnit: unit }),
       setTempUnit: (unit) => set({ tempUnit: unit }),
       toggleUnits: () =>

@@ -91,9 +91,29 @@ export default function WeatherBar({ weather }: WeatherBarProps) {
       )}
       <button
         onClick={toggleUnits}
-        className="col-span-2 cursor-pointer rounded bg-white/10 px-2 py-0.5 text-xs font-medium text-white/50 transition-colors hover:bg-white/20 hover:text-white/70 sm:col-span-1 sm:ml-auto"
+        className="col-span-2 relative flex cursor-pointer items-center rounded-full bg-white/10 p-0.5 text-xs font-medium sm:col-span-1 sm:ml-auto"
       >
-        {isMetric ? "°C / km/h" : "°F / mph"}
+        <span
+          className={`relative z-10 rounded-full px-2.5 py-0.5 transition-colors ${
+            !isMetric ? "text-white" : "text-white/50"
+          }`}
+        >
+          Standard
+        </span>
+        <span
+          className={`relative z-10 rounded-full px-2.5 py-0.5 transition-colors ${
+            isMetric ? "text-white" : "text-white/50"
+          }`}
+        >
+          Metric
+        </span>
+        <span
+          className="absolute top-0.5 bottom-0.5 rounded-full bg-white/20 transition-all duration-200"
+          style={{
+            left: isMetric ? "calc(50% + 2px)" : "2px",
+            width: isMetric ? "calc(50% - 4px)" : "calc(50% - 4px)",
+          }}
+        />
       </button>
     </div>
   );

@@ -19,14 +19,16 @@ describe("WeatherBar", () => {
   it("renders weather data when provided", () => {
     render(<WeatherBar weather={mockWeather} />);
 
-    expect(screen.getByText("42.7°C")).toBeInTheDocument();
-    expect(screen.getByText("25.3°C")).toBeInTheDocument();
+    // Default is Standard (°F)
+    expect(screen.getByText("108.9°F")).toBeInTheDocument();
+    expect(screen.getByText("77.5°F")).toBeInTheDocument();
     expect(screen.getByText("55%")).toBeInTheDocument();
   });
 
   it("shows wind speed and cardinal direction", () => {
     render(<WeatherBar weather={mockWeather} />);
-    expect(screen.getByText(/12\.5/)).toBeInTheDocument();
+    // Default is Standard (mph): 12.5 * 0.621371 ≈ 7.8
+    expect(screen.getByText(/7\.8/)).toBeInTheDocument();
     expect(screen.getByText("S")).toBeInTheDocument();
   });
 
