@@ -4,6 +4,7 @@ import { discoverLiveSession } from "./session-discovery.js";
 import { SignalRClient } from "./signalr-client.js";
 import { StateManager } from "./state-manager.js";
 import { TursoWriter } from "./turso-writer.js";
+import { ingestStaleSessions } from "./post-session-ingest.js";
 
 // ---------------------------------------------------------------------------
 // Configuration
@@ -14,6 +15,7 @@ const FLUSH_INTERVAL_MS = 3_000;      // Flush to Turso every 3s
 const SESSION_END_GRACE_MS = 30_000;  // Wait 30s after session ends before stopping
 const SCHEDULE_RETRY_MS = 600_000;    // Retry schedule fetch every 10min on failure
 const MAX_AWAKE_MS = 4 * 60 * 60 * 1000; // Max 4h awake per session window
+const INGEST_DELAY_MS = 24 * 60 * 60 * 1000; // Wait 24h before ingesting archived data
 
 // ---------------------------------------------------------------------------
 // Main loop
@@ -30,6 +32,7 @@ async function main(): Promise<void> {
 
   const writer = new TursoWriter();
   const stateManager = new StateManager();
+  let lastSessionEndTime: number | null = null;
 
   // Graceful shutdown
   let shutdownRequested = false;
@@ -70,6 +73,31 @@ async function main(): Promise<void> {
           `Next: ${wakeup.session.raceName} ${wakeup.session.sessionName} ` +
           `at ${wakeup.session.startTime.toUTCString()}`,
         );
+
+        // Check if we need to wake up early for post-session ingest
+        if (lastSessionEndTime) {
+          const ingestTime = lastSessionEndTime + INGEST_DELAY_MS;
+          const now = Date.now();
+
+          if (now >= ingestTime) {
+            // 24h already passed — ingest now before sleeping
+            log("24h since last session — running archive ingest...");
+            await ingestStaleSessions();
+            lastSessionEndTime = null;
+          } else if (ingestTime < now + wakeup.sleepMs) {
+            // Ingest time falls during our sleep — wake up early for it
+            const sleepUntilIngest = ingestTime - now;
+            const ingestHours = Math.round(sleepUntilIngest / (1000 * 60 * 60) * 10) / 10;
+            log(`Sleeping ${ingestHours}h then running archive ingest...`);
+            await sleep(sleepUntilIngest);
+            if (!shutdownRequested) {
+              await ingestStaleSessions();
+              lastSessionEndTime = null;
+            }
+          }
+          // else: next session comes before ingest time, ingest will happen next loop
+        }
+
         log(`Sleeping ${hours}h until 1h before session...`);
         await sleep(wakeup.sleepMs);
 
@@ -154,6 +182,7 @@ async function main(): Promise<void> {
       signalR.disconnect();
 
       log(`Session ${session.sessionKey} processing complete`);
+      lastSessionEndTime = Date.now();
       // Loop back to Phase 1 — fetch schedule again for the next session
     } catch (err) {
       logError("Main loop error:", err);

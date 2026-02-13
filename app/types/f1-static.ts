@@ -28,7 +28,7 @@ export interface RawSession {
   StartDate: string;
   EndDate: string;
   GmtOffset: string;
-  Path: string;
+  Path?: string;
 }
 
 // ---------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { RaceWithResults } from "@/app/types/history";
 import { NationalityFlag, DriverImg, TeamLogo } from "./shared";
 import SessionDrillDown from "./SessionDrillDown";
@@ -16,7 +16,19 @@ export default function RaceResultsView({ races, season, driverHeadshots }: Race
     races.length > 0 ? races.length - 1 : 0,
   );
   const [sessionKey, setSessionKey] = useState<number | null>(null);
-  const [loadingSession, setLoadingSession] = useState(false);
+  const [availableRounds, setAvailableRounds] = useState<Map<number, number>>(new Map());
+
+  useEffect(() => {
+    if (season < 2018) return;
+    fetch(`/api/sessions?year=${season}&type=Race`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((sessions: Array<{ round: number; sessionKey: number }>) => {
+        const map = new Map<number, number>();
+        for (const s of sessions) map.set(s.round, s.sessionKey);
+        setAvailableRounds(map);
+      })
+      .catch(() => {});
+  }, [season]);
 
   if (races.length === 0) {
     return (
@@ -29,23 +41,12 @@ export default function RaceResultsView({ races, season, driverHeadshots }: Race
   }
 
   const race = races[selectedRound];
-  const hasSessionData = season >= 2018;
+  const roundNum = parseInt(race.round, 10);
+  const roundSessionKey = availableRounds.get(roundNum) ?? null;
 
-  async function handleViewSession() {
-    if (!race || !hasSessionData) return;
-    setLoadingSession(true);
-    try {
-      const round = parseInt(race.round, 10);
-      const res = await fetch(`/api/sessions?year=${season}&type=Race&round=${round}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const sessions = await res.json();
-      if (sessions.length > 0) {
-        setSessionKey(sessions[0].sessionKey);
-      }
-    } catch {
-      // Silently fail — button stays clickable
-    } finally {
-      setLoadingSession(false);
+  function handleViewSession() {
+    if (roundSessionKey) {
+      setSessionKey(roundSessionKey);
     }
   }
 
@@ -71,13 +72,12 @@ export default function RaceResultsView({ races, season, driverHeadshots }: Race
           {race.Circuit.circuitName} — {race.Circuit.Location.locality},{" "}
           {race.Circuit.Location.country}
         </span>
-        {hasSessionData && (
+        {roundSessionKey && !sessionKey && (
           <button
             onClick={handleViewSession}
-            disabled={loadingSession || sessionKey !== null}
-            className="cursor-pointer rounded-lg border border-white/10 px-3 py-1.5 text-xs font-medium text-white/60 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-40 sm:ml-auto"
+            className="cursor-pointer rounded-lg border border-white/10 px-3 py-1.5 text-xs font-medium text-white/60 transition-colors hover:bg-white/10 hover:text-white sm:ml-auto"
           >
-            {loadingSession ? "Loading..." : sessionKey ? "Session Open" : "View Session"}
+            View Session
           </button>
         )}
       </div>

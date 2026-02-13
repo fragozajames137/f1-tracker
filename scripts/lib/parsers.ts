@@ -123,7 +123,7 @@ export function parseSession(
     startDate: raw.StartDate || null,
     endDate: raw.EndDate || null,
     gmtOffset: raw.GmtOffset || null,
-    path: raw.Path,
+    path: raw.Path || "",
     totalLaps: null,
     ingestedAt: null,
   };

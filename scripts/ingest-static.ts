@@ -253,6 +253,12 @@ async function main() {
 
       // Process sessions
       for (const rawSession of rawMeeting.Sessions) {
+        // Skip malformed sessions (e.g. key=-1, missing name)
+        if (!rawSession.Name || rawSession.Key < 0) {
+          console.log(`    Skipping malformed session (key=${rawSession.Key}, name=${rawSession.Name})`);
+          continue;
+        }
+
         const session = parseSession(rawSession, meeting.key);
         totalSessions++;
 
@@ -280,7 +286,11 @@ async function main() {
             .where(eq(schema.sessions.key, session.key));
         }
 
-        // Ingest session data
+        // Ingest session data (skip if no path — older seasons may lack it)
+        if (!session.path) {
+          console.log(`    Skipping ${meeting.name} - ${session.name} (no archive path)`);
+          continue;
+        }
         const didIngest = await ingestSession(
           session.key,
           session.path,
