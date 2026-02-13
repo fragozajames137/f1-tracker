@@ -1,0 +1,183 @@
+{
+  "permanent": [
+    { "number": 1, "status": "reserved", "note": "Reserved for reigning World Drivers' Champion", "holders": [
+      { "driver": "Sebastian Vettel", "nationality": "Germany", "team2026": null, "firstUsed": 2014, "lastUsed": 2014, "asChampion": true },
+      { "driver": "Max Verstappen", "nationality": "Netherlands", "team2026": null, "firstUsed": 2022, "lastUsed": 2025, "asChampion": true },
+      { "driver": "Lando Norris", "nationality": "United Kingdom", "team2026": "McLaren", "firstUsed": 2026, "lastUsed": "active", "asChampion": true }
+    ]},
+    { "number": 2, "holders": [
+      { "driver": "Stoffel Vandoorne", "nationality": "Belgium", "team2026": null, "firstUsed": 2017, "lastUsed": 2018 },
+      { "driver": "Logan Sargeant", "nationality": "United States", "team2026": null, "firstUsed": 2023, "lastUsed": 2024 }
+    ]},
+    { "number": 3, "holders": [
+      { "driver": "Daniel Ricciardo", "nationality": "Australia", "team2026": null, "firstUsed": 2014, "lastUsed": 2024 },
+      { "driver": "Max Verstappen", "nationality": "Netherlands", "team2026": "Red Bull Racing", "firstUsed": 2026, "lastUsed": "active" }
+    ]},
+    { "number": 4, "holders": [
+      { "driver": "Max Chilton", "nationality": "United Kingdom", "team2026": null, "firstUsed": 2014, "lastUsed": 2014 },
+      { "driver": "Lando Norris", "nationality": "United Kingdom", "team2026": "McLaren", "firstUsed": 2019, "lastUsed": 2025, "note": "Using #1 in 2026 as champion" }
+    ]},
+    { "number": 5, "holders": [
+      { "driver": "Sebastian Vettel", "nationality": "Germany", "team2026": null, "firstUsed": 2015, "lastUsed": 2022 },
+      { "driver": "Gabriel Bortoleto", "nationality": "Brazil", "team2026": "Audi", "firstUsed": 2025, "lastUsed": "active" }
+    ]},
+    { "number": 6, "holders": [
+      { "driver": "Nico Rosberg", "nationality": "Germany", "team2026": null, "firstUsed": 2014, "lastUsed": 2016 },
+      { "driver": "Nicholas Latifi", "nationality": "Canada", "team2026": null, "firstUsed": 2020, "lastUsed": 2022 },
+      { "driver": "Isack Hadjar", "nationality": "France", "team2026": "Red Bull Racing", "firstUsed": 2025, "lastUsed": "active" }
+    ]},
+    { "number": 7, "holders": [
+      { "driver": "Kimi Räikkönen", "nationality": "Finland", "team2026": null, "firstUsed": 2014, "lastUsed": 2021 },
+      { "driver": "Jack Doohan", "nationality": "Australia", "team2026": null, "firstUsed": 2025, "lastUsed": 2025 }
+    ]},
+    { "number": 8, "holders": [
+      { "driver": "Romain Grosjean", "nationality": "France", "team2026": null, "firstUsed": 2014, "lastUsed": 2020 }
+    ]},
+    { "number": 9, "holders": [
+      { "driver": "Marcus Ericsson", "nationality": "Sweden", "team2026": null, "firstUsed": 2014, "lastUsed": 2018 },
+      { "driver": "Nikita Mazepin", "nationality": "Russia", "team2026": null, "firstUsed": 2021, "lastUsed": 2021 }
+    ]},
+    { "number": 10, "holders": [
+      { "driver": "Kamui Kobayashi", "nationality": "Japan", "team2026": null, "firstUsed": 2014, "lastUsed": 2014 },
+      { "driver": "Pierre Gasly", "nationality": "France", "team2026": "Alpine", "firstUsed": 2017, "lastUsed": "active" }
+    ]},
+    { "number": 11, "holders": [
+      { "driver": "Sergio Pérez", "nationality": "Mexico", "team2026": "Cadillac", "firstUsed": 2014, "lastUsed": "active" }
+    ]},
+    { "number": 12, "holders": [
+      { "driver": "Felipe Nasr", "nationality": "Brazil", "team2026": null, "firstUsed": 2015, "lastUsed": 2016 },
+      { "driver": "Kimi Antonelli", "nationality": "Italy", "team2026": "Mercedes", "firstUsed": 2025, "lastUsed": "active" }
+    ]},
+    { "number": 13, "holders": [
+      { "driver": "Pastor Maldonado", "nationality": "Venezuela", "team2026": null, "firstUsed": 2014, "lastUsed": 2015 }
+    ]},
+    { "number": 14, "holders": [
+      { "driver": "Fernando Alonso", "nationality": "Spain", "team2026": "Aston Martin", "firstUsed": 2014, "lastUsed": "active" }
+    ]},
+    { "number": 16, "holders": [
+      { "driver": "Charles Leclerc", "nationality": "Monaco", "team2026": "Ferrari", "firstUsed": 2018, "lastUsed": "active" }
+    ]},
+    { "number": 17, "status": "retired", "note": "Permanently retired in honour of Jules Bianchi", "holders": [
+      { "driver": "Jules Bianchi", "nationality": "France", "team2026": null, "firstUsed": 2014, "lastUsed": 2014 }
+    ]},
+    { "number": 18, "holders": [
+      { "driver": "Lance Stroll", "nationality": "Canada", "team2026": "Aston Martin", "firstUsed": 2017, "lastUsed": "active" }
+    ]},
+    { "number": 19, "holders": [
+      { "driver": "Felipe Massa", "nationality": "Brazil", "team2026": null, "firstUsed": 2014, "lastUsed": 2017 }
+    ]},
+    { "number": 20, "holders": [
+      { "driver": "Kevin Magnussen", "nationality": "Denmark", "team2026": null, "firstUsed": 2014, "lastUsed": 2024 }
+    ]},
+    { "number": 21, "holders": [
+      { "driver": "Esteban Gutiérrez", "nationality": "Mexico", "team2026": null, "firstUsed": 2014, "lastUsed": 2016 },
+      { "driver": "Nyck de Vries", "nationality": "Netherlands", "team2026": null, "firstUsed": 2023, "lastUsed": 2023 }
+    ]},
+    { "number": 22, "holders": [
+      { "driver": "Jenson Button", "nationality": "United Kingdom", "team2026": null, "firstUsed": 2014, "lastUsed": 2017 },
+      { "driver": "Yuki Tsunoda", "nationality": "Japan", "team2026": null, "firstUsed": 2021, "lastUsed": 2025 }
+    ]},
+    { "number": 23, "holders": [
+      { "driver": "Alexander Albon", "nationality": "Thailand", "team2026": "Williams", "firstUsed": 2019, "lastUsed": "active" }
+    ]},
+    { "number": 24, "holders": [
+      { "driver": "Zhou Guanyu", "nationality": "China", "team2026": null, "firstUsed": 2022, "lastUsed": 2024 }
+    ]},
+    { "number": 25, "holders": [
+      { "driver": "Jean-Éric Vergne", "nationality": "France", "team2026": null, "firstUsed": 2014, "lastUsed": 2014 }
+    ]},
+    { "number": 26, "holders": [
+      { "driver": "Daniil Kvyat", "nationality": "Russia", "team2026": null, "firstUsed": 2014, "lastUsed": 2020 }
+    ]},
+    { "number": 27, "holders": [
+      { "driver": "Nico Hülkenberg", "nationality": "Germany", "team2026": "Audi", "firstUsed": 2014, "lastUsed": "active" }
+    ]},
+    { "number": 28, "holders": [
+      { "driver": "Will Stevens", "nationality": "United Kingdom", "team2026": null, "firstUsed": 2015, "lastUsed": 2015 },
+      { "driver": "Brendon Hartley", "nationality": "New Zealand", "team2026": null, "firstUsed": 2017, "lastUsed": 2018 }
+    ]},
+    { "number": 30, "holders": [
+      { "driver": "Jolyon Palmer", "nationality": "United Kingdom", "team2026": null, "firstUsed": 2016, "lastUsed": 2017 },
+      { "driver": "Liam Lawson", "nationality": "New Zealand", "team2026": "Racing Bulls", "firstUsed": 2024, "lastUsed": "active" }
+    ]},
+    { "number": 31, "holders": [
+      { "driver": "Esteban Ocon", "nationality": "France", "team2026": "Haas", "firstUsed": 2016, "lastUsed": "active" }
+    ]},
+    { "number": 33, "holders": [
+      { "driver": "Max Verstappen", "nationality": "Netherlands", "team2026": null, "firstUsed": 2015, "lastUsed": 2021, "note": "Switched to #3 in 2026 after using #1 as champion 2022-2025" }
+    ]},
+    { "number": 35, "holders": [
+      { "driver": "Sergey Sirotkin", "nationality": "Russia", "team2026": null, "firstUsed": 2018, "lastUsed": 2018 }
+    ]},
+    { "number": 41, "holders": [
+      { "driver": "Arvid Lindblad", "nationality": "United Kingdom", "team2026": "Racing Bulls", "firstUsed": 2026, "lastUsed": "active" }
+    ]},
+    { "number": 43, "holders": [
+      { "driver": "Franco Colapinto", "nationality": "Argentina", "team2026": "Alpine", "firstUsed": 2024, "lastUsed": "active" }
+    ]},
+    { "number": 44, "holders": [
+      { "driver": "Lewis Hamilton", "nationality": "United Kingdom", "team2026": "Ferrari", "firstUsed": 2014, "lastUsed": "active", "note": "Kept #44 through all championship wins (2014-2015, 2017-2020)" }
+    ]},
+    { "number": 47, "holders": [
+      { "driver": "Mick Schumacher", "nationality": "Germany", "team2026": null, "firstUsed": 2021, "lastUsed": 2022 }
+    ]},
+    { "number": 53, "holders": [
+      { "driver": "Alexander Rossi", "nationality": "United States", "team2026": null, "firstUsed": 2015, "lastUsed": 2015 }
+    ]},
+    { "number": 55, "holders": [
+      { "driver": "Carlos Sainz Jr.", "nationality": "Spain", "team2026": "Williams", "firstUsed": 2015, "lastUsed": "active" }
+    ]},
+    { "number": 63, "holders": [
+      { "driver": "George Russell", "nationality": "United Kingdom", "team2026": "Mercedes", "firstUsed": 2019, "lastUsed": "active" }
+    ]},
+    { "number": 77, "holders": [
+      { "driver": "Valtteri Bottas", "nationality": "Finland", "team2026": "Cadillac", "firstUsed": 2014, "lastUsed": "active" }
+    ]},
+    { "number": 81, "holders": [
+      { "driver": "Oscar Piastri", "nationality": "Australia", "team2026": "McLaren", "firstUsed": 2023, "lastUsed": "active" }
+    ]},
+    { "number": 87, "holders": [
+      { "driver": "Oliver Bearman", "nationality": "United Kingdom", "team2026": "Haas", "firstUsed": 2025, "lastUsed": "active" }
+    ]},
+    { "number": 88, "holders": [
+      { "driver": "Rio Haryanto", "nationality": "Indonesia", "team2026": null, "firstUsed": 2016, "lastUsed": 2016 },
+      { "driver": "Robert Kubica", "nationality": "Poland", "team2026": null, "firstUsed": 2019, "lastUsed": 2021 }
+    ]},
+    { "number": 89, "holders": [
+      { "driver": "Jack Aitken", "nationality": "United Kingdom", "team2026": null, "firstUsed": 2020, "lastUsed": 2020 }
+    ]},
+    { "number": 94, "holders": [
+      { "driver": "Pascal Wehrlein", "nationality": "Germany", "team2026": null, "firstUsed": 2016, "lastUsed": 2017 }
+    ]},
+    { "number": 98, "holders": [
+      { "driver": "Roberto Merhi", "nationality": "Spain", "team2026": null, "firstUsed": 2015, "lastUsed": 2015 }
+    ]},
+    { "number": 99, "holders": [
+      { "driver": "Adrian Sutil", "nationality": "Germany", "team2026": null, "firstUsed": 2014, "lastUsed": 2014 },
+      { "driver": "Antonio Giovinazzi", "nationality": "Italy", "team2026": null, "firstUsed": 2019, "lastUsed": 2021 }
+    ]}
+  ],
+  "temporary": [
+    { "number": 36, "driver": "Antonio Giovinazzi", "nationality": "Italy", "team": "Sauber", "races": ["2017 Australian Grand Prix", "2017 Chinese Grand Prix"] },
+    { "number": 38, "driver": "Oliver Bearman", "nationality": "United Kingdom", "team": "Ferrari", "races": ["2024 Saudi Arabian Grand Prix"] },
+    { "number": 39, "driver": "Brendon Hartley", "nationality": "New Zealand", "team": "Toro Rosso", "races": ["2017 United States Grand Prix"] },
+    { "number": 40, "driver": "Paul di Resta", "nationality": "United Kingdom", "team": "Williams", "races": ["2017 Hungarian Grand Prix"] },
+    { "number": 40, "driver": "Liam Lawson", "nationality": "New Zealand", "team": "AlphaTauri", "races": ["2023 Dutch Grand Prix", "2023 Italian Grand Prix", "2023 Singapore Grand Prix", "2023 Japanese Grand Prix", "2023 Qatar Grand Prix"] },
+    { "number": 42, "driver": "Alexander Rossi", "nationality": "United States", "team": "Marussia", "races": [], "note": "Entered twice in 2014 but never raced: Belgian GP practice (was to replace Chilton, reinstated) and Russian GP (substitute for Bianchi, team chose not to run second car)" },
+    { "number": 45, "driver": "André Lotterer", "nationality": "Germany", "team": "Caterham", "races": ["2014 Belgian Grand Prix"] },
+    { "number": 45, "driver": "Nyck de Vries", "nationality": "Netherlands", "team": "Williams", "races": ["2022 Italian Grand Prix"] },
+    { "number": 46, "driver": "Will Stevens", "nationality": "United Kingdom", "team": "Caterham", "races": ["2014 Abu Dhabi Grand Prix"] },
+    { "number": 47, "driver": "Stoffel Vandoorne", "nationality": "Belgium", "team": "McLaren", "races": ["2016 Bahrain Grand Prix"] },
+    { "number": 50, "driver": "Oliver Bearman", "nationality": "United Kingdom", "team": "Haas", "races": ["2024 Azerbaijan Grand Prix", "2024 São Paulo Grand Prix"] },
+    { "number": 51, "driver": "Pietro Fittipaldi", "nationality": "Brazil", "team": "Haas", "races": ["2020 Sakhir Grand Prix", "2020 Abu Dhabi Grand Prix"] },
+    { "number": 61, "driver": "Jack Doohan", "nationality": "Australia", "team": "Alpine", "races": ["2024 Abu Dhabi Grand Prix"] }
+  ],
+  "number1History": {
+    "note": "Number 1 is reserved for the reigning World Drivers' Champion but is not mandatory. Hamilton kept #44 through his title wins (2014-2015, 2017-2020). Rosberg retired after his 2016 championship. Hamilton received permission to display #1 on the nose during Friday practice at the 2018 and 2019 Abu Dhabi Grand Prix, though his car was officially entered as #44.",
+    "users": [
+      { "driver": "Sebastian Vettel", "team": "Red Bull Racing", "firstUsed": 2014, "lastUsed": 2014 },
+      { "driver": "Max Verstappen", "team": "Red Bull Racing", "firstUsed": 2022, "lastUsed": 2025 },
+      { "driver": "Lando Norris", "team": "McLaren", "firstUsed": 2026, "lastUsed": "active" }
+    ]
+  }
+}
