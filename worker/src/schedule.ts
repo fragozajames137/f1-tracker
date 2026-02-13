@@ -40,14 +40,29 @@ export interface ScheduledSession {
   raceName: string;
   sessionName: string;
   startTime: Date;
+  durationMs: number; // estimated session duration in ms
 }
 
 const JOLPICA_URL = "https://api.jolpi.ca/ergast/f1/2026.json";
 const WAKE_BEFORE_MS = 60 * 60 * 1000; // 1 hour before session
 
+// ---------------------------------------------------------------------------
+// Pre-season testing — not in the Jolpica/Ergast calendar
+// Bahrain 2026: Feb 10-12, 23:00-08:00 UTC each day (night testing)
+// ---------------------------------------------------------------------------
+
+const NINE_HOURS = 9 * 60 * 60 * 1000;
+const THREE_HOURS = 3 * 60 * 60 * 1000;
+
+const PRE_SEASON_TESTING: ScheduledSession[] = [
+  { round: 0, raceName: "Bahrain Pre-Season Test", sessionName: "Day 1", startTime: new Date("2026-02-10T23:00:00Z"), durationMs: NINE_HOURS },
+  { round: 0, raceName: "Bahrain Pre-Season Test", sessionName: "Day 2", startTime: new Date("2026-02-11T23:00:00Z"), durationMs: NINE_HOURS },
+  { round: 0, raceName: "Bahrain Pre-Season Test", sessionName: "Day 3", startTime: new Date("2026-02-12T23:00:00Z"), durationMs: NINE_HOURS },
+];
+
 /**
  * Fetch the 2026 F1 calendar from Jolpica and return a sorted list of
- * every session start time.
+ * every session start time, including pre-season testing.
  */
 export async function fetchSchedule(): Promise<ScheduledSession[]> {
   const res = await fetch(JOLPICA_URL);
@@ -57,17 +72,17 @@ export async function fetchSchedule(): Promise<ScheduledSession[]> {
 
   const data: JolpicaResponse = await res.json();
   const races = data.MRData.RaceTable.Races;
-  const sessions: ScheduledSession[] = [];
+  const sessions: ScheduledSession[] = [...PRE_SEASON_TESTING];
 
   for (const race of races) {
     const round = parseInt(race.round, 10);
     const name = race.raceName;
 
-    const add = (sessionName: string, st: SessionTime | undefined) => {
+    const add = (sessionName: string, st: SessionTime | undefined, duration = THREE_HOURS) => {
       if (!st) return;
       const start = new Date(`${st.date}T${st.time}`);
       if (!isNaN(start.getTime())) {
-        sessions.push({ round, raceName: name, sessionName, startTime: start });
+        sessions.push({ round, raceName: name, sessionName, startTime: start, durationMs: duration });
       }
     };
 
@@ -97,9 +112,9 @@ export function findNextWakeup(
     // Wake up WAKE_BEFORE_MS before session start
     const wakeTime = new Date(session.startTime.getTime() - WAKE_BEFORE_MS);
 
-    // If we haven't passed the session start yet (give 3h buffer for long sessions)
+    // If we haven't passed the estimated session end
     const sessionEndEstimate = new Date(
-      session.startTime.getTime() + 3 * 60 * 60 * 1000,
+      session.startTime.getTime() + session.durationMs,
     );
 
     if (now < sessionEndEstimate) {

@@ -9,10 +9,10 @@ import { TursoWriter } from "./turso-writer.js";
 // Configuration
 // ---------------------------------------------------------------------------
 
-const DISCOVERY_POLL_MS = 60_000;    // Check for live session every 60s (once awake)
-const FLUSH_INTERVAL_MS = 3_000;     // Flush to Turso every 3s
-const SESSION_END_GRACE_MS = 30_000; // Wait 30s after session ends before stopping
-const SCHEDULE_RETRY_MS = 600_000;   // Retry schedule fetch every 10min on failure
+const DISCOVERY_POLL_MS = 60_000;     // Check for live session every 60s (once awake)
+const FLUSH_INTERVAL_MS = 3_000;      // Flush to Turso every 3s
+const SESSION_END_GRACE_MS = 30_000;  // Wait 30s after session ends before stopping
+const SCHEDULE_RETRY_MS = 600_000;    // Retry schedule fetch every 10min on failure
 const MAX_AWAKE_MS = 4 * 60 * 60 * 1000; // Max 4h awake per session window
 
 // ---------------------------------------------------------------------------
