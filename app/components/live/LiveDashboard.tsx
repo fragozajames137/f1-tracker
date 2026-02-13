@@ -10,7 +10,7 @@ import type {
 } from "@/app/types/openf1";
 import { useLiveSessionStore } from "@/app/stores/liveSession";
 import { useLivePolling } from "@/app/hooks/useLivePolling";
-import { getSessions } from "@/app/lib/openf1";
+import { liveProvider } from "@/app/lib/live-timing-provider";
 
 import dynamic from "next/dynamic";
 import SessionSelector from "./SessionSelector";
@@ -158,7 +158,7 @@ export default function LiveDashboard() {
             <button
               onClick={() => {
                 useLiveSessionStore.setState({ error: null, loading: true });
-                getSessions(year)
+                liveProvider.getSessions(year)
                   .then((data) => {
                     const sorted = [...data].sort(
                       (a, b) =>

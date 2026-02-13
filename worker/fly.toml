@@ -1,0 +1,14 @@
+app = 'f1-tracker-worker'
+primary_region = 'lhr'
+
+[build]
+  dockerfile = "Dockerfile"
+
+# No HTTP service — this is a background worker process
+[processes]
+  worker = "node dist/index.js"
+
+[[vm]]
+  size = 'shared-cpu-1x'
+  memory = '256mb'
+  processes = ['worker']

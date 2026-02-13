@@ -283,6 +283,23 @@ export const weatherSeries = sqliteTable(
 );
 
 // ---------------------------------------------------------------------------
+// liveState — real-time SignalR data blobs for the live dashboard
+// ---------------------------------------------------------------------------
+export const liveState = sqliteTable(
+  "live_state",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    sessionKey: integer("session_key").notNull(),
+    topic: text("topic").notNull(), // "positions", "laps", "drivers", etc.
+    data: text("data").notNull(), // JSON blob of OpenF1-typed array
+    updatedAt: text("updated_at").notNull(), // ISO datetime
+  },
+  (table) => [
+    uniqueIndex("live_state_pk").on(table.sessionKey, table.topic),
+  ],
+);
+
+// ---------------------------------------------------------------------------
 // sessionStatus — track status + session status timeline
 // ---------------------------------------------------------------------------
 export const sessionStatus = sqliteTable(

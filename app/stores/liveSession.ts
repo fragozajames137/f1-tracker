@@ -11,18 +11,7 @@ import type {
   OpenF1TeamRadio,
   OpenF1Stint,
 } from "@/app/types/openf1";
-import {
-  getSessions,
-  getSessionDrivers,
-  getPositions,
-  getLaps,
-  getPitStops,
-  getIntervals,
-  getRaceControl,
-  getWeather,
-  getTeamRadio,
-  getStints,
-} from "@/app/lib/openf1";
+import { liveProvider } from "@/app/lib/live-timing-provider";
 
 interface LiveSessionState {
   // Session selection
@@ -100,7 +89,7 @@ export const useLiveSessionStore = create<LiveSessionState>()((set) => ({
   loadSessions: async (year, signal) => {
     set({ loading: true, error: null });
     try {
-      const data = await getSessions(year, { signal });
+      const data = await liveProvider.getSessions(year, { signal });
       const sorted = [...data].sort(
         (a, b) =>
           new Date(b.date_start).getTime() - new Date(a.date_start).getTime(),
@@ -132,15 +121,15 @@ export const useLiveSessionStore = create<LiveSessionState>()((set) => ({
         weatherData,
         stintsData,
       ] = await Promise.all([
-        getSessionDrivers(sessionKey, { signal }),
-        getPositions(sessionKey, { signal }),
-        getLaps(sessionKey, undefined, { signal }),
-        getPitStops(sessionKey, { signal }),
-        getIntervals(sessionKey, { signal }).catch(() => []),
-        getRaceControl(sessionKey, { signal }).catch(() => []),
-        getTeamRadio(sessionKey, undefined, { signal }).catch(() => []),
-        getWeather(sessionKey, { signal }).catch(() => []),
-        getStints(sessionKey, { signal }),
+        liveProvider.getSessionDrivers(sessionKey, { signal }),
+        liveProvider.getPositions(sessionKey, { signal }),
+        liveProvider.getLaps(sessionKey, undefined, { signal }),
+        liveProvider.getPitStops(sessionKey, { signal }),
+        liveProvider.getIntervals(sessionKey, { signal }).catch(() => []),
+        liveProvider.getRaceControl(sessionKey, { signal }).catch(() => []),
+        liveProvider.getTeamRadio(sessionKey, undefined, { signal }).catch(() => []),
+        liveProvider.getWeather(sessionKey, { signal }).catch(() => []),
+        liveProvider.getStints(sessionKey, { signal }),
       ]);
 
       if (signal?.aborted) return;
@@ -164,7 +153,7 @@ export const useLiveSessionStore = create<LiveSessionState>()((set) => ({
 
   loadDriverLaps: async (sessionKey, driverNumber, signal) => {
     try {
-      const laps = await getLaps(sessionKey, driverNumber, { signal });
+      const laps = await liveProvider.getLaps(sessionKey, driverNumber, { signal });
       if (!signal?.aborted) {
         set({ driverLaps: laps });
       }

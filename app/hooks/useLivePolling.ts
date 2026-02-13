@@ -1,15 +1,6 @@
 import { useEffect, useRef, startTransition } from "react";
 import { useLiveSessionStore } from "@/app/stores/liveSession";
-import {
-  getPositions,
-  getLaps,
-  getIntervals,
-  getStints,
-  getRaceControl,
-  getTeamRadio,
-  getWeather,
-  getPitStops,
-} from "@/app/lib/openf1";
+import { liveProvider } from "@/app/lib/live-timing-provider";
 
 const CURRENT_YEAR = 2026;
 const FAST_POLL_MS = 5_000;
@@ -54,10 +45,10 @@ export function useLivePolling() {
       try {
         const [positionsData, lapsData, intervalsData, stintsData] =
           await Promise.all([
-            getPositions(selectedSessionKey!, { signal }),
-            getLaps(selectedSessionKey!, undefined, { signal }),
-            getIntervals(selectedSessionKey!, { signal }).catch(() => []),
-            getStints(selectedSessionKey!, { signal }),
+            liveProvider.getPositions(selectedSessionKey!, { signal }),
+            liveProvider.getLaps(selectedSessionKey!, undefined, { signal }),
+            liveProvider.getIntervals(selectedSessionKey!, { signal }).catch(() => []),
+            liveProvider.getStints(selectedSessionKey!, { signal }),
           ]);
         if (signal.aborted) return;
         startTransition(() => {
@@ -80,12 +71,12 @@ export function useLivePolling() {
       slowPollingRef.current = true;
       try {
         const [rcData, radioData, weatherData, pitsData] = await Promise.all([
-          getRaceControl(selectedSessionKey!, { signal }).catch(() => []),
-          getTeamRadio(selectedSessionKey!, undefined, { signal }).catch(
+          liveProvider.getRaceControl(selectedSessionKey!, { signal }).catch(() => []),
+          liveProvider.getTeamRadio(selectedSessionKey!, undefined, { signal }).catch(
             () => [],
           ),
-          getWeather(selectedSessionKey!, { signal }).catch(() => []),
-          getPitStops(selectedSessionKey!, { signal }),
+          liveProvider.getWeather(selectedSessionKey!, { signal }).catch(() => []),
+          liveProvider.getPitStops(selectedSessionKey!, { signal }),
         ]);
         if (signal.aborted) return;
         startTransition(() => {
