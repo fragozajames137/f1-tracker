@@ -1,5 +1,5 @@
 import { eq, and, asc, desc, sql } from "drizzle-orm";
-import { db } from "@/db";
+import { getDb } from "@/db";
 import * as schema from "@/db/schema";
 
 const CURRENT_YEAR = 2026;
@@ -15,10 +15,14 @@ export function getCacheControl(year?: number) {
 // Sessions
 // ---------------------------------------------------------------------------
 
-export async function getSessionsByYear(year: number, type?: string) {
+export async function getSessionsByYear(year: number, type?: string, round?: number) {
+  const db = getDb();
   const conditions = [eq(schema.meetings.year, year)];
   if (type) {
     conditions.push(eq(schema.sessions.type, type));
+  }
+  if (round) {
+    conditions.push(eq(schema.meetings.round, round));
   }
 
   return db
@@ -45,6 +49,7 @@ export async function getSessionsByYear(year: number, type?: string) {
 }
 
 export async function getSessionDetail(sessionKey: number) {
+  const db = getDb();
   const [session] = await db
     .select({
       sessionKey: schema.sessions.key,
@@ -95,6 +100,7 @@ export async function getLaps(
   fromLap?: number,
   toLap?: number,
 ) {
+  const db = getDb();
   const conditions = [eq(schema.laps.sessionKey, sessionKey)];
   if (driverNumber) conditions.push(eq(schema.laps.driverNumber, driverNumber));
   if (fromLap) conditions.push(sql`${schema.laps.lapNumber} >= ${fromLap}`);
@@ -112,6 +118,7 @@ export async function getLaps(
 // ---------------------------------------------------------------------------
 
 export async function getLapChart(sessionKey: number) {
+  const db = getDb();
   const positions = await db
     .select()
     .from(schema.lapPositions)
@@ -154,6 +161,7 @@ export async function getLapChart(sessionKey: number) {
 // ---------------------------------------------------------------------------
 
 export async function getStrategy(sessionKey: number) {
+  const db = getDb();
   const stintsData = await db
     .select()
     .from(schema.stints)
@@ -186,6 +194,7 @@ export async function getStrategy(sessionKey: number) {
 // ---------------------------------------------------------------------------
 
 export async function getWeather(sessionKey: number) {
+  const db = getDb();
   return db
     .select()
     .from(schema.weatherSeries)
@@ -198,6 +207,7 @@ export async function getWeather(sessionKey: number) {
 // ---------------------------------------------------------------------------
 
 export async function getRaceControlMessages(sessionKey: number) {
+  const db = getDb();
   return db
     .select()
     .from(schema.raceControlMessages)
@@ -210,6 +220,7 @@ export async function getRaceControlMessages(sessionKey: number) {
 // ---------------------------------------------------------------------------
 
 export async function getPitStops(sessionKey: number) {
+  const db = getDb();
   const stops = await db
     .select()
     .from(schema.pitStops)

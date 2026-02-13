@@ -4,6 +4,7 @@ import { getSessionsByYear, getCacheControl } from "@/app/lib/db-queries";
 export async function GET(request: NextRequest) {
   const yearParam = request.nextUrl.searchParams.get("year");
   const type = request.nextUrl.searchParams.get("type") || undefined;
+  const roundParam = request.nextUrl.searchParams.get("round");
 
   if (!yearParam) {
     return NextResponse.json(
@@ -20,7 +21,8 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const sessions = await getSessionsByYear(year, type);
+  const round = roundParam ? parseInt(roundParam, 10) : undefined;
+  const sessions = await getSessionsByYear(year, type, round);
 
   return NextResponse.json(sessions, {
     headers: { "Cache-Control": getCacheControl(year) },

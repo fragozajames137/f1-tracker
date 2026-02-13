@@ -122,7 +122,7 @@ export default function HistoryDashboard({
       )}
 
       {!fetchError && activeTab === "results" && (
-        <RaceResultsView races={data.races} driverHeadshots={data.driverHeadshots} />
+        <RaceResultsView races={data.races} season={data.season} driverHeadshots={data.driverHeadshots} />
       )}
     </div>
   );

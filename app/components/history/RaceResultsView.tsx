@@ -3,16 +3,20 @@
 import { useState } from "react";
 import type { RaceWithResults } from "@/app/types/history";
 import { NationalityFlag, DriverImg, TeamLogo } from "./shared";
+import SessionDrillDown from "./SessionDrillDown";
 
 interface RaceResultsViewProps {
   races: RaceWithResults[];
+  season: number;
   driverHeadshots?: Record<string, string>;
 }
 
-export default function RaceResultsView({ races, driverHeadshots }: RaceResultsViewProps) {
+export default function RaceResultsView({ races, season, driverHeadshots }: RaceResultsViewProps) {
   const [selectedRound, setSelectedRound] = useState<number>(() =>
     races.length > 0 ? races.length - 1 : 0,
   );
+  const [sessionKey, setSessionKey] = useState<number | null>(null);
+  const [loadingSession, setLoadingSession] = useState(false);
 
   if (races.length === 0) {
     return (
@@ -25,6 +29,25 @@ export default function RaceResultsView({ races, driverHeadshots }: RaceResultsV
   }
 
   const race = races[selectedRound];
+  const hasSessionData = season >= 2018;
+
+  async function handleViewSession() {
+    if (!race || !hasSessionData) return;
+    setLoadingSession(true);
+    try {
+      const round = parseInt(race.round, 10);
+      const res = await fetch(`/api/sessions?year=${season}&type=Race&round=${round}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const sessions = await res.json();
+      if (sessions.length > 0) {
+        setSessionKey(sessions[0].sessionKey);
+      }
+    } catch {
+      // Silently fail — button stays clickable
+    } finally {
+      setLoadingSession(false);
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -32,7 +55,10 @@ export default function RaceResultsView({ races, driverHeadshots }: RaceResultsV
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <select
           value={selectedRound}
-          onChange={(e) => setSelectedRound(parseInt(e.target.value, 10))}
+          onChange={(e) => {
+            setSelectedRound(parseInt(e.target.value, 10));
+            setSessionKey(null);
+          }}
           className="w-full cursor-pointer rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none focus:border-white/30 sm:w-auto"
         >
           {races.map((r, i) => (
@@ -45,6 +71,15 @@ export default function RaceResultsView({ races, driverHeadshots }: RaceResultsV
           {race.Circuit.circuitName} — {race.Circuit.Location.locality},{" "}
           {race.Circuit.Location.country}
         </span>
+        {hasSessionData && (
+          <button
+            onClick={handleViewSession}
+            disabled={loadingSession || sessionKey !== null}
+            className="cursor-pointer rounded-lg border border-white/10 px-3 py-1.5 text-xs font-medium text-white/60 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-40 sm:ml-auto"
+          >
+            {loadingSession ? "Loading..." : sessionKey ? "Session Open" : "View Session"}
+          </button>
+        )}
       </div>
 
       {/* Results table */}
@@ -121,6 +156,14 @@ export default function RaceResultsView({ races, driverHeadshots }: RaceResultsV
           </table>
         </div>
       </div>
+
+      {/* Session drill-down */}
+      {sessionKey && (
+        <SessionDrillDown
+          sessionKey={sessionKey}
+          onClose={() => setSessionKey(null)}
+        />
+      )}
     </div>
   );
 }
