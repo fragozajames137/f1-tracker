@@ -134,6 +134,39 @@ export const useLiveSessionStore = create<LiveSessionState>()((set) => ({
 
       if (signal?.aborted) return;
 
+      // If this session has no data, try other sessions in the current list
+      if (driversData.length === 0) {
+        const { sessions } = useLiveSessionStore.getState();
+        for (const s of sessions) {
+          if (s.session_key === sessionKey) continue;
+          if (signal?.aborted) return;
+          const testDrivers = await liveProvider.getSessionDrivers(s.session_key, { signal }).catch(() => []);
+          if (testDrivers.length > 0) {
+            // Found a session with data — switch to it
+            set({ selectedSessionKey: s.session_key });
+            return; // The effect will re-trigger loadSessionData for the new key
+          }
+        }
+
+        // If no session in the current year has data, try the previous year
+        const { year } = useLiveSessionStore.getState();
+        if (year === 2026) {
+          if (signal?.aborted) return;
+          const prevSessions = await liveProvider.getSessions(2025, { signal }).catch(() => []);
+          if (prevSessions.length > 0) {
+            const sorted = [...prevSessions].sort(
+              (a, b) => new Date(b.date_start).getTime() - new Date(a.date_start).getTime(),
+            );
+            set({
+              sessions: sorted,
+              selectedSessionKey: sorted[0].session_key,
+              year: 2025,
+            });
+            return;
+          }
+        }
+      }
+
       set({
         drivers: driversData,
         positions: positionsData,
