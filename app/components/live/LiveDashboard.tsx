@@ -165,10 +165,19 @@ export default function LiveDashboard() {
                         new Date(b.date_start).getTime() -
                         new Date(a.date_start).getTime(),
                     );
+                    const now = Date.now();
+                    const started = sorted.filter(
+                      (s) => new Date(s.date_start).getTime() <= now,
+                    );
+                    const defaultSession =
+                      started.length > 0
+                        ? started[0]
+                        : sorted.length > 0
+                          ? sorted[sorted.length - 1]
+                          : null;
                     useLiveSessionStore.setState({
                       sessions: sorted,
-                      selectedSessionKey:
-                        sorted.length > 0 ? sorted[0].session_key : null,
+                      selectedSessionKey: defaultSession?.session_key ?? null,
                       loading: false,
                     });
                   })

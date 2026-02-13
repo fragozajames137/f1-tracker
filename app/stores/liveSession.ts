@@ -94,9 +94,18 @@ export const useLiveSessionStore = create<LiveSessionState>()((set) => ({
         (a, b) =>
           new Date(b.date_start).getTime() - new Date(a.date_start).getTime(),
       );
+
+      // Pick the most recently started session (not a future one)
+      const now = Date.now();
+      const started = sorted.filter(
+        (s) => new Date(s.date_start).getTime() <= now,
+      );
+      const defaultSession =
+        started.length > 0 ? started[0] : sorted.length > 0 ? sorted[sorted.length - 1] : null;
+
       set({
         sessions: sorted,
-        selectedSessionKey: sorted.length > 0 ? sorted[0].session_key : null,
+        selectedSessionKey: defaultSession?.session_key ?? null,
         loading: false,
       });
     } catch (err) {
@@ -134,33 +143,45 @@ export const useLiveSessionStore = create<LiveSessionState>()((set) => ({
 
       if (signal?.aborted) return;
 
-      // If this session has no data, try other sessions in the current list
+      // If this session has no data, try other past sessions in the current list
       if (driversData.length === 0) {
         const { sessions } = useLiveSessionStore.getState();
-        for (const s of sessions) {
-          if (s.session_key === sessionKey) continue;
+        const now = Date.now();
+        const pastSessions = sessions.filter(
+          (s) =>
+            s.session_key !== sessionKey &&
+            new Date(s.date_start).getTime() <= now,
+        );
+        // pastSessions is already sorted newest-first from loadSessions
+        for (const s of pastSessions) {
           if (signal?.aborted) return;
-          const testDrivers = await liveProvider.getSessionDrivers(s.session_key, { signal }).catch(() => []);
+          const testDrivers = await liveProvider
+            .getSessionDrivers(s.session_key, { signal })
+            .catch(() => []);
           if (testDrivers.length > 0) {
-            // Found a session with data — switch to it
+            // Found a session with data — switch to it and let effect re-trigger
             set({ selectedSessionKey: s.session_key });
-            return; // The effect will re-trigger loadSessionData for the new key
+            return;
           }
         }
 
         // If no session in the current year has data, try the previous year
         const { year } = useLiveSessionStore.getState();
-        if (year === 2026) {
+        if (year >= 2024) {
           if (signal?.aborted) return;
-          const prevSessions = await liveProvider.getSessions(2025, { signal }).catch(() => []);
+          const prevSessions = await liveProvider
+            .getSessions(year - 1, { signal })
+            .catch(() => []);
           if (prevSessions.length > 0) {
             const sorted = [...prevSessions].sort(
-              (a, b) => new Date(b.date_start).getTime() - new Date(a.date_start).getTime(),
+              (a, b) =>
+                new Date(b.date_start).getTime() -
+                new Date(a.date_start).getTime(),
             );
             set({
               sessions: sorted,
               selectedSessionKey: sorted[0].session_key,
-              year: 2025,
+              year: year - 1,
             });
             return;
           }
