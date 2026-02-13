@@ -4,7 +4,7 @@ const JOLPICA_URL = "https://api.jolpi.ca/ergast/f1/2026.json";
 
 export async function fetchRaceSchedule(): Promise<Race[]> {
   const res = await fetch(JOLPICA_URL, {
-    next: { revalidate: 3600 },
+    next: { revalidate: 86400 },
   });
 
   if (!res.ok) {

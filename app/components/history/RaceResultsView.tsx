@@ -6,9 +6,10 @@ import { NationalityFlag, DriverImg, TeamLogo } from "./shared";
 
 interface RaceResultsViewProps {
   races: RaceWithResults[];
+  driverHeadshots?: Record<string, string>;
 }
 
-export default function RaceResultsView({ races }: RaceResultsViewProps) {
+export default function RaceResultsView({ races, driverHeadshots }: RaceResultsViewProps) {
   const [selectedRound, setSelectedRound] = useState<number>(() =>
     races.length > 0 ? races.length - 1 : 0,
   );
@@ -79,6 +80,7 @@ export default function RaceResultsView({ races }: RaceResultsViewProps) {
                         familyName={r.Driver.familyName}
                         name={`${r.Driver.givenName} ${r.Driver.familyName}`}
                         nationality={r.Driver.nationality}
+                        espnUrl={driverHeadshots?.[r.Driver.driverId]}
                       />
                       <span>
                         <span className="font-medium text-white">

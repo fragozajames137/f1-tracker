@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "www.formula1.com",
       },
+      {
+        protocol: "https",
+        hostname: "a.espncdn.com",
+      },
     ],
   },
   async headers() {

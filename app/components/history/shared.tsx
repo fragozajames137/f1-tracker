@@ -58,11 +58,16 @@ export function NationalityFlag({ nationality }: { nationality: string }) {
   );
 }
 
-export function DriverImg({ familyName, name, nationality }: { familyName: string; name: string; nationality?: string }) {
-  const [attempt, setAttempt] = useState(0); // 0=optimized, 1=webp, 2=png, 3=flag, 4=text
+export function DriverImg({ familyName, name, nationality, espnUrl }: { familyName: string; name: string; nationality?: string; espnUrl?: string }) {
+  const [attempt, setAttempt] = useState(0);
   const key = driverKey(familyName);
   const blur = getBlurPlaceholder(`drivers/${key}`);
-  if (attempt === 3) {
+
+  const srcMap: string[] = [driverSrc(key, 48), `/drivers/${key}.webp`, `/drivers/${key}.png`];
+  if (espnUrl) srcMap.push(espnUrl);
+
+  // Flag fallback
+  if (attempt === srcMap.length) {
     const code = nationality ? JOLPICA_NATIONALITY_TO_ISO[nationality] : undefined;
     if (code) {
       return (
@@ -72,7 +77,7 @@ export function DriverImg({ familyName, name, nationality }: { familyName: strin
           width={24}
           height={24}
           className="h-6 w-6 shrink-0 rounded-full object-cover"
-          onError={() => setAttempt(4)}
+          onError={() => setAttempt((a) => a + 1)}
         />
       );
     }
@@ -82,14 +87,16 @@ export function DriverImg({ familyName, name, nationality }: { familyName: strin
       </span>
     );
   }
-  if (attempt >= 4) {
+
+  // Initials fallback
+  if (attempt > srcMap.length) {
     return (
       <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-[9px] font-bold text-white/40">
         {name.charAt(0)}
       </span>
     );
   }
-  const srcMap = [driverSrc(key, 48), `/drivers/${key}.webp`, `/drivers/${key}.png`];
+
   return (
     <Image
       src={srcMap[attempt]}

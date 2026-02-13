@@ -1,0 +1,235 @@
+import { eq, and, asc, desc, sql } from "drizzle-orm";
+import { db } from "@/db";
+import * as schema from "@/db/schema";
+
+const CURRENT_YEAR = 2026;
+
+export function getCacheControl(year?: number) {
+  const isPast = year && year < CURRENT_YEAR;
+  return isPast
+    ? "public, max-age=3600, s-maxage=604800, stale-while-revalidate=86400"
+    : "public, max-age=300, s-maxage=3600, stale-while-revalidate=300";
+}
+
+// ---------------------------------------------------------------------------
+// Sessions
+// ---------------------------------------------------------------------------
+
+export async function getSessionsByYear(year: number, type?: string) {
+  const conditions = [eq(schema.meetings.year, year)];
+  if (type) {
+    conditions.push(eq(schema.sessions.type, type));
+  }
+
+  return db
+    .select({
+      sessionKey: schema.sessions.key,
+      sessionType: schema.sessions.type,
+      sessionName: schema.sessions.name,
+      startDate: schema.sessions.startDate,
+      endDate: schema.sessions.endDate,
+      gmtOffset: schema.sessions.gmtOffset,
+      totalLaps: schema.sessions.totalLaps,
+      ingestedAt: schema.sessions.ingestedAt,
+      meetingKey: schema.meetings.key,
+      meetingName: schema.meetings.name,
+      round: schema.meetings.round,
+      location: schema.meetings.location,
+      country: schema.meetings.country,
+      circuit: schema.meetings.circuit,
+    })
+    .from(schema.sessions)
+    .innerJoin(schema.meetings, eq(schema.sessions.meetingKey, schema.meetings.key))
+    .where(and(...conditions))
+    .orderBy(asc(schema.meetings.round), asc(schema.sessions.startDate));
+}
+
+export async function getSessionDetail(sessionKey: number) {
+  const [session] = await db
+    .select({
+      sessionKey: schema.sessions.key,
+      sessionType: schema.sessions.type,
+      sessionName: schema.sessions.name,
+      startDate: schema.sessions.startDate,
+      endDate: schema.sessions.endDate,
+      gmtOffset: schema.sessions.gmtOffset,
+      totalLaps: schema.sessions.totalLaps,
+      ingestedAt: schema.sessions.ingestedAt,
+      meetingKey: schema.meetings.key,
+      meetingName: schema.meetings.name,
+      year: schema.meetings.year,
+      round: schema.meetings.round,
+      location: schema.meetings.location,
+      country: schema.meetings.country,
+      circuit: schema.meetings.circuit,
+    })
+    .from(schema.sessions)
+    .innerJoin(schema.meetings, eq(schema.sessions.meetingKey, schema.meetings.key))
+    .where(eq(schema.sessions.key, sessionKey))
+    .limit(1);
+
+  if (!session) return null;
+
+  const drivers = await db
+    .select()
+    .from(schema.sessionDrivers)
+    .where(eq(schema.sessionDrivers.sessionKey, sessionKey))
+    .orderBy(asc(schema.sessionDrivers.finalPosition));
+
+  const statusTimeline = await db
+    .select()
+    .from(schema.sessionStatus)
+    .where(eq(schema.sessionStatus.sessionKey, sessionKey))
+    .orderBy(asc(schema.sessionStatus.utc));
+
+  return { ...session, drivers, statusTimeline };
+}
+
+// ---------------------------------------------------------------------------
+// Laps
+// ---------------------------------------------------------------------------
+
+export async function getLaps(
+  sessionKey: number,
+  driverNumber?: number,
+  fromLap?: number,
+  toLap?: number,
+) {
+  const conditions = [eq(schema.laps.sessionKey, sessionKey)];
+  if (driverNumber) conditions.push(eq(schema.laps.driverNumber, driverNumber));
+  if (fromLap) conditions.push(sql`${schema.laps.lapNumber} >= ${fromLap}`);
+  if (toLap) conditions.push(sql`${schema.laps.lapNumber} <= ${toLap}`);
+
+  return db
+    .select()
+    .from(schema.laps)
+    .where(and(...conditions))
+    .orderBy(asc(schema.laps.driverNumber), asc(schema.laps.lapNumber));
+}
+
+// ---------------------------------------------------------------------------
+// Lap Chart (positions per lap for all drivers)
+// ---------------------------------------------------------------------------
+
+export async function getLapChart(sessionKey: number) {
+  const positions = await db
+    .select()
+    .from(schema.lapPositions)
+    .where(eq(schema.lapPositions.sessionKey, sessionKey))
+    .orderBy(asc(schema.lapPositions.lapNumber), asc(schema.lapPositions.position));
+
+  // Get driver info for labeling
+  const drivers = await db
+    .select({
+      driverNumber: schema.sessionDrivers.driverNumber,
+      abbreviation: schema.sessionDrivers.abbreviation,
+      teamName: schema.sessionDrivers.teamName,
+      teamColor: schema.sessionDrivers.teamColor,
+    })
+    .from(schema.sessionDrivers)
+    .where(eq(schema.sessionDrivers.sessionKey, sessionKey));
+
+  const driverMap = new Map(drivers.map((d) => [d.driverNumber, d]));
+
+  // Group by lap number
+  const laps = new Map<number, Array<{ driverNumber: number; position: number }>>();
+  for (const pos of positions) {
+    if (!laps.has(pos.lapNumber)) laps.set(pos.lapNumber, []);
+    laps.get(pos.lapNumber)!.push({
+      driverNumber: pos.driverNumber,
+      position: pos.position,
+    });
+  }
+
+  return {
+    drivers: Object.fromEntries(driverMap),
+    laps: Array.from(laps.entries())
+      .sort(([a], [b]) => a - b)
+      .map(([lap, positions]) => ({ lap, positions })),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Strategy (stints + pit stops)
+// ---------------------------------------------------------------------------
+
+export async function getStrategy(sessionKey: number) {
+  const stintsData = await db
+    .select()
+    .from(schema.stints)
+    .where(eq(schema.stints.sessionKey, sessionKey))
+    .orderBy(asc(schema.stints.driverNumber), asc(schema.stints.stintNumber));
+
+  const pitStopsData = await db
+    .select()
+    .from(schema.pitStops)
+    .where(eq(schema.pitStops.sessionKey, sessionKey))
+    .orderBy(asc(schema.pitStops.driverNumber), asc(schema.pitStops.lapNumber));
+
+  const drivers = await db
+    .select({
+      driverNumber: schema.sessionDrivers.driverNumber,
+      abbreviation: schema.sessionDrivers.abbreviation,
+      teamName: schema.sessionDrivers.teamName,
+      teamColor: schema.sessionDrivers.teamColor,
+      finalPosition: schema.sessionDrivers.finalPosition,
+    })
+    .from(schema.sessionDrivers)
+    .where(eq(schema.sessionDrivers.sessionKey, sessionKey))
+    .orderBy(asc(schema.sessionDrivers.finalPosition));
+
+  return { drivers, stints: stintsData, pitStops: pitStopsData };
+}
+
+// ---------------------------------------------------------------------------
+// Weather
+// ---------------------------------------------------------------------------
+
+export async function getWeather(sessionKey: number) {
+  return db
+    .select()
+    .from(schema.weatherSeries)
+    .where(eq(schema.weatherSeries.sessionKey, sessionKey))
+    .orderBy(asc(schema.weatherSeries.utc));
+}
+
+// ---------------------------------------------------------------------------
+// Race Control Messages
+// ---------------------------------------------------------------------------
+
+export async function getRaceControlMessages(sessionKey: number) {
+  return db
+    .select()
+    .from(schema.raceControlMessages)
+    .where(eq(schema.raceControlMessages.sessionKey, sessionKey))
+    .orderBy(asc(schema.raceControlMessages.utc));
+}
+
+// ---------------------------------------------------------------------------
+// Pit Stops
+// ---------------------------------------------------------------------------
+
+export async function getPitStops(sessionKey: number) {
+  const stops = await db
+    .select()
+    .from(schema.pitStops)
+    .where(eq(schema.pitStops.sessionKey, sessionKey))
+    .orderBy(asc(schema.pitStops.lapNumber));
+
+  const drivers = await db
+    .select({
+      driverNumber: schema.sessionDrivers.driverNumber,
+      abbreviation: schema.sessionDrivers.abbreviation,
+      teamName: schema.sessionDrivers.teamName,
+      teamColor: schema.sessionDrivers.teamColor,
+    })
+    .from(schema.sessionDrivers)
+    .where(eq(schema.sessionDrivers.sessionKey, sessionKey));
+
+  const driverMap = new Map(drivers.map((d) => [d.driverNumber, d]));
+
+  return stops.map((stop) => ({
+    ...stop,
+    driver: driverMap.get(stop.driverNumber) ?? null,
+  }));
+}

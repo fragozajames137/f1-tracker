@@ -155,4 +155,6 @@ export interface HistoryData {
   driverStandings: DriverStanding[];
   constructorStandings: ConstructorStanding[];
   races: RaceWithResults[];
+  /** Jolpica driverId → ESPN headshot URL (may be partial/empty) */
+  driverHeadshots?: Record<string, string>;
 }

@@ -8,12 +8,14 @@ interface StandingsViewProps {
   season: number;
   driverStandings: DriverStanding[];
   constructorStandings: ConstructorStanding[];
+  driverHeadshots?: Record<string, string>;
 }
 
 export default function StandingsView({
   season,
   driverStandings,
   constructorStandings,
+  driverHeadshots,
 }: StandingsViewProps) {
   const engine = dominantEngines[String(season) as keyof typeof dominantEngines] ?? null;
 
@@ -75,6 +77,7 @@ export default function StandingsView({
                           familyName={s.Driver.familyName}
                           name={`${s.Driver.givenName} ${s.Driver.familyName}`}
                           nationality={s.Driver.nationality}
+                          espnUrl={driverHeadshots?.[s.Driver.driverId]}
                         />
                         <span>
                           <span className="font-medium text-white">

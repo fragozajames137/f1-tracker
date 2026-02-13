@@ -2,18 +2,11 @@
 
 import { useState, useRef, useCallback } from "react";
 import type { HistoryData } from "@/app/types/history";
-import type {
-  DriverStandingsResponse,
-  ConstructorStandingsResponse,
-  RaceResultsResponse,
-} from "@/app/types/history";
 import SeasonSelector from "./SeasonSelector";
 import StandingsView from "./StandingsView";
 import RaceResultsView from "./RaceResultsView";
 
 type Tab = "standings" | "results";
-
-const JOLPICA_BASE = "https://api.jolpi.ca/ergast/f1";
 
 interface HistoryDashboardProps {
   seasons: number[];
@@ -48,39 +41,10 @@ export default function HistoryDashboard({
     setFetchError(null);
 
     try {
-      const [driversRes, constructorsRes, resultsRes] = await Promise.all([
-        fetch(`${JOLPICA_BASE}/${year}/driverstandings.json`),
-        fetch(`${JOLPICA_BASE}/${year}/constructorstandings.json`),
-        fetch(`${JOLPICA_BASE}/${year}/results.json?limit=1000`),
-      ]);
+      const res = await fetch(`/api/history/${year}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-      const driversData: DriverStandingsResponse = driversRes.ok
-        ? await driversRes.json()
-        : { MRData: { StandingsTable: { StandingsLists: [] } } };
-
-      const constructorsData: ConstructorStandingsResponse = constructorsRes.ok
-        ? await constructorsRes.json()
-        : { MRData: { StandingsTable: { StandingsLists: [] } } };
-
-      const resultsData: RaceResultsResponse = resultsRes.ok
-        ? await resultsRes.json()
-        : { MRData: { RaceTable: { Races: [] } } };
-
-      const driverLists = driversData.MRData.StandingsTable.StandingsLists;
-      const constructorLists =
-        constructorsData.MRData.StandingsTable.StandingsLists;
-
-      const historyData: HistoryData = {
-        season: year,
-        driverStandings:
-          driverLists.length > 0 ? driverLists[0].DriverStandings : [],
-        constructorStandings:
-          constructorLists.length > 0
-            ? constructorLists[0].ConstructorStandings
-            : [],
-        races: resultsData.MRData.RaceTable.Races,
-      };
-
+      const historyData: HistoryData = await res.json();
       cacheRef.current.set(year, historyData);
       setData(historyData);
     } catch {
@@ -153,11 +117,12 @@ export default function HistoryDashboard({
           season={data.season}
           driverStandings={data.driverStandings}
           constructorStandings={data.constructorStandings}
+          driverHeadshots={data.driverHeadshots}
         />
       )}
 
       {!fetchError && activeTab === "results" && (
-        <RaceResultsView races={data.races} />
+        <RaceResultsView races={data.races} driverHeadshots={data.driverHeadshots} />
       )}
     </div>
   );

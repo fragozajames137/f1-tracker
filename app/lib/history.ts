@@ -8,13 +8,14 @@ import type {
   SeasonsResponse,
   HistoryData,
 } from "@/app/types/history";
+import { resolveEspnHeadshots } from "@/app/lib/espn";
 
 const BASE_URL = "https://api.jolpi.ca/ergast/f1";
 const CURRENT_YEAR = 2026;
 
 function revalidateFor(year: number): number {
   // Current/future seasons refresh hourly; past seasons refresh daily
-  return year >= CURRENT_YEAR ? 3600 : 86400;
+  return year >= CURRENT_YEAR ? 3600 : 604800;
 }
 
 export async function fetchDriverStandings(
@@ -75,5 +76,26 @@ export async function fetchHistoryData(year: number): Promise<HistoryData> {
     fetchSeasonResults(year),
   ]);
 
-  return { season: year, driverStandings, constructorStandings, races };
+  // Collect all unique drivers across standings and race results
+  const driverMap = new Map<
+    string,
+    { driverId: string; givenName: string; familyName: string }
+  >();
+  for (const s of driverStandings) {
+    driverMap.set(s.Driver.driverId, s.Driver);
+  }
+  for (const race of races) {
+    for (const r of race.Results) {
+      if (!driverMap.has(r.Driver.driverId)) {
+        driverMap.set(r.Driver.driverId, r.Driver);
+      }
+    }
+  }
+
+  const driverHeadshots = await resolveEspnHeadshots(
+    year,
+    Array.from(driverMap.values()),
+  );
+
+  return { season: year, driverStandings, constructorStandings, races, driverHeadshots };
 }
