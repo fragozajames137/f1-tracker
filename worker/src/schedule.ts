@@ -1,4 +1,4 @@
-import { log, logError } from "./utils.js";
+import { log } from "./utils.js";
 
 // ---------------------------------------------------------------------------
 // Jolpica API types
@@ -45,6 +45,7 @@ export interface ScheduledSession {
 
 const JOLPICA_URL = "https://api.jolpi.ca/ergast/f1/2026.json";
 const WAKE_BEFORE_MS = 60 * 60 * 1000; // 1 hour before session
+const POST_RACE_BUFFER_MS = 4 * 60 * 60 * 1000; // Stay awake 4h after last session ends
 
 // ---------------------------------------------------------------------------
 // Pre-season testing — not in the Jolpica/Ergast calendar
@@ -100,26 +101,43 @@ export async function fetchSchedule(): Promise<ScheduledSession[]> {
 }
 
 /**
- * Find the next session that the worker should wake up for.
- * Returns the session and how many ms to sleep before waking.
- * Returns null if the season is over.
+ * Find the next race weekend the worker should wake up for.
+ * Wakes 1h before the first session of the weekend (FP1) and stays awake
+ * until the last session (Race) has ended.
+ *
+ * Returns the first session of the weekend, how long to sleep, and the end
+ * time of the entire weekend.
  */
 export function findNextWakeup(
   sessions: ScheduledSession[],
   now: Date = new Date(),
-): { session: ScheduledSession; sleepMs: number } | null {
-  for (const session of sessions) {
-    // Wake up WAKE_BEFORE_MS before session start
-    const wakeTime = new Date(session.startTime.getTime() - WAKE_BEFORE_MS);
+): { session: ScheduledSession; sleepMs: number; weekendEndMs: number } | null {
+  // Group sessions by round
+  const rounds = new Map<number, ScheduledSession[]>();
+  for (const s of sessions) {
+    if (!rounds.has(s.round)) rounds.set(s.round, []);
+    rounds.get(s.round)!.push(s);
+  }
 
-    // If we haven't passed the estimated session end
-    const sessionEndEstimate = new Date(
-      session.startTime.getTime() + session.durationMs,
-    );
+  // Find the first round whose last session hasn't ended yet
+  const sortedRounds = [...rounds.entries()].sort(
+    ([, a], [, b]) => a[0].startTime.getTime() - b[0].startTime.getTime(),
+  );
 
-    if (now < sessionEndEstimate) {
-      const sleepMs = Math.max(0, wakeTime.getTime() - now.getTime());
-      return { session, sleepMs };
+  for (const [, roundSessions] of sortedRounds) {
+    // Last session in the weekend + 4h buffer for delayed data
+    const lastSession = roundSessions[roundSessions.length - 1];
+    const weekendEndMs =
+      lastSession.startTime.getTime() + lastSession.durationMs + POST_RACE_BUFFER_MS;
+
+    // If the weekend isn't over yet
+    if (now.getTime() < weekendEndMs) {
+      // Wake up 1h before the first session of the weekend
+      const firstSession = roundSessions[0];
+      const wakeTime = firstSession.startTime.getTime() - WAKE_BEFORE_MS;
+      const sleepMs = Math.max(0, wakeTime - now.getTime());
+
+      return { session: firstSession, sleepMs, weekendEndMs };
     }
   }
 

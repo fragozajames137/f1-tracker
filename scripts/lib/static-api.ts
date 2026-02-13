@@ -1,6 +1,7 @@
 import type { RawSeasonIndex } from "../../app/types/f1-static";
 
 const BASE_URL = "https://livetiming.formula1.com/static";
+const MIRROR_URL = "https://livetiming-mirror.fastf1.dev/static";
 const MAX_RETRIES = 3;
 const RETRY_BASE_MS = 1000;
 const DELAY_BETWEEN_REQUESTS_MS = 200;
@@ -16,7 +17,7 @@ async function throttle(): Promise<void> {
   lastRequestTime = Date.now();
 }
 
-async function fetchWithRetry(url: string): Promise<Response | null> {
+async function fetchOnce(url: string): Promise<Response | null> {
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     await throttle();
     try {
@@ -25,6 +26,8 @@ async function fetchWithRetry(url: string): Promise<Response | null> {
       });
       if (res.status === 404) return null;
       if (res.ok) return res;
+      // 403 = access denied, don't retry (fall through to mirror)
+      if (res.status === 403) return null;
       // Retry on 5xx or 429
       if (res.status >= 500 || res.status === 429) {
         if (attempt < MAX_RETRIES) {
@@ -51,6 +54,27 @@ async function fetchWithRetry(url: string): Promise<Response | null> {
       return null;
     }
   }
+  return null;
+}
+
+/**
+ * Fetch with automatic fallback to FastF1 mirror for seasons where F1's
+ * official API returns 403 (e.g. 2022).
+ */
+async function fetchWithRetry(url: string): Promise<Response | null> {
+  const res = await fetchOnce(url);
+  if (res) return res;
+
+  // Try mirror as fallback
+  if (url.startsWith(BASE_URL)) {
+    const mirrorUrl = MIRROR_URL + url.slice(BASE_URL.length);
+    const mirrorRes = await fetchOnce(mirrorUrl);
+    if (mirrorRes) {
+      console.log(`  (fetched from mirror: ${mirrorUrl})`);
+      return mirrorRes;
+    }
+  }
+
   return null;
 }
 

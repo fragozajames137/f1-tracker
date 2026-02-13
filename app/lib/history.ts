@@ -47,14 +47,37 @@ export async function fetchConstructorStandings(
 export async function fetchSeasonResults(
   year: number,
 ): Promise<RaceWithResults[]> {
-  const res = await fetch(
-    `${BASE_URL}/${year}/results.json?limit=1000`,
-    { next: { revalidate: revalidateFor(year) } },
-  );
-  if (!res.ok) return [];
+  const PAGE_SIZE = 100;
+  const raceMap = new Map<string, RaceWithResults>();
+  let offset = 0;
+  let total = Infinity;
 
-  const data: RaceResultsResponse = await res.json();
-  return data.MRData.RaceTable.Races;
+  while (offset < total) {
+    const res = await fetch(
+      `${BASE_URL}/${year}/results.json?limit=${PAGE_SIZE}&offset=${offset}`,
+      { next: { revalidate: revalidateFor(year) } },
+    );
+    if (!res.ok) break;
+
+    const data: RaceResultsResponse = await res.json();
+    total = parseInt(data.MRData.total, 10);
+
+    for (const race of data.MRData.RaceTable.Races) {
+      const existing = raceMap.get(race.round);
+      if (existing) {
+        // Merge results for races split across pages
+        existing.Results.push(...race.Results);
+      } else {
+        raceMap.set(race.round, { ...race, Results: [...race.Results] });
+      }
+    }
+
+    offset += PAGE_SIZE;
+  }
+
+  return Array.from(raceMap.values()).sort(
+    (a, b) => parseInt(a.round, 10) - parseInt(b.round, 10),
+  );
 }
 
 export async function fetchAvailableSeasons(): Promise<number[]> {

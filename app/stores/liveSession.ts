@@ -15,7 +15,6 @@ import { liveProvider } from "@/app/lib/live-timing-provider";
 
 interface LiveSessionState {
   // Session selection
-  year: number;
   sessions: OpenF1Session[];
   selectedSessionKey: number | null;
   loading: boolean;
@@ -37,10 +36,9 @@ interface LiveSessionState {
   driverLaps: OpenF1Lap[];
 
   // Actions
-  setYear: (year: number) => void;
   setSelectedSessionKey: (key: number | null) => void;
   setSelectedDriverNumber: (num: number | null) => void;
-  loadSessions: (year: number, signal?: AbortSignal) => Promise<void>;
+  loadSessions: (signal?: AbortSignal) => Promise<void>;
   loadSessionData: (sessionKey: number, signal?: AbortSignal) => Promise<void>;
   loadDriverLaps: (
     sessionKey: number,
@@ -63,7 +61,6 @@ interface LiveSessionState {
 }
 
 export const useLiveSessionStore = create<LiveSessionState>()((set) => ({
-  year: 2026,
   sessions: [],
   selectedSessionKey: null,
   loading: true,
@@ -82,20 +79,20 @@ export const useLiveSessionStore = create<LiveSessionState>()((set) => ({
   selectedDriverNumber: null,
   driverLaps: [],
 
-  setYear: (year) => set({ year }),
   setSelectedSessionKey: (key) => set({ selectedSessionKey: key }),
   setSelectedDriverNumber: (num) => set({ selectedDriverNumber: num }),
 
-  loadSessions: async (year, signal) => {
+  loadSessions: async (signal) => {
     set({ loading: true, error: null });
     try {
-      const data = await liveProvider.getSessions(year, { signal });
+      const data = await liveProvider.getSessions({ signal });
       const sorted = [...data].sort(
         (a, b) =>
           new Date(b.date_start).getTime() - new Date(a.date_start).getTime(),
       );
 
-      // Pick the most recently started session (not a future one)
+      // Auto-select: pick the most recently started session (not a future one),
+      // or the last session in the list if all are future
       const now = Date.now();
       const started = sorted.filter(
         (s) => new Date(s.date_start).getTime() <= now,
@@ -142,51 +139,6 @@ export const useLiveSessionStore = create<LiveSessionState>()((set) => ({
       ]);
 
       if (signal?.aborted) return;
-
-      // If this session has no data, try other past sessions in the current list
-      if (driversData.length === 0) {
-        const { sessions } = useLiveSessionStore.getState();
-        const now = Date.now();
-        const pastSessions = sessions.filter(
-          (s) =>
-            s.session_key !== sessionKey &&
-            new Date(s.date_start).getTime() <= now,
-        );
-        // pastSessions is already sorted newest-first from loadSessions
-        for (const s of pastSessions) {
-          if (signal?.aborted) return;
-          const testDrivers = await liveProvider
-            .getSessionDrivers(s.session_key, { signal })
-            .catch(() => []);
-          if (testDrivers.length > 0) {
-            // Found a session with data — switch to it and let effect re-trigger
-            set({ selectedSessionKey: s.session_key });
-            return;
-          }
-        }
-
-        // If no session in the current year has data, try the previous year
-        const { year } = useLiveSessionStore.getState();
-        if (year >= 2024) {
-          if (signal?.aborted) return;
-          const prevSessions = await liveProvider
-            .getSessions(year - 1, { signal })
-            .catch(() => []);
-          if (prevSessions.length > 0) {
-            const sorted = [...prevSessions].sort(
-              (a, b) =>
-                new Date(b.date_start).getTime() -
-                new Date(a.date_start).getTime(),
-            );
-            set({
-              sessions: sorted,
-              selectedSessionKey: sorted[0].session_key,
-              year: year - 1,
-            });
-            return;
-          }
-        }
-      }
 
       set({
         drivers: driversData,

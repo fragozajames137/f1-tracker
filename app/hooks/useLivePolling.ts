@@ -2,7 +2,6 @@ import { useEffect, useRef, startTransition } from "react";
 import { useLiveSessionStore } from "@/app/stores/liveSession";
 import { liveProvider } from "@/app/lib/live-timing-provider";
 
-const CURRENT_YEAR = 2026;
 const FAST_POLL_MS = 5_000;
 const SLOW_POLL_MS = 15_000;
 
@@ -10,7 +9,6 @@ export function useLivePolling() {
   const fastPollingRef = useRef(false);
   const slowPollingRef = useRef(false);
 
-  const year = useLiveSessionStore((s) => s.year);
   const sessions = useLiveSessionStore((s) => s.sessions);
   const selectedSessionKey = useLiveSessionStore((s) => s.selectedSessionKey);
   const selectedDriverNumber = useLiveSessionStore(
@@ -23,12 +21,12 @@ export function useLivePolling() {
   const setFastPollData = useLiveSessionStore((s) => s.setFastPollData);
   const setSlowPollData = useLiveSessionStore((s) => s.setSlowPollData);
 
-  // Load sessions for selected year
+  // Load available sessions on mount
   useEffect(() => {
     const abortController = new AbortController();
-    loadSessions(year, abortController.signal);
+    loadSessions(abortController.signal);
     return () => abortController.abort();
-  }, [year, loadSessions]);
+  }, [loadSessions]);
 
   // Load full session data + set up polling when session changes
   useEffect(() => {
@@ -97,19 +95,9 @@ export function useLivePolling() {
     loadSessionData(selectedSessionKey, signal).then(() => {
       if (signal.aborted) return;
 
-      const isCurrentYear = year === CURRENT_YEAR;
       const currentSession = sessions.find(
         (s) => s.session_key === selectedSessionKey,
       );
-      const isLatestSession =
-        sessions.length > 0 &&
-        sessions[0].session_key === selectedSessionKey;
-
-      // Only poll race weekend sessions (Race, Sprint, Qualifying, Practice 1-3)
-      // Don't poll pre-season testing ("Day 1", "Day 2", etc.)
-      const isRaceWeekend =
-        currentSession?.session_name !== undefined &&
-        !currentSession.session_name.startsWith("Day");
 
       // Only poll if session is currently live (started but not ended)
       const now = Date.now();
@@ -121,7 +109,7 @@ export function useLivePolling() {
         : sessionStart + 4 * 60 * 60 * 1000; // default 4h window
       const isLive = now >= sessionStart && now <= sessionEnd;
 
-      if (isCurrentYear && isLatestSession && isRaceWeekend && isLive) {
+      if (isLive) {
         fastTimer = setInterval(fetchFastUpdates, FAST_POLL_MS);
         slowTimer = setInterval(fetchSlowUpdates, SLOW_POLL_MS);
       }
@@ -136,7 +124,6 @@ export function useLivePolling() {
     };
   }, [
     selectedSessionKey,
-    year,
     sessions,
     loadSessionData,
     setFastPollData,

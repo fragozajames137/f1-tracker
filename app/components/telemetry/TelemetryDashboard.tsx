@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import type { TelemetrySession, TelemetryFileInfo } from "@/app/types/telemetry";
 import { usePreferencesStore } from "@/app/stores/preferences";
 import TrackMap from "./TrackMap";
@@ -21,6 +21,10 @@ function getTop3Drivers(session: TelemetrySession): number[] {
     .map((d) => d.number);
 }
 
+function formatSlug(slug: string): string {
+  return slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 export default function TelemetryDashboard({
   files,
   initialSession,
@@ -29,6 +33,9 @@ export default function TelemetryDashboard({
   const [selectedFile, setSelectedFile] = useState<string>(
     files[0]?.filename ?? "",
   );
+  const [selectedYear, setSelectedYear] = useState<number>(
+    files[0]?.year ?? 2025,
+  );
   const [loadingSession, setLoadingSession] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [selectedDriverNumbers, setSelectedDriverNumbers] = useState<number[]>(
@@ -36,6 +43,15 @@ export default function TelemetryDashboard({
   );
   const speedUnit = usePreferencesStore((s) => s.speedUnit);
   const setSpeedUnit = usePreferencesStore((s) => s.setSpeedUnit);
+
+  const years = useMemo(
+    () => [...new Set(files.map((f) => f.year))].sort((a, b) => b - a),
+    [files],
+  );
+  const racesForYear = useMemo(
+    () => files.filter((f) => f.year === selectedYear),
+    [files, selectedYear],
+  );
 
   // Client-side cache to avoid re-fetching the same file
   const cacheRef = useRef(new Map<string, TelemetrySession>());
@@ -105,16 +121,30 @@ export default function TelemetryDashboard({
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
         <select
+          value={selectedYear}
+          onChange={(e) => {
+            const year = Number(e.target.value);
+            setSelectedYear(year);
+            const firstForYear = files.find((f) => f.year === year);
+            if (firstForYear) handleFileChange(firstForYear.filename);
+          }}
+          className="w-full cursor-pointer rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none focus:border-white/30 sm:w-auto"
+        >
+          {years.map((y) => (
+            <option key={y} value={y} className="bg-[#111]">
+              {y}
+            </option>
+          ))}
+        </select>
+
+        <select
           value={selectedFile}
           onChange={(e) => handleFileChange(e.target.value)}
           className="w-full cursor-pointer rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none focus:border-white/30 sm:w-auto"
         >
-          {files.map((f) => (
+          {racesForYear.map((f) => (
             <option key={f.filename} value={f.filename} className="bg-[#111]">
-              {f.year} Round {f.round} —{" "}
-              {f.slug
-                .replace(/-/g, " ")
-                .replace(/\b\w/g, (c) => c.toUpperCase())}
+              R{f.round} — {formatSlug(f.slug)}
             </option>
           ))}
         </select>

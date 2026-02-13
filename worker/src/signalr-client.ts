@@ -1,7 +1,22 @@
+// node-signalr is CJS — runtime exports lowercase `client` class
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import pkg from "node-signalr";
-const { Client } = pkg;
 import { log, logError, sleep } from "./utils.js";
 import type { SignalRFeed } from "./types.js";
+
+// Minimal type for the node-signalr client
+interface NodeSignalRClient {
+  on(event: string, ...args: unknown[]): void;
+  call(hub: string, method: string, ...args: unknown[]): Promise<unknown>;
+  start(): void;
+  end(): void;
+}
+
+// Runtime: pkg.client is the constructor (lowercase)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const NodeClient = (pkg as any).client as {
+  new (url: string, hubs: string[], options?: Record<string, unknown>): NodeSignalRClient;
+};
 
 const SIGNALR_URL = "https://livetiming.formula1.com/signalr";
 const HUB_NAME = "Streaming";
@@ -23,7 +38,7 @@ const TOPICS = [
 export type FeedCallback = (topic: string, data: unknown) => void;
 
 export class SignalRClient {
-  private client: InstanceType<typeof Client> | null = null;
+  private client: NodeSignalRClient | null = null;
   private onFeed: FeedCallback;
   private shouldReconnect = true;
   private connected = false;
@@ -41,7 +56,7 @@ export class SignalRClient {
     try {
       log("Connecting to F1 SignalR...");
 
-      const client = new Client(SIGNALR_URL, [HUB_NAME], {
+      const client = new NodeClient(SIGNALR_URL, [HUB_NAME], {
         headers: {
           "User-Agent": "BestHTTP",
           "Accept-Encoding": "gzip, identity",

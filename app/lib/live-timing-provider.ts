@@ -21,6 +21,7 @@ import {
   getWeather as openf1GetWeather,
   getTeamRadio as openf1GetTeamRadio,
   getStints as openf1GetStints,
+  enrichDrivers,
 } from "@/app/lib/openf1";
 
 // ---------------------------------------------------------------------------
@@ -28,7 +29,7 @@ import {
 // ---------------------------------------------------------------------------
 
 export interface LiveTimingProvider {
-  getSessions(year: number, opts?: { signal?: AbortSignal }): Promise<OpenF1Session[]>;
+  getSessions(opts?: { signal?: AbortSignal }): Promise<OpenF1Session[]>;
   getSessionDrivers(sessionKey: number, opts?: { signal?: AbortSignal }): Promise<OpenF1Driver[]>;
   getPositions(sessionKey: number, opts?: { signal?: AbortSignal }): Promise<OpenF1Position[]>;
   getLaps(sessionKey: number, driverNumber?: number, opts?: { signal?: AbortSignal }): Promise<OpenF1Lap[]>;
@@ -44,8 +45,10 @@ export interface LiveTimingProvider {
 // OpenF1 provider — wraps existing functions (fallback / default)
 // ---------------------------------------------------------------------------
 
+const CURRENT_YEAR = 2026;
+
 const openF1Provider: LiveTimingProvider = {
-  getSessions: openf1GetSessions,
+  getSessions: (opts) => openf1GetSessions(CURRENT_YEAR, opts),
   getSessionDrivers: openf1GetSessionDrivers,
   getPositions: openf1GetPositions,
   getLaps: openf1GetLaps,
@@ -61,23 +64,6 @@ const openF1Provider: LiveTimingProvider = {
 // SignalR provider — fetches from /api/live/[topic], falls back to OpenF1
 // ---------------------------------------------------------------------------
 
-async function fetchLiveTopic<T>(
-  topic: string,
-  sessionKey: number,
-  opts?: { signal?: AbortSignal },
-): Promise<T[]> {
-  const res = await fetch(
-    `/api/live/${topic}?session_key=${sessionKey}`,
-    { signal: opts?.signal },
-  );
-  if (!res.ok) throw new Error(`Live ${topic} failed: ${res.status}`);
-  const json = await res.json();
-  return json.data ?? [];
-}
-
-/** Stale threshold — if live_state data is older than 30s, fall back to OpenF1 */
-const STALE_MS = 30_000;
-
 async function fetchLiveTopicWithFallback<T>(
   topic: string,
   sessionKey: number,
@@ -91,26 +77,45 @@ async function fetchLiveTopicWithFallback<T>(
     );
     if (!res.ok) throw new Error(`${res.status}`);
     const json = await res.json();
-    // If data is stale or empty, use OpenF1
-    if (json.updated_at) {
-      const age = Date.now() - new Date(json.updated_at).getTime();
-      if (age > STALE_MS && (json.data?.length ?? 0) === 0) {
-        return fallback();
-      }
+    const data = json.data ?? [];
+    // If DB has no data at all for this topic, fall back to OpenF1
+    if (data.length === 0 && !json.updated_at) {
+      return fallback();
     }
-    return json.data ?? [];
+    return data;
   } catch {
     return fallback();
   }
 }
 
+/**
+ * Fetch sessions from our DB endpoint, falling back to OpenF1 if empty.
+ */
+async function fetchAvailableSessions(
+  opts?: { signal?: AbortSignal },
+): Promise<OpenF1Session[]> {
+  try {
+    const res = await fetch("/api/live/available-sessions", {
+      signal: opts?.signal,
+    });
+    if (!res.ok) throw new Error(`${res.status}`);
+    const json = await res.json();
+    const sessions: OpenF1Session[] = json.sessions ?? [];
+    if (sessions.length > 0) return sessions;
+  } catch {
+    // Fall through to OpenF1
+  }
+  // Fallback: no worker data, try OpenF1 directly
+  return openf1GetSessions(CURRENT_YEAR, opts);
+}
+
 const signalRProvider: LiveTimingProvider = {
-  // Sessions always come from OpenF1 — the worker doesn't store session lists
-  getSessions: openf1GetSessions,
+  getSessions: fetchAvailableSessions,
 
   getSessionDrivers: (sessionKey, opts) =>
-    fetchLiveTopicWithFallback("drivers", sessionKey,
-      () => openf1GetSessionDrivers(sessionKey, opts), opts),
+    fetchLiveTopicWithFallback<OpenF1Driver>("drivers", sessionKey,
+      () => openf1GetSessionDrivers(sessionKey, opts), opts)
+      .then(enrichDrivers),
 
   getPositions: (sessionKey, opts) =>
     fetchLiveTopicWithFallback("positions", sessionKey,

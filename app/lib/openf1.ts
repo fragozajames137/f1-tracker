@@ -11,9 +11,51 @@ import type {
   OpenF1Stint,
 } from "@/app/types/openf1";
 
+import grid2026 from "@/app/data/grid-2026.json";
+
 const BASE_URL = "https://api.openf1.org/v1";
 const MAX_RETRIES = 2;
 const BACKOFF_MS = 3_000;
+
+// Build a static lookup from driver number → grid info for enriching incomplete API data
+const gridLookup = new Map<
+  number,
+  { name: string; team: string; colour: string; acronym: string; nationality: string; headshotUrl: string }
+>();
+for (const team of grid2026.teams) {
+  for (const seat of [team.seat1, team.seat2]) {
+    const parts = seat.name.split(" ");
+    gridLookup.set(seat.number, {
+      name: seat.name,
+      team: team.name,
+      colour: team.color.replace("#", ""),
+      acronym: parts[parts.length - 1].slice(0, 3).toUpperCase(),
+      nationality: seat.nationality,
+      headshotUrl: seat.headshotUrl,
+    });
+  }
+}
+
+/** Fill in missing fields on OpenF1 drivers using local 2026 grid data. */
+export function enrichDrivers(drivers: OpenF1Driver[]): OpenF1Driver[] {
+  return drivers.map((d) => {
+    const grid = gridLookup.get(d.driver_number);
+    if (!grid) return d;
+    // Only fill in fields that are null/empty from the API
+    return {
+      ...d,
+      name_acronym: d.name_acronym || grid.acronym,
+      full_name: d.full_name || grid.name,
+      team_name: d.team_name || grid.team,
+      team_colour: d.team_colour || grid.colour,
+      first_name: d.first_name || grid.name.split(" ")[0],
+      last_name: d.last_name || grid.name.split(" ").slice(1).join(" "),
+      broadcast_name: d.broadcast_name || grid.name.split(" ").pop()!.toUpperCase(),
+      country_code: d.country_code || grid.nationality,
+      headshot_url: d.headshot_url || grid.headshotUrl,
+    };
+  });
+}
 
 async function fetchOpenF1<T>(
   endpoint: string,
@@ -62,7 +104,8 @@ export async function getSessionDrivers(
   sessionKey: number,
   options?: { signal?: AbortSignal },
 ): Promise<OpenF1Driver[]> {
-  return fetchOpenF1<OpenF1Driver>("/drivers", { session_key: sessionKey }, options);
+  const drivers = await fetchOpenF1<OpenF1Driver>("/drivers", { session_key: sessionKey }, options);
+  return enrichDrivers(drivers);
 }
 
 export async function getPositions(

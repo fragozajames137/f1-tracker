@@ -33,7 +33,6 @@ const RainRadar = dynamic(() => import("./RainRadar"), {
 
 export default function LiveDashboard() {
   // Connect to store
-  const year = useLiveSessionStore((s) => s.year);
   const sessions = useLiveSessionStore((s) => s.sessions);
   const selectedSessionKey = useLiveSessionStore((s) => s.selectedSessionKey);
   const loading = useLiveSessionStore((s) => s.loading);
@@ -52,7 +51,6 @@ export default function LiveDashboard() {
   );
   const driverLaps = useLiveSessionStore((s) => s.driverLaps);
 
-  const setYear = useLiveSessionStore((s) => s.setYear);
   const setSelectedSessionKey = useLiveSessionStore(
     (s) => s.setSelectedSessionKey,
   );
@@ -158,7 +156,7 @@ export default function LiveDashboard() {
             <button
               onClick={() => {
                 useLiveSessionStore.setState({ error: null, loading: true });
-                liveProvider.getSessions(year)
+                liveProvider.getSessions()
                   .then((data) => {
                     const sorted = [...data].sort(
                       (a, b) =>
@@ -201,20 +199,18 @@ export default function LiveDashboard() {
   return (
     <div className="space-y-6">
       <SessionSelector
-        year={year}
         sessions={sessions}
         selectedSessionKey={selectedSessionKey}
-        onYearChange={setYear}
         onSessionChange={setSelectedSessionKey}
       />
 
       {sessions.length === 0 ? (
         <div className="rounded-lg border border-white/10 bg-white/5 p-8 text-center">
           <p className="text-lg font-medium text-white/60">
-            No sessions yet for {year}
+            No sessions available
           </p>
           <p className="mt-2 text-sm text-white/30">
-            Try selecting a previous year, or check the{" "}
+            Check the{" "}
             <a
               href="/schedule"
               className="text-white/60 underline hover:text-white"
@@ -270,7 +266,7 @@ export default function LiveDashboard() {
               drivers={drivers}
               positions={positions}
               sessionType={selectedSession.session_type}
-              year={year}
+              year={selectedSession.year}
             />
           )}
         </>
