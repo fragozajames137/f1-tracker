@@ -2,7 +2,8 @@
 
 import { memo } from "react";
 import { DriverWithDetails } from "@/app/types/openf1";
-import { COMPOUNDS, formatLapTime, formatGap } from "@/app/lib/format";
+import { formatLapTime, formatGap } from "@/app/lib/format";
+import TireIcon from "./TireIcon";
 
 interface PositionTableProps {
   drivers: DriverWithDetails[];
@@ -34,8 +35,6 @@ export default memo(function PositionTable({
             const isSelected =
               selectedDriverNumber === d.driver.driver_number;
             const compound = d.currentStint?.compound ?? "";
-            const dotColor =
-              COMPOUNDS[compound.toUpperCase()]?.tw ?? "bg-white/30";
 
             return (
               <tr
@@ -73,17 +72,7 @@ export default memo(function PositionTable({
                   {formatGap(d.interval?.gap_to_leader ?? null)}
                 </td>
                 <td className="px-2 py-3 sm:px-3 sm:py-2">
-                  {compound && (
-                    <div className="flex items-center gap-1.5">
-                      <span
-                        className={`inline-block h-2.5 w-2.5 rounded-full ${dotColor}`}
-                      />
-                      <span className="text-xs text-white/50">
-                        {compound.charAt(0).toUpperCase() +
-                          compound.slice(1).toLowerCase()}
-                      </span>
-                    </div>
-                  )}
+                  {compound && <TireIcon compound={compound} />}
                 </td>
               </tr>
             );
