@@ -98,11 +98,30 @@ export function useLivePolling() {
       if (signal.aborted) return;
 
       const isCurrentYear = year === CURRENT_YEAR;
+      const currentSession = sessions.find(
+        (s) => s.session_key === selectedSessionKey,
+      );
       const isLatestSession =
         sessions.length > 0 &&
         sessions[0].session_key === selectedSessionKey;
 
-      if (isCurrentYear && isLatestSession) {
+      // Only poll race weekend sessions (Race, Sprint, Qualifying, Practice 1-3)
+      // Don't poll pre-season testing ("Day 1", "Day 2", etc.)
+      const isRaceWeekend =
+        currentSession?.session_name !== undefined &&
+        !currentSession.session_name.startsWith("Day");
+
+      // Only poll if session is currently live (started but not ended)
+      const now = Date.now();
+      const sessionStart = currentSession
+        ? new Date(currentSession.date_start).getTime()
+        : 0;
+      const sessionEnd = currentSession?.date_end
+        ? new Date(currentSession.date_end).getTime()
+        : sessionStart + 4 * 60 * 60 * 1000; // default 4h window
+      const isLive = now >= sessionStart && now <= sessionEnd;
+
+      if (isCurrentYear && isLatestSession && isRaceWeekend && isLive) {
         fastTimer = setInterval(fetchFastUpdates, FAST_POLL_MS);
         slowTimer = setInterval(fetchSlowUpdates, SLOW_POLL_MS);
       }

@@ -12,6 +12,8 @@ import type {
 } from "@/app/types/openf1";
 
 const BASE_URL = "https://api.openf1.org/v1";
+const MAX_RETRIES = 2;
+const BACKOFF_MS = 3_000;
 
 async function fetchOpenF1<T>(
   endpoint: string,
@@ -23,14 +25,30 @@ async function fetchOpenF1<T>(
     url.searchParams.set(key, String(value));
   }
 
-  const res = await fetch(url.toString(), {
-    cache: "no-store",
-    signal: options?.signal,
-  });
-  if (!res.ok) {
-    throw new Error(`OpenF1 ${endpoint} failed: ${res.status}`);
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    if (options?.signal?.aborted) throw new DOMException("Aborted", "AbortError");
+
+    const res = await fetch(url.toString(), {
+      cache: "no-store",
+      signal: options?.signal,
+    });
+
+    if (res.status === 429 && attempt < MAX_RETRIES) {
+      const retryAfter = res.headers.get("Retry-After");
+      const waitMs = retryAfter
+        ? parseInt(retryAfter, 10) * 1000
+        : BACKOFF_MS * (attempt + 1);
+      await new Promise((r) => setTimeout(r, waitMs));
+      continue;
+    }
+
+    if (!res.ok) {
+      throw new Error(`OpenF1 ${endpoint} failed: ${res.status}`);
+    }
+    return res.json();
   }
-  return res.json();
+
+  throw new Error(`OpenF1 ${endpoint} failed after ${MAX_RETRIES} retries`);
 }
 
 export async function getSessions(
