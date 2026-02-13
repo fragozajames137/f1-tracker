@@ -68,7 +68,23 @@ The app uses [Turso](https://turso.tech) for storing detailed session data (lap 
 | [OpenF1 API](https://api.openf1.org/v1/) | Live telemetry, positions, weather (2023+) |
 | [F1 Live Timing Static API](https://livetiming.formula1.com/static/) | Session data: lap positions, tire strategies, pit stops, weather, race control (2018+) |
 | [Turso DB](https://turso.tech) | Ingested session data served via API routes |
-| Local JSON | 2026 grid, contracts, rumors, schedule |
+| Local JSON | 2026 grid, driver contracts, GP contracts, schedule, driver numbers, constructors, circuits, and full historical driver/team/race reference data |
+
+## Reference Data (`app/data/`)
+
+| File | Contents |
+|------|----------|
+| `grid-2026.json` | 2026 grid — all 11 teams, 22 drivers, team colors |
+| `driver-contracts-2026.json` | Driver contract end years, deal types, estimated salaries |
+| `driver-numbers.json` | Permanent numbers (1–99) since 2014, temporary numbers, #1 history, #17 retired for Bianchi |
+| `gp-contracts-2026.json` | Grand Prix hosting contracts and calendar through 2026 |
+| `gp-race-titles.json` | All 54 F1 race titles with years held and circuits used |
+| `gp-host-nations.json` | 34 host nations with race counts and circuits |
+| `gp-circuits.json` | 77 circuits with locations, race history, and contract status |
+| `f1-drivers.json` | Every F1 driver in history (877) with full career stats |
+| `f1-drivers-by-country.json` | Driver totals by country (41 nations), champions, and current grid |
+| `f1-constructors.json` | 11 current + ~135 former constructors with stats and team lineages |
+| `engine-manufacturers.json` | Historical engine manufacturers and supply records |
 
 ## API Routes
 
