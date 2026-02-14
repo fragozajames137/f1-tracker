@@ -70,11 +70,11 @@ jobs:
                   print(f"round={int(race['round'])}")
                   print("session=R")
                   print("skip=false")
-                  print(f"::notice::Fetching {race['raceName']} ({year} R{race['round']})")
+                  print(f"Fetching {race['raceName']} ({year} R{race['round']})", file=sys.stderr)
                   sys.exit(0)
 
           print("skip=true")
-          print("::notice::No missing races to fetch")
+          print("No missing races to fetch", file=sys.stderr)
           PYEOF
           fi
 
