@@ -9,6 +9,10 @@ on:
         description: "Run even outside race weekends"
         type: boolean
         default: false
+      run_enrichment:
+        description: "Also run FIA document enrichment"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -23,25 +27,54 @@ jobs:
         with:
           node-version: "20"
 
-      # Race weekend check uses only native Node.js APIs — no npm install needed
-      - name: Check race weekend
+      # Race weekend check + enrichment window check (native Node.js only)
+      - name: Check schedule
         id: check
         run: |
           SEASON=$(date +%Y)
-          RESULT=$(node --input-type=module -e "
-            import { isRaceWeekend } from './scripts/lib/race-calendar.mjs';
-            const status = await isRaceWeekend($SEASON);
-            if (status.active) {
-              console.error('Race weekend: ' + status.race.raceName);
-              console.log('true');
-            } else {
-              const next = status.nextRace;
+          node --input-type=module -e "
+            import { getRaceWeekendWindows } from './scripts/lib/race-calendar.mjs';
+
+            const now = new Date();
+            const hour = now.getUTCHours();
+            const windows = await getRaceWeekendWindows($SEASON);
+
+            let isRaceWeekend = false;
+            let runEnrichment = false;
+
+            for (const w of windows) {
+              // Liquipedia sync: FP1 start → race end + 2h (the normal window)
+              if (now >= w.windowStart && now <= w.windowEnd) {
+                isRaceWeekend = true;
+                console.error('Race weekend: ' + w.raceName);
+              }
+
+              // FIA enrichment: FP1 day 00:00 UTC → race day + 1 23:59 UTC
+              // Only at 10:00 UTC (one run per day)
+              const fp1Day = new Date(w.windowStart);
+              fp1Day.setUTCHours(0, 0, 0, 0);
+              const racePlusOne = new Date(w.windowEnd);
+              racePlusOne.setUTCDate(racePlusOne.getUTCDate() + 1);
+              racePlusOne.setUTCHours(23, 59, 59, 999);
+
+              if (now >= fp1Day && now <= racePlusOne && hour === 10) {
+                runEnrichment = true;
+                console.error('FIA enrichment window: ' + w.raceName);
+              }
+            }
+
+            if (!isRaceWeekend) {
+              const next = windows.find(w => w.windowStart > now);
               if (next) console.error('Not race weekend. Next: ' + next.raceName + ' (' + next.windowStart.toISOString().slice(0,10) + ')');
               else console.error('No upcoming races for $SEASON');
-              console.log('false');
             }
-          ")
-          echo "is_race_weekend=$RESULT" >> $GITHUB_OUTPUT
+
+            // Write outputs
+            const fs = await import('fs');
+            const out = process.env.GITHUB_OUTPUT;
+            fs.appendFileSync(out, 'is_race_weekend=' + isRaceWeekend + '\n');
+            fs.appendFileSync(out, 'run_enrichment=' + runEnrichment + '\n');
+          "
 
       - name: Install dependencies
         if: steps.check.outputs.is_race_weekend == 'true' || inputs.force
@@ -52,7 +85,7 @@ jobs:
         run: node scripts/sync-penalty-points.mjs --write
 
       - name: Enrich with FIA documents
-        if: steps.check.outputs.is_race_weekend == 'true' || inputs.force
+        if: steps.check.outputs.run_enrichment == 'true' || inputs.run_enrichment
         run: node scripts/enrich-fia-documents.mjs --write
 
       - name: Commit and push changes
