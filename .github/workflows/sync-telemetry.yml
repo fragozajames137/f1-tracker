@@ -1,0 +1,184 @@
+name: Fetch Telemetry & Sync R2
+
+on:
+  schedule:
+    # Daily at 06:00 UTC — on days after a race it fetches new data, otherwise exits fast
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+    inputs:
+      year:
+        description: "Season year (auto-detects if empty)"
+        type: number
+        required: false
+      round:
+        description: "Round number (auto-detects if empty)"
+        type: number
+        required: false
+      session:
+        description: "Session type"
+        type: choice
+        default: "R"
+        options: ["R", "Q", "S", "SQ"]
+
+permissions:
+  contents: write
+
+env:
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+jobs:
+  fetch-and-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Auto-detect uses only stdlib — no pip install needed
+      - name: Determine race to fetch
+        id: race
+        run: |
+          if [ -n "${{ inputs.year }}" ] && [ -n "${{ inputs.round }}" ]; then
+            echo "year=${{ inputs.year }}" >> $GITHUB_OUTPUT
+            echo "round=${{ inputs.round }}" >> $GITHUB_OUTPUT
+            echo "session=${{ inputs.session || 'R' }}" >> $GITHUB_OUTPUT
+            echo "skip=false" >> $GITHUB_OUTPUT
+          else
+            python3 << 'PYEOF' >> $GITHUB_OUTPUT
+          import json, sys, urllib.request
+          from datetime import datetime, timedelta, timezone
+
+          with open("app/data/telemetry-manifest.json") as f:
+              manifest = json.load(f)
+          existing = {(e["year"], e["round"]) for e in manifest}
+
+          year = datetime.now(timezone.utc).year
+          url = f"https://api.jolpi.ca/ergast/f1/{year}.json"
+          req = urllib.request.Request(url, headers={"User-Agent": "f1-tracker/1.0"})
+          with urllib.request.urlopen(req, timeout=15) as resp:
+              data = json.loads(resp.read())
+
+          races = data["MRData"]["RaceTable"]["Races"]
+          now = datetime.now(timezone.utc)
+
+          for race in races:
+              race_dt = datetime.fromisoformat(
+                  race["date"] + "T" + race.get("time", "14:00:00Z").rstrip("Z")
+              ).replace(tzinfo=timezone.utc)
+              # Wait at least 4h after race start for data availability
+              if race_dt + timedelta(hours=4) < now and (year, int(race["round"])) not in existing:
+                  print(f"year={year}")
+                  print(f"round={int(race['round'])}")
+                  print("session=R")
+                  print("skip=false")
+                  print(f"::notice::Fetching {race['raceName']} ({year} R{race['round']})")
+                  sys.exit(0)
+
+          print("skip=true")
+          print("::notice::No missing races to fetch")
+          PYEOF
+          fi
+
+      - uses: actions/setup-python@v5
+        if: steps.race.outputs.skip != 'true'
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: scripts/requirements.txt
+
+      - uses: actions/setup-node@v4
+        if: steps.race.outputs.skip != 'true'
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        if: steps.race.outputs.skip != 'true'
+        run: |
+          pip install -r scripts/requirements.txt
+          npm install -g wrangler
+
+      - name: Cache FastF1 data
+        if: steps.race.outputs.skip != 'true'
+        uses: actions/cache@v4
+        with:
+          path: .fastf1-cache
+          key: fastf1-${{ steps.race.outputs.year }}-R${{ steps.race.outputs.round }}
+
+      - name: Fetch telemetry
+        if: steps.race.outputs.skip != 'true'
+        run: |
+          python3 scripts/fetch_telemetry.py \
+            --year ${{ steps.race.outputs.year }} \
+            --round ${{ steps.race.outputs.round }} \
+            --session ${{ steps.race.outputs.session }}
+
+      - name: Upload to R2
+        if: steps.race.outputs.skip != 'true'
+        run: |
+          YEAR=${{ steps.race.outputs.year }}
+          ROUND=$(printf "%02d" ${{ steps.race.outputs.round }})
+
+          echo "=== Uploading telemetry JSON ==="
+          for json_file in app/data/telemetry/${YEAR}-R${ROUND}-*.json; do
+            [ -f "$json_file" ] || continue
+            KEY="telemetry/$(basename "$json_file")"
+            echo "  $KEY"
+            wrangler r2 object put --remote "f1-radio/$KEY" \
+              --file "$json_file" \
+              --content-type "application/json" \
+              --cache-control "public, max-age=31536000, immutable"
+          done
+
+          echo "=== Uploading radio MP3s ==="
+          RADIO_DIR="app/data/radio/${YEAR}-R${ROUND}"
+          if [ -d "$RADIO_DIR" ]; then
+            count=$(find "$RADIO_DIR" -name '*.mp3' | wc -l)
+            echo "  $count MP3 files to upload"
+            for mp3 in "$RADIO_DIR"/*.mp3; do
+              [ -f "$mp3" ] || continue
+              KEY="radio/${YEAR}-R${ROUND}/$(basename "$mp3")"
+              wrangler r2 object put --remote "f1-radio/$KEY" \
+                --file "$mp3" \
+                --content-type "audio/mpeg" \
+                --cache-control "public, max-age=31536000, immutable"
+            done
+          else
+            echo "  No radio directory — skipping"
+          fi
+
+      - name: Update manifest and commit
+        if: steps.race.outputs.skip != 'true'
+        run: |
+          python3 -c "
+          import json, re, os
+
+          with open('app/data/telemetry-manifest.json') as f:
+              manifest = json.load(f)
+          existing = {(e['year'], e['round']) for e in manifest}
+
+          for f in sorted(os.listdir('app/data/telemetry')):
+              if not f.endswith('.json'):
+                  continue
+              m = re.match(r'^(\d{4})-R(\d{2})-(.+)\.json$', f)
+              if not m:
+                  continue
+              year, rnd = int(m.group(1)), int(m.group(2))
+              if (year, rnd) not in existing:
+                  manifest.append({'filename': f, 'year': year, 'round': rnd, 'slug': m.group(3)})
+
+          manifest.sort(key=lambda e: (e['year'], e['round']))
+          with open('app/data/telemetry-manifest.json', 'w') as f:
+              json.dump(manifest, f, indent=2)
+              f.write('\n')
+          "
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add app/data/telemetry-manifest.json
+          if git diff --staged --quiet; then
+            echo "No manifest changes"
+          else
+            YEAR=${{ steps.race.outputs.year }}
+            ROUND=${{ steps.race.outputs.round }}
+            git commit -m "chore: add telemetry for ${YEAR} R${ROUND} [automated]"
+            git push
+          fi

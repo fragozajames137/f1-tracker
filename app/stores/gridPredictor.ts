@@ -86,7 +86,7 @@ function buildInitialState() {
           nationality: rd.nationality,
           isLocked: false,
           isCustom: false,
-          pool: rd.role === "development" ? "academy" : "reserve",
+          pool: rd.role === "development" || rd.role === "academy" ? "academy" : "reserve",
         };
       }
     }

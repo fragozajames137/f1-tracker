@@ -1,6 +1,6 @@
 {
   "season": 2026,
-  "lastUpdated": "2026-02-12",
+  "lastUpdated": "2026-02-14",
   "teams": [
     {
       "id": "red-bull",
@@ -15,7 +15,85 @@
         {
           "name": "Yuki Tsunoda",
           "nationality": "JPN",
-          "role": "reserve"
+          "role": "reserve",
+          "sharedWith": "Racing Bulls"
+        },
+        {
+          "name": "Nikola Tsolov",
+          "nationality": "BUL",
+          "role": "academy",
+          "series": "F2",
+          "sharedWith": "Racing Bulls"
+        },
+        {
+          "name": "Ernesto Rivera",
+          "nationality": "MEX",
+          "role": "academy",
+          "series": "F3",
+          "sharedWith": "Racing Bulls"
+        },
+        {
+          "name": "Fionn McLaughlin",
+          "nationality": "IRL",
+          "role": "academy",
+          "series": "F3",
+          "sharedWith": "Racing Bulls"
+        },
+        {
+          "name": "Mattia Colnaghi",
+          "nationality": "ITA",
+          "role": "academy",
+          "series": "F3",
+          "sharedWith": "Racing Bulls"
+        },
+        {
+          "name": "Enzo Tarnvanichkul",
+          "nationality": "THA",
+          "role": "academy",
+          "series": "Eurocup-3",
+          "sharedWith": "Racing Bulls"
+        },
+        {
+          "name": "Scott Kin Lindblom",
+          "nationality": "SWE",
+          "role": "academy",
+          "series": "British F4",
+          "sharedWith": "Racing Bulls"
+        },
+        {
+          "name": "Rocco Coronel",
+          "nationality": "NED",
+          "role": "academy",
+          "series": "Spanish F4",
+          "sharedWith": "Racing Bulls"
+        },
+        {
+          "name": "Melvin Kalousdian",
+          "nationality": "SWE",
+          "role": "academy",
+          "series": "British F4",
+          "sharedWith": "Racing Bulls"
+        },
+        {
+          "name": "Chiara Bättig",
+          "nationality": "SUI",
+          "role": "academy",
+          "series": "British F4",
+          "sharedWith": "Racing Bulls"
+        },
+        {
+          "name": "Alisha Palmowski",
+          "nationality": "GBR",
+          "role": "academy",
+          "series": "F1 Academy",
+          "sharedWith": "Racing Bulls"
+        },
+        {
+          "name": "Rafaela Ferreira",
+          "nationality": "BRA",
+          "role": "academy",
+          "series": "F1 Academy",
+          "sharedWith": "Racing Bulls"
         }
       ],
       "seat1": {
@@ -70,6 +148,53 @@
           "name": "Leonardo Fornaroli",
           "nationality": "ITA",
           "role": "reserve"
+        },
+        {
+          "name": "Pato O'Ward",
+          "nationality": "MEX",
+          "role": "reserve"
+        },
+        {
+          "name": "Matteo De Palo",
+          "nationality": "ITA",
+          "role": "academy",
+          "series": "F3"
+        },
+        {
+          "name": "Richard Verschoor",
+          "nationality": "NED",
+          "role": "academy",
+          "series": "ELMS LMP2"
+        },
+        {
+          "name": "Ella Lloyd",
+          "nationality": "GBR",
+          "role": "academy",
+          "series": "F1 Academy"
+        },
+        {
+          "name": "Ella Stevens",
+          "nationality": "GBR",
+          "role": "academy",
+          "series": "F1 Academy"
+        },
+        {
+          "name": "Dries Van Langendonck",
+          "nationality": "BEL",
+          "role": "academy",
+          "series": "British F4"
+        },
+        {
+          "name": "Christian Costoya",
+          "nationality": "ESP",
+          "role": "academy",
+          "series": "Italian F4"
+        },
+        {
+          "name": "Ella Hakkinen",
+          "nationality": "FIN",
+          "role": "academy",
+          "series": "F4 Testing"
         }
       ],
       "seat1": {
@@ -117,6 +242,54 @@
           "name": "Antonio Giovinazzi",
           "nationality": "ITA",
           "role": "reserve"
+        },
+        {
+          "name": "Dino Beganovic",
+          "nationality": "SWE",
+          "role": "academy",
+          "series": "F2"
+        },
+        {
+          "name": "Rafael Camara",
+          "nationality": "BRA",
+          "role": "academy",
+          "series": "F2"
+        },
+        {
+          "name": "Tuukka Taponen",
+          "nationality": "FIN",
+          "role": "academy",
+          "series": "F3"
+        },
+        {
+          "name": "Alba Hurup Larsen",
+          "nationality": "DEN",
+          "role": "academy",
+          "series": "F1 Academy"
+        },
+        {
+          "name": "Niccolo Maccagnani",
+          "nationality": "ITA",
+          "role": "academy",
+          "series": "Italian F4"
+        },
+        {
+          "name": "Noah Baglin",
+          "nationality": "GBR",
+          "role": "academy",
+          "series": "Karting"
+        },
+        {
+          "name": "Filippo Sala",
+          "nationality": "ITA",
+          "role": "academy",
+          "series": "Karting"
+        },
+        {
+          "name": "Maya Weug",
+          "nationality": "NED",
+          "role": "academy",
+          "series": "GT3"
         }
       ],
       "seat1": {
@@ -177,6 +350,65 @@
           "name": "Frederik Vesti",
           "nationality": "DEN",
           "role": "reserve"
+        },
+        {
+          "name": "Doriane Pin",
+          "nationality": "FRA",
+          "role": "development"
+        },
+        {
+          "name": "Joshua Durksen",
+          "nationality": "PAR",
+          "role": "development",
+          "series": "F2"
+        },
+        {
+          "name": "Rashid Al Dhaheri",
+          "nationality": "UAE",
+          "role": "academy",
+          "series": "FRECA"
+        },
+        {
+          "name": "Ethan Jeff-Hall",
+          "nationality": "GBR",
+          "role": "academy",
+          "series": "British F4"
+        },
+        {
+          "name": "Andy Consani",
+          "nationality": "FRA",
+          "role": "academy",
+          "series": "Italian F4"
+        },
+        {
+          "name": "Luna Fluxa",
+          "nationality": "ESP",
+          "role": "academy",
+          "series": "Spanish F4"
+        },
+        {
+          "name": "Kenzo Craigie",
+          "nationality": "GBR",
+          "role": "academy",
+          "series": "Karting"
+        },
+        {
+          "name": "Many Nuvolini",
+          "nationality": "ITA",
+          "role": "academy",
+          "series": "Karting"
+        },
+        {
+          "name": "James Anagnostiadis",
+          "nationality": "AUS",
+          "role": "academy",
+          "series": "Karting"
+        },
+        {
+          "name": "Anthony Davidson",
+          "nationality": "GBR",
+          "role": "development",
+          "series": "Simulator"
         }
       ],
       "seat1": {
@@ -235,9 +467,26 @@
       "logoUrl": "/logos/aston-martin.webp",
       "reserveDrivers": [
         {
+          "name": "Jak Crawford",
+          "nationality": "USA",
+          "role": "reserve"
+        },
+        {
           "name": "Stoffel Vandoorne",
           "nationality": "BEL",
-          "role": "reserve"
+          "role": "test"
+        },
+        {
+          "name": "Mari Boya",
+          "nationality": "ESP",
+          "role": "academy",
+          "series": "F2"
+        },
+        {
+          "name": "Mathilda Paatz",
+          "nationality": "GER",
+          "role": "academy",
+          "series": "F1 Academy"
         }
       ],
       "seat1": {
@@ -303,6 +552,48 @@
           "name": "Kush Maini",
           "nationality": "IND",
           "role": "reserve"
+        },
+        {
+          "name": "Gabriele Mini",
+          "nationality": "ITA",
+          "role": "academy",
+          "series": "F2"
+        },
+        {
+          "name": "Nicola Lacorte",
+          "nationality": "ITA",
+          "role": "academy",
+          "series": "F3"
+        },
+        {
+          "name": "Nina Gademan",
+          "nationality": "NED",
+          "role": "academy",
+          "series": "F1 Academy"
+        },
+        {
+          "name": "Kabir Anurag",
+          "nationality": "SGP",
+          "role": "academy",
+          "series": "FRECA"
+        },
+        {
+          "name": "Keanu Al Azhari",
+          "nationality": "UAE",
+          "role": "academy",
+          "series": "Eurocup-3"
+        },
+        {
+          "name": "Ilie Tristan Crisan",
+          "nationality": "CAN",
+          "role": "academy",
+          "series": "Karting"
+        },
+        {
+          "name": "Sukhmani Kaur Khera",
+          "nationality": "GBR",
+          "role": "academy",
+          "series": "Karting"
         }
       ],
       "seat1": {
@@ -357,6 +648,48 @@
           "name": "Luke Browning",
           "nationality": "GBR",
           "role": "reserve"
+        },
+        {
+          "name": "Alessandro Giusti",
+          "nationality": "FRA",
+          "role": "academy",
+          "series": "F3"
+        },
+        {
+          "name": "Kean Nakamura-Berta",
+          "nationality": "JPN",
+          "role": "academy",
+          "series": "FRECA"
+        },
+        {
+          "name": "Oleksandr Bondarev",
+          "nationality": "UKR",
+          "role": "academy",
+          "series": "Italian F4"
+        },
+        {
+          "name": "Jade Jacquet",
+          "nationality": "FRA",
+          "role": "academy",
+          "series": "F1 Academy"
+        },
+        {
+          "name": "Dean Hoogendoorn",
+          "nationality": "NED",
+          "role": "academy",
+          "series": "Karting"
+        },
+        {
+          "name": "Will Green",
+          "nationality": "GBR",
+          "role": "academy",
+          "series": "Karting"
+        },
+        {
+          "name": "Lucas Palacio",
+          "nationality": "USA",
+          "role": "academy",
+          "series": "Karting"
         },
         {
           "name": "Victor Martins",
@@ -415,7 +748,14 @@
         {
           "name": "Yuki Tsunoda",
           "nationality": "JPN",
-          "role": "reserve"
+          "role": "reserve",
+          "sharedWith": "Red Bull Racing"
+        },
+        {
+          "name": "Ayumu Iwasa",
+          "nationality": "JPN",
+          "role": "test",
+          "sharedWith": "Red Bull Racing"
         }
       ],
       "seat1": {
@@ -472,7 +812,20 @@
       "name": "Audi",
       "color": "#F50537",
       "logoUrl": "/logos/audi.webp",
-      "reserveDrivers": [],
+      "reserveDrivers": [
+        {
+          "name": "Freddie Slater",
+          "nationality": "GBR",
+          "role": "academy",
+          "series": "F3"
+        },
+        {
+          "name": "Emma Felbermayr",
+          "nationality": "AUT",
+          "role": "academy",
+          "series": "F1 Academy"
+        }
+      ],
       "seat1": {
         "id": "nico-hulkenberg",
         "name": "Nico Hulkenberg",
@@ -523,6 +876,18 @@
           "name": "Ryo Hirakawa",
           "nationality": "JPN",
           "role": "reserve"
+        },
+        {
+          "name": "Ritomo Miyata",
+          "nationality": "JPN",
+          "role": "development",
+          "series": "F2"
+        },
+        {
+          "name": "Kaylee Countryman",
+          "nationality": "USA",
+          "role": "academy",
+          "series": "F1 Academy"
         }
       ],
       "seat1": {
@@ -582,6 +947,24 @@
           "name": "Colton Herta",
           "nationality": "USA",
           "role": "test"
+        },
+        {
+          "name": "Pietro Fittipaldi",
+          "nationality": "BRA",
+          "role": "development",
+          "series": "Simulator"
+        },
+        {
+          "name": "Simon Pagenaud",
+          "nationality": "FRA",
+          "role": "development",
+          "series": "Simulator"
+        },
+        {
+          "name": "Charlie Eastwood",
+          "nationality": "IRL",
+          "role": "development",
+          "series": "Simulator"
         }
       ],
       "seat1": {

@@ -11,6 +11,8 @@ import LapChart from "../history/LapChart";
 import RaceControlFeed from "../history/RaceControlFeed";
 import WeatherChart from "../history/WeatherChart";
 import PitStopTable from "../history/PitStopTable";
+import DOTDCard from "../fan-favorites/DOTDCard";
+import { getDOTDByRound } from "@/app/lib/dotd";
 
 interface SessionInfo {
   sessionKey: number;
@@ -39,6 +41,7 @@ interface PostRaceTabProps {
 
 const SECTIONS = [
   { id: "results", label: "Results" },
+  { id: "dotd", label: "DOTD" },
   { id: "positions", label: "Positions" },
   { id: "strategy", label: "Strategy" },
   { id: "track-dominance", label: "Track" },
@@ -49,6 +52,8 @@ const SECTIONS = [
 ];
 
 export default function PostRaceTab({ sessions, raceSessionKey, year, round, race }: PostRaceTabProps) {
+  const dotdRace = getDOTDByRound(round);
+
   // Find the race session key — prefer explicit prop, fallback to finding it
   const sessionKey = useMemo(() => {
     if (raceSessionKey) return raceSessionKey;
@@ -80,6 +85,12 @@ export default function PostRaceTab({ sessions, raceSessionKey, year, round, rac
         <section id="results" className="scroll-mt-16">
           <ResultsTable sessionKey={sessionKey} />
         </section>
+
+        {dotdRace && (
+          <section id="dotd" className="scroll-mt-16">
+            <DOTDCard race={dotdRace} />
+          </section>
+        )}
 
         <section id="positions" className="scroll-mt-16">
           <PositionChart sessionKey={sessionKey} />

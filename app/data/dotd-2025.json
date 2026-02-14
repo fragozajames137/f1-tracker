@@ -1,0 +1,342 @@
+{
+  "season": 2025,
+  "lastUpdated": "2026-02-14",
+  "races": [
+    {
+      "round": 1,
+      "raceName": "Australian Grand Prix",
+      "date": "2025-03-16",
+      "winnerId": "lando-norris",
+      "winnerName": "Lando Norris",
+      "topFive": [
+        { "driverId": "lando-norris", "driverName": "Lando Norris", "percentage": 24.0 },
+        { "driverId": "kimi-antonelli", "driverName": "Kimi Antonelli", "percentage": 16.1 },
+        { "driverId": "oscar-piastri", "driverName": "Oscar Piastri", "percentage": 11.3 },
+        { "driverId": "alex-albon", "driverName": "Alex Albon", "percentage": 10.9 },
+        { "driverId": "max-verstappen", "driverName": "Max Verstappen", "percentage": 9.0 }
+      ]
+    },
+    {
+      "round": 2,
+      "raceName": "Chinese Grand Prix",
+      "date": "2025-03-23",
+      "winnerId": "kimi-antonelli",
+      "winnerName": "Kimi Antonelli",
+      "topFive": [
+        { "driverId": "kimi-antonelli", "driverName": "Kimi Antonelli", "percentage": 20.7 },
+        { "driverId": "oscar-piastri", "driverName": "Oscar Piastri", "percentage": 15.6 },
+        { "driverId": "oliver-bearman", "driverName": "Oliver Bearman", "percentage": 12.9 },
+        { "driverId": "charles-leclerc", "driverName": "Charles Leclerc", "percentage": 8.4 },
+        { "driverId": "max-verstappen", "driverName": "Max Verstappen", "percentage": 6.5 }
+      ]
+    },
+    {
+      "round": 3,
+      "raceName": "Japanese Grand Prix",
+      "date": "2025-04-06",
+      "winnerId": "yuki-tsunoda",
+      "winnerName": "Yuki Tsunoda",
+      "topFive": [
+        { "driverId": "yuki-tsunoda", "driverName": "Yuki Tsunoda", "percentage": 23.7 },
+        { "driverId": "max-verstappen", "driverName": "Max Verstappen", "percentage": 19.7 },
+        { "driverId": "kimi-antonelli", "driverName": "Kimi Antonelli", "percentage": 13.6 },
+        { "driverId": "oscar-piastri", "driverName": "Oscar Piastri", "percentage": 7.9 },
+        { "driverId": "isack-hadjar", "driverName": "Isack Hadjar", "percentage": 7.0 }
+      ]
+    },
+    {
+      "round": 4,
+      "raceName": "Bahrain Grand Prix",
+      "date": "2025-04-13",
+      "winnerId": "lewis-hamilton",
+      "winnerName": "Lewis Hamilton",
+      "topFive": [
+        { "driverId": "lewis-hamilton", "driverName": "Lewis Hamilton", "percentage": 29.6 },
+        { "driverId": "oscar-piastri", "driverName": "Oscar Piastri", "percentage": 14.1 },
+        { "driverId": "charles-leclerc", "driverName": "Charles Leclerc", "percentage": 7.8 },
+        { "driverId": "lando-norris", "driverName": "Lando Norris", "percentage": 6.7 },
+        { "driverId": "pierre-gasly", "driverName": "Pierre Gasly", "percentage": 6.5 }
+      ]
+    },
+    {
+      "round": 5,
+      "raceName": "Saudi Arabian Grand Prix",
+      "date": "2025-04-20",
+      "winnerId": "max-verstappen",
+      "winnerName": "Max Verstappen",
+      "topFive": [
+        { "driverId": "max-verstappen", "driverName": "Max Verstappen", "percentage": 23.3 },
+        { "driverId": "charles-leclerc", "driverName": "Charles Leclerc", "percentage": 16.3 },
+        { "driverId": "lando-norris", "driverName": "Lando Norris", "percentage": 15.1 },
+        { "driverId": "oscar-piastri", "driverName": "Oscar Piastri", "percentage": 13.8 },
+        { "driverId": "carlos-sainz", "driverName": "Carlos Sainz", "percentage": 5.5 }
+      ]
+    },
+    {
+      "round": 6,
+      "raceName": "Miami Grand Prix",
+      "date": "2025-05-04",
+      "winnerId": "oscar-piastri",
+      "winnerName": "Oscar Piastri",
+      "topFive": [
+        { "driverId": "oscar-piastri", "driverName": "Oscar Piastri", "percentage": 20.7 },
+        { "driverId": "alex-albon", "driverName": "Alex Albon", "percentage": 19.0 },
+        { "driverId": "lando-norris", "driverName": "Lando Norris", "percentage": 14.2 },
+        { "driverId": "max-verstappen", "driverName": "Max Verstappen", "percentage": 9.3 },
+        { "driverId": "lewis-hamilton", "driverName": "Lewis Hamilton", "percentage": 8.7 }
+      ]
+    },
+    {
+      "round": 7,
+      "raceName": "Emilia Romagna Grand Prix",
+      "date": "2025-05-18",
+      "winnerId": "max-verstappen",
+      "winnerName": "Max Verstappen",
+      "topFive": [
+        { "driverId": "max-verstappen", "driverName": "Max Verstappen", "percentage": 19.0 },
+        { "driverId": "alex-albon", "driverName": "Alex Albon", "percentage": 14.9 },
+        { "driverId": "charles-leclerc", "driverName": "Charles Leclerc", "percentage": 11.0 },
+        { "driverId": "lewis-hamilton", "driverName": "Lewis Hamilton", "percentage": 9.5 },
+        { "driverId": "oscar-piastri", "driverName": "Oscar Piastri", "percentage": 9.3 }
+      ]
+    },
+    {
+      "round": 8,
+      "raceName": "Monaco Grand Prix",
+      "date": "2025-05-25",
+      "winnerId": "charles-leclerc",
+      "winnerName": "Charles Leclerc",
+      "topFive": [
+        { "driverId": "charles-leclerc", "driverName": "Charles Leclerc", "percentage": 20.1 },
+        { "driverId": "isack-hadjar", "driverName": "Isack Hadjar", "percentage": 16.8 },
+        { "driverId": "lando-norris", "driverName": "Lando Norris", "percentage": 14.6 },
+        { "driverId": "max-verstappen", "driverName": "Max Verstappen", "percentage": 7.0 },
+        { "driverId": "lewis-hamilton", "driverName": "Lewis Hamilton", "percentage": 6.2 }
+      ]
+    },
+    {
+      "round": 9,
+      "raceName": "Spanish Grand Prix",
+      "date": "2025-06-01",
+      "winnerId": "max-verstappen",
+      "winnerName": "Max Verstappen",
+      "topFive": [
+        { "driverId": "max-verstappen", "driverName": "Max Verstappen", "percentage": 19.7 },
+        { "driverId": "oscar-piastri", "driverName": "Oscar Piastri", "percentage": 14.5 },
+        { "driverId": "nico-hulkenberg", "driverName": "Nico Hulkenberg", "percentage": 10.6 },
+        { "driverId": "charles-leclerc", "driverName": "Charles Leclerc", "percentage": 9.6 },
+        { "driverId": "lando-norris", "driverName": "Lando Norris", "percentage": 9.3 }
+      ]
+    },
+    {
+      "round": 10,
+      "raceName": "Canadian Grand Prix",
+      "date": "2025-06-15",
+      "winnerId": "kimi-antonelli",
+      "winnerName": "Kimi Antonelli",
+      "topFive": [
+        { "driverId": "kimi-antonelli", "driverName": "Kimi Antonelli", "percentage": 27.3 },
+        { "driverId": "george-russell", "driverName": "George Russell", "percentage": 11.7 },
+        { "driverId": "max-verstappen", "driverName": "Max Verstappen", "percentage": 11.1 },
+        { "driverId": "lando-norris", "driverName": "Lando Norris", "percentage": 9.3 },
+        { "driverId": "nico-hulkenberg", "driverName": "Nico Hulkenberg", "percentage": 6.7 }
+      ]
+    },
+    {
+      "round": 11,
+      "raceName": "Austrian Grand Prix",
+      "date": "2025-06-29",
+      "winnerId": "gabriel-bortoleto",
+      "winnerName": "Gabriel Bortoleto",
+      "topFive": [
+        { "driverId": "gabriel-bortoleto", "driverName": "Gabriel Bortoleto", "percentage": 30.0 },
+        { "driverId": "lando-norris", "driverName": "Lando Norris", "percentage": 15.7 },
+        { "driverId": "oscar-piastri", "driverName": "Oscar Piastri", "percentage": 10.7 },
+        { "driverId": "liam-lawson", "driverName": "Liam Lawson", "percentage": 6.8 },
+        { "driverId": "charles-leclerc", "driverName": "Charles Leclerc", "percentage": 6.7 }
+      ]
+    },
+    {
+      "round": 12,
+      "raceName": "British Grand Prix",
+      "date": "2025-07-06",
+      "winnerId": "nico-hulkenberg",
+      "winnerName": "Nico Hulkenberg",
+      "topFive": [
+        { "driverId": "nico-hulkenberg", "driverName": "Nico Hulkenberg", "percentage": 49.0 },
+        { "driverId": "lewis-hamilton", "driverName": "Lewis Hamilton", "percentage": 11.5 },
+        { "driverId": "lando-norris", "driverName": "Lando Norris", "percentage": 8.6 },
+        { "driverId": "max-verstappen", "driverName": "Max Verstappen", "percentage": 5.9 },
+        { "driverId": "lance-stroll", "driverName": "Lance Stroll", "percentage": 5.8 }
+      ]
+    },
+    {
+      "round": 13,
+      "raceName": "Belgian Grand Prix",
+      "date": "2025-07-27",
+      "winnerId": "lewis-hamilton",
+      "winnerName": "Lewis Hamilton",
+      "topFive": [
+        { "driverId": "lewis-hamilton", "driverName": "Lewis Hamilton", "percentage": 38.8 },
+        { "driverId": "oscar-piastri", "driverName": "Oscar Piastri", "percentage": 10.6 },
+        { "driverId": "charles-leclerc", "driverName": "Charles Leclerc", "percentage": 9.6 },
+        { "driverId": "lando-norris", "driverName": "Lando Norris", "percentage": 6.7 },
+        { "driverId": "alex-albon", "driverName": "Alex Albon", "percentage": 6.3 }
+      ]
+    },
+    {
+      "round": 14,
+      "raceName": "Hungarian Grand Prix",
+      "date": "2025-08-03",
+      "winnerId": "gabriel-bortoleto",
+      "winnerName": "Gabriel Bortoleto",
+      "topFive": [
+        { "driverId": "gabriel-bortoleto", "driverName": "Gabriel Bortoleto", "percentage": 18.8 },
+        { "driverId": "fernando-alonso", "driverName": "Fernando Alonso", "percentage": 18.3 },
+        { "driverId": "charles-leclerc", "driverName": "Charles Leclerc", "percentage": 15.2 },
+        { "driverId": "lando-norris", "driverName": "Lando Norris", "percentage": 9.8 },
+        { "driverId": "oscar-piastri", "driverName": "Oscar Piastri", "percentage": 7.7 }
+      ]
+    },
+    {
+      "round": 15,
+      "raceName": "Dutch Grand Prix",
+      "date": "2025-08-31",
+      "winnerId": "isack-hadjar",
+      "winnerName": "Isack Hadjar",
+      "topFive": [
+        { "driverId": "isack-hadjar", "driverName": "Isack Hadjar", "percentage": 38.6 },
+        { "driverId": "max-verstappen", "driverName": "Max Verstappen", "percentage": 8.7 },
+        { "driverId": "charles-leclerc", "driverName": "Charles Leclerc", "percentage": 8.1 },
+        { "driverId": "oscar-piastri", "driverName": "Oscar Piastri", "percentage": 6.8 },
+        { "driverId": "lando-norris", "driverName": "Lando Norris", "percentage": 5.9 }
+      ]
+    },
+    {
+      "round": 16,
+      "raceName": "Italian Grand Prix",
+      "date": "2025-09-07",
+      "winnerId": "max-verstappen",
+      "winnerName": "Max Verstappen",
+      "topFive": [
+        { "driverId": "max-verstappen", "driverName": "Max Verstappen", "percentage": 29.4 },
+        { "driverId": "lewis-hamilton", "driverName": "Lewis Hamilton", "percentage": 17.0 },
+        { "driverId": "charles-leclerc", "driverName": "Charles Leclerc", "percentage": 10.0 },
+        { "driverId": "lando-norris", "driverName": "Lando Norris", "percentage": 8.0 },
+        { "driverId": "alex-albon", "driverName": "Alex Albon", "percentage": 5.7 }
+      ]
+    },
+    {
+      "round": 17,
+      "raceName": "Azerbaijan Grand Prix",
+      "date": "2025-09-21",
+      "winnerId": "carlos-sainz",
+      "winnerName": "Carlos Sainz",
+      "topFive": [
+        { "driverId": "carlos-sainz", "driverName": "Carlos Sainz", "percentage": 28.6 },
+        { "driverId": "max-verstappen", "driverName": "Max Verstappen", "percentage": 18.5 },
+        { "driverId": "george-russell", "driverName": "George Russell", "percentage": 8.3 },
+        { "driverId": "lewis-hamilton", "driverName": "Lewis Hamilton", "percentage": 8.3 },
+        { "driverId": "liam-lawson", "driverName": "Liam Lawson", "percentage": 7.4 }
+      ]
+    },
+    {
+      "round": 18,
+      "raceName": "Singapore Grand Prix",
+      "date": "2025-10-05",
+      "winnerId": "fernando-alonso",
+      "winnerName": "Fernando Alonso",
+      "topFive": [
+        { "driverId": "fernando-alonso", "driverName": "Fernando Alonso", "percentage": 22.5 },
+        { "driverId": "george-russell", "driverName": "George Russell", "percentage": 16.4 },
+        { "driverId": "max-verstappen", "driverName": "Max Verstappen", "percentage": 14.5 },
+        { "driverId": "lando-norris", "driverName": "Lando Norris", "percentage": 8.7 },
+        { "driverId": "lewis-hamilton", "driverName": "Lewis Hamilton", "percentage": 7.6 }
+      ]
+    },
+    {
+      "round": 19,
+      "raceName": "United States Grand Prix",
+      "date": "2025-10-19",
+      "winnerId": "charles-leclerc",
+      "winnerName": "Charles Leclerc",
+      "topFive": [
+        { "driverId": "charles-leclerc", "driverName": "Charles Leclerc", "percentage": 35.0 },
+        { "driverId": "max-verstappen", "driverName": "Max Verstappen", "percentage": 18.2 },
+        { "driverId": "lando-norris", "driverName": "Lando Norris", "percentage": 8.9 },
+        { "driverId": "lewis-hamilton", "driverName": "Lewis Hamilton", "percentage": 7.8 },
+        { "driverId": "yuki-tsunoda", "driverName": "Yuki Tsunoda", "percentage": 6.0 }
+      ]
+    },
+    {
+      "round": 20,
+      "raceName": "Mexico City Grand Prix",
+      "date": "2025-10-26",
+      "winnerId": "oliver-bearman",
+      "winnerName": "Oliver Bearman",
+      "topFive": [
+        { "driverId": "oliver-bearman", "driverName": "Oliver Bearman", "percentage": 41.3 },
+        { "driverId": "max-verstappen", "driverName": "Max Verstappen", "percentage": 14.5 },
+        { "driverId": "lando-norris", "driverName": "Lando Norris", "percentage": 11.2 },
+        { "driverId": "lewis-hamilton", "driverName": "Lewis Hamilton", "percentage": 6.6 },
+        { "driverId": "charles-leclerc", "driverName": "Charles Leclerc", "percentage": 6.5 }
+      ]
+    },
+    {
+      "round": 21,
+      "raceName": "São Paulo Grand Prix",
+      "date": "2025-11-09",
+      "winnerId": "max-verstappen",
+      "winnerName": "Max Verstappen",
+      "topFive": [
+        { "driverId": "max-verstappen", "driverName": "Max Verstappen", "percentage": 56.7 },
+        { "driverId": "kimi-antonelli", "driverName": "Kimi Antonelli", "percentage": 10.0 },
+        { "driverId": "lando-norris", "driverName": "Lando Norris", "percentage": 8.5 },
+        { "driverId": "oliver-bearman", "driverName": "Oliver Bearman", "percentage": 6.2 },
+        { "driverId": "oscar-piastri", "driverName": "Oscar Piastri", "percentage": 3.8 }
+      ]
+    },
+    {
+      "round": 22,
+      "raceName": "Las Vegas Grand Prix",
+      "date": "2025-11-22",
+      "winnerId": "max-verstappen",
+      "winnerName": "Max Verstappen",
+      "topFive": [
+        { "driverId": "max-verstappen", "driverName": "Max Verstappen", "percentage": 26.2 },
+        { "driverId": "kimi-antonelli", "driverName": "Kimi Antonelli", "percentage": 16.4 },
+        { "driverId": "lewis-hamilton", "driverName": "Lewis Hamilton", "percentage": 14.5 },
+        { "driverId": "charles-leclerc", "driverName": "Charles Leclerc", "percentage": 13.5 },
+        { "driverId": "lando-norris", "driverName": "Lando Norris", "percentage": 7.5 }
+      ]
+    },
+    {
+      "round": 23,
+      "raceName": "Qatar Grand Prix",
+      "date": "2025-11-30",
+      "winnerId": "max-verstappen",
+      "winnerName": "Max Verstappen",
+      "topFive": [
+        { "driverId": "max-verstappen", "driverName": "Max Verstappen", "percentage": 31.2 },
+        { "driverId": "carlos-sainz", "driverName": "Carlos Sainz", "percentage": 30.0 },
+        { "driverId": "oscar-piastri", "driverName": "Oscar Piastri", "percentage": 10.2 },
+        { "driverId": "kimi-antonelli", "driverName": "Kimi Antonelli", "percentage": 6.7 },
+        { "driverId": "lando-norris", "driverName": "Lando Norris", "percentage": 5.6 }
+      ]
+    },
+    {
+      "round": 24,
+      "raceName": "Abu Dhabi Grand Prix",
+      "date": "2025-12-07",
+      "winnerId": "max-verstappen",
+      "winnerName": "Max Verstappen",
+      "topFive": [
+        { "driverId": "max-verstappen", "driverName": "Max Verstappen", "percentage": 19.0 },
+        { "driverId": "lando-norris", "driverName": "Lando Norris", "percentage": 16.3 },
+        { "driverId": "lewis-hamilton", "driverName": "Lewis Hamilton", "percentage": 13.4 },
+        { "driverId": "charles-leclerc", "driverName": "Charles Leclerc", "percentage": 12.2 },
+        { "driverId": "yuki-tsunoda", "driverName": "Yuki Tsunoda", "percentage": 11.3 }
+      ]
+    }
+  ]
+}

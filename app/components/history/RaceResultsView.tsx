@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import type { RaceWithResults } from "@/app/types/history";
 import { NationalityFlag, DriverImg, TeamLogo } from "./shared";
 import SessionDrillDown from "./SessionDrillDown";
+import DOTDCard from "../fan-favorites/DOTDCard";
+import { getDOTDByRound } from "@/app/lib/dotd";
 
 interface RaceResultsViewProps {
   races: RaceWithResults[];
@@ -47,6 +49,7 @@ export default function RaceResultsView({ races, season, driverHeadshots }: Race
   const race = races[selectedRound];
   const roundNum = parseInt(race.round, 10);
   const roundSessionKey = availableRounds.get(roundNum) ?? null;
+  const dotdRace = season === 2025 ? getDOTDByRound(roundNum) : null;
 
   function handleViewSession() {
     if (roundSessionKey) {
@@ -89,6 +92,9 @@ export default function RaceResultsView({ races, season, driverHeadshots }: Race
           </button>
         )}
       </div>
+
+      {/* DOTD Card (2025 only) */}
+      {dotdRace && <DOTDCard race={dotdRace} />}
 
       {/* Results table */}
       <div className="rounded-lg border border-white/10 bg-white/5 p-4">

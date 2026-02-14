@@ -23,7 +23,7 @@ export default function Header({ season, isHome }: HeaderProps) {
             </p>
           )}
         </div>
-        <nav className="mt-4 grid grid-cols-8">
+        <nav className="-mb-px mt-4 flex justify-center overflow-x-auto scrollbar-none">
           <NavLink href="/">Grid</NavLink>
           <NavLink href="/silly-season">Silly Season</NavLink>
           <NavLink href="/schedule">Schedule</NavLink>
@@ -31,6 +31,8 @@ export default function Header({ season, isHome }: HeaderProps) {
           <NavLink href="/telemetry">Telemetry</NavLink>
           <NavLink href="/compare">H2H</NavLink>
           <NavLink href="/predict">Predict</NavLink>
+          <NavLink href="/penalties">Penalties</NavLink>
+          <NavLink href="/fan-favorites">Fan Favorites</NavLink>
           <NavLink href="/history">History</NavLink>
         </nav>
       </div>

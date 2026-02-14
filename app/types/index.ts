@@ -1,3 +1,21 @@
+export type {
+  IncidentType,
+  SessionType,
+  PenaltyDecision,
+  Incident,
+  PenaltyData,
+  DriverPenaltySummary,
+  ConsistencyGroup,
+} from "./penalties";
+
+export type {
+  DOTDCandidate,
+  DOTDRace,
+  DOTDSeason,
+  DOTDDriverStats,
+  DOTDHighlights,
+} from "./dotd";
+
 export type ContractStatus = "locked" | "expiring" | "open";
 
 export interface Rumor {
@@ -28,7 +46,9 @@ export interface Driver {
 export interface ReserveDriver {
   name: string;
   nationality: string;
-  role: "reserve" | "test" | "development";
+  role: "reserve" | "test" | "development" | "academy";
+  series?: string;
+  sharedWith?: string;
 }
 
 export interface Team {

@@ -55,5 +55,7 @@ app/data/radio/
 # Local database
 f1.db
 
-# Script logs
+# Script logs and caches
 scripts/*.log
+scripts/logs/
+scripts/cache/

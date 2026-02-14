@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Team, Constructor } from "@/app/types";
+import { Team, Constructor, ReserveDriver } from "@/app/types";
 import type { EngineManufacturer } from "@/app/types/f1-reference";
 import { logoSrc, extractSlug } from "@/app/lib/image-helpers";
 import { getBlurPlaceholder } from "@/app/lib/blur-placeholders";
 import { driverSrc } from "@/app/lib/image-helpers";
 import { getInitials } from "@/app/lib/drivers";
+import { nationalityToFlag } from "@/app/lib/flags";
 import TeamSocials from "./TeamSocials";
 
 interface TeamProfileProps {
@@ -66,6 +67,30 @@ function DriverCard({ driver, team, accentColor }: { driver: Team["seat1"]; team
   );
 }
 
+function DriverRow({ driver, accentColor }: { driver: ReserveDriver; accentColor: string }) {
+  const flag = nationalityToFlag(driver.nationality);
+  const roleLabel = driver.role === "development" ? "Development" : driver.role === "test" ? "Test" : driver.role === "academy" ? "Academy" : "Reserve";
+  return (
+    <div className="flex items-center gap-2.5 rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2">
+      {flag && <span className="text-sm leading-none">{flag}</span>}
+      <span className="text-sm text-white/70 flex-1">
+        {driver.name}
+        {driver.sharedWith && (
+          <span className="ml-1.5 text-[10px] text-white/25">
+            also {driver.sharedWith}
+          </span>
+        )}
+      </span>
+      {driver.series && (
+        <span className="text-[10px] font-medium rounded-full px-2 py-0.5" style={{ backgroundColor: `${accentColor}15`, color: `${accentColor}99` }}>
+          {driver.series}
+        </span>
+      )}
+      <span className="text-xs text-white/30">{roleLabel}</span>
+    </div>
+  );
+}
+
 export default function TeamProfile({ team, constructor: ctor, engine }: TeamProfileProps) {
   const teamSlug = extractSlug(team.logoUrl, "logos");
   const logoBlur = teamSlug ? getBlurPlaceholder(`logos/${teamSlug}`) : undefined;
@@ -113,25 +138,43 @@ export default function TeamProfile({ team, constructor: ctor, engine }: TeamPro
         </div>
       </div>
 
-      {/* Reserve drivers */}
-      {team.reserveDrivers && team.reserveDrivers.length > 0 && (
-        <div>
-          <h2 className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: `${accentColor}99` }}>
-            Reserve & Test Drivers
-          </h2>
-          <div className="space-y-2">
-            {team.reserveDrivers.map((rd) => (
-              <div
-                key={rd.name}
-                className="flex items-center justify-between rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2"
-              >
-                <span className="text-sm text-white/70">{rd.name}</span>
-                <span className="text-xs text-white/30 capitalize">{rd.role}</span>
+      {/* Reserve & test drivers */}
+      {(() => {
+        const all = team.reserveDrivers ?? [];
+        const reserves = all.filter((d) => d.role === "reserve" || d.role === "test" || d.role === "development");
+        const academy = all.filter((d) => d.role === "academy");
+        if (reserves.length === 0 && academy.length === 0) return null;
+        return (
+          <>
+            <div>
+              <h2 className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: `${accentColor}99` }}>
+                Reserve & Test Drivers
+              </h2>
+              {reserves.length > 0 ? (
+                <div className="space-y-2">
+                  {reserves.map((rd) => (
+                    <DriverRow key={rd.name} driver={rd} accentColor={accentColor} />
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-white/30 italic">No reserve driver announced yet</p>
+              )}
+            </div>
+            {academy.length > 0 && (
+              <div>
+                <h2 className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: `${accentColor}99` }}>
+                  Academy & Junior Drivers
+                </h2>
+                <div className="space-y-2">
+                  {academy.map((rd) => (
+                    <DriverRow key={rd.name} driver={rd} accentColor={accentColor} />
+                  ))}
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
+            )}
+          </>
+        );
+      })()}
 
       {/* Constructor stats */}
       {ctor && (
