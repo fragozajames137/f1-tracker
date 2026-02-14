@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getLaps, getCacheControl } from "@/app/lib/db-queries";
+import { getLaps, getCacheControl, getSessionYear } from "@/app/lib/db-queries";
 
 export async function GET(
   request: NextRequest,
@@ -23,9 +23,12 @@ export async function GET(
   const fromLap = fromParam ? parseInt(fromParam, 10) : undefined;
   const toLap = toParam ? parseInt(toParam, 10) : undefined;
 
-  const laps = await getLaps(sessionKey, driverNumber, fromLap, toLap);
+  const [year, laps] = await Promise.all([
+    getSessionYear(sessionKey),
+    getLaps(sessionKey, driverNumber, fromLap, toLap),
+  ]);
 
   return NextResponse.json(laps, {
-    headers: { "Cache-Control": getCacheControl() },
+    headers: { "Cache-Control": getCacheControl(year ?? undefined) },
   });
 }

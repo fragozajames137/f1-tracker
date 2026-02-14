@@ -5,8 +5,9 @@ import type { HistoryData } from "@/app/types/history";
 import SeasonSelector from "./SeasonSelector";
 import StandingsView from "./StandingsView";
 import RaceResultsView from "./RaceResultsView";
+import RecordsView from "./RecordsView";
 
-type Tab = "standings" | "results";
+type Tab = "standings" | "results" | "records";
 
 interface HistoryDashboardProps {
   seasons: number[];
@@ -58,12 +59,14 @@ export default function HistoryDashboard({
     <div className="space-y-6">
       {/* Controls row */}
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-        <SeasonSelector
-          seasons={seasons}
-          selected={selectedSeason}
-          onChange={handleSeasonChange}
-          disabled={loading}
-        />
+        {activeTab !== "records" && (
+          <SeasonSelector
+            seasons={seasons}
+            selected={selectedSeason}
+            onChange={handleSeasonChange}
+            disabled={loading}
+          />
+        )}
 
         {/* Standings / Results toggle */}
         <div role="tablist" aria-label="View mode" className="flex overflow-hidden rounded-lg border border-white/10">
@@ -90,6 +93,18 @@ export default function HistoryDashboard({
             }`}
           >
             Results
+          </button>
+          <button
+            role="tab"
+            aria-selected={activeTab === "records"}
+            onClick={() => setActiveTab("records")}
+            className={`cursor-pointer px-3 py-1.5 text-xs font-medium transition-colors ${
+              activeTab === "records"
+                ? "bg-white/10 text-white"
+                : "text-white/40 hover:text-white/70"
+            }`}
+          >
+            Records
           </button>
         </div>
 
@@ -118,12 +133,15 @@ export default function HistoryDashboard({
           driverStandings={data.driverStandings}
           constructorStandings={data.constructorStandings}
           driverHeadshots={data.driverHeadshots}
+          races={data.races}
         />
       )}
 
       {!fetchError && activeTab === "results" && (
         <RaceResultsView races={data.races} season={data.season} driverHeadshots={data.driverHeadshots} />
       )}
+
+      {activeTab === "records" && <RecordsView />}
     </div>
   );
 }

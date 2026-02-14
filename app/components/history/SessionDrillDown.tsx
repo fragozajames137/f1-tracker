@@ -6,15 +6,21 @@ import StrategyTimeline from "./StrategyTimeline";
 import PitStopTable from "./PitStopTable";
 import WeatherChart from "./WeatherChart";
 import RaceControlFeed from "./RaceControlFeed";
+import TeamRadioTab from "./TeamRadioTab";
+import SpeedTrapTab from "./SpeedTrapTab";
+import TrackLimitsTab from "./TrackLimitsTab";
 
-type Tab = "lap-chart" | "strategy" | "pit-stops" | "weather" | "race-control";
+type Tab = "lap-chart" | "strategy" | "pit-stops" | "speed-traps" | "weather" | "race-control" | "track-limits" | "team-radio";
 
 const TABS: { key: Tab; label: string }[] = [
   { key: "lap-chart", label: "Lap Chart" },
   { key: "strategy", label: "Strategy" },
   { key: "pit-stops", label: "Pit Stops" },
+  { key: "speed-traps", label: "Speed Traps" },
   { key: "weather", label: "Weather" },
   { key: "race-control", label: "Race Control" },
+  { key: "track-limits", label: "Track Limits" },
+  { key: "team-radio", label: "Team Radio" },
 ];
 
 interface SessionDrillDownProps {
@@ -62,7 +68,10 @@ export default function SessionDrillDown({ sessionKey, onClose }: SessionDrillDo
       {activeTab === "strategy" && <StrategyTimeline sessionKey={sessionKey} />}
       {activeTab === "pit-stops" && <PitStopTable sessionKey={sessionKey} />}
       {activeTab === "weather" && <WeatherChart sessionKey={sessionKey} />}
+      {activeTab === "speed-traps" && <SpeedTrapTab sessionKey={sessionKey} />}
       {activeTab === "race-control" && <RaceControlFeed sessionKey={sessionKey} />}
+      {activeTab === "track-limits" && <TrackLimitsTab sessionKey={sessionKey} />}
+      {activeTab === "team-radio" && <TeamRadioTab sessionKey={sessionKey} />}
     </div>
   );
 }

@@ -1,19 +1,18 @@
-"use client";
-
 import Image from "next/image";
-import { Team, Driver } from "@/app/types";
+import Link from "next/link";
+import { Team } from "@/app/types";
 import SeatCard from "./SeatCard";
 import { logoSrc, extractSlug } from "@/app/lib/image-helpers";
 import { getBlurPlaceholder } from "@/app/lib/blur-placeholders";
 
 interface TeamRowProps {
   team: Team;
-  onSelectDriver: (driver: Driver, team: Team) => void;
 }
 
-export default function TeamRow({ team, onSelectDriver }: TeamRowProps) {
+export default function TeamRow({ team }: TeamRowProps) {
   const slug = extractSlug(team.logoUrl, "logos");
   const blur = slug ? getBlurPlaceholder(`logos/${slug}`) : undefined;
+  const accentColor = team.id === "cadillac" ? "#FFFFFF" : team.color;
 
   return (
     <div className="group">
@@ -34,21 +33,24 @@ export default function TeamRow({ team, onSelectDriver }: TeamRowProps) {
             />
           ) : null}
         </div>
-        <h2 className="font-display text-base font-bold text-white">{team.name}</h2>
+        <Link
+          href={`/team/${team.id}`}
+          className="font-display text-base font-bold text-white hover:text-white/80 transition-colors"
+        >
+          {team.name}
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <SeatCard
           driver={team.seat1}
-          teamColor={team.color}
+          teamColor={accentColor}
           seatLabel="Seat 1"
-          onClick={() => onSelectDriver(team.seat1, team)}
         />
         <SeatCard
           driver={team.seat2}
-          teamColor={team.color}
+          teamColor={accentColor}
           seatLabel="Seat 2"
-          onClick={() => onSelectDriver(team.seat2, team)}
         />
       </div>
     </div>

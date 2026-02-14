@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getLapChart, getCacheControl } from "@/app/lib/db-queries";
+import { getLapChart, getCacheControl, getSessionYear } from "@/app/lib/db-queries";
 
 export async function GET(
   _request: Request,
@@ -15,9 +15,12 @@ export async function GET(
     );
   }
 
-  const lapChart = await getLapChart(sessionKey);
+  const [year, lapChart] = await Promise.all([
+    getSessionYear(sessionKey),
+    getLapChart(sessionKey),
+  ]);
 
   return NextResponse.json(lapChart, {
-    headers: { "Cache-Control": getCacheControl() },
+    headers: { "Cache-Control": getCacheControl(year ?? undefined) },
   });
 }

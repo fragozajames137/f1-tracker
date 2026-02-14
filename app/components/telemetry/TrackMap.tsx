@@ -12,6 +12,7 @@ interface TrackMapProps {
   drivers: TelemetryDriver[];
   trackBoundary?: TrackBoundary | null;
   drsZones?: DrsZone[];
+  speedUnit?: "kph" | "mph";
 }
 
 const PADDING = 20;
@@ -69,7 +70,7 @@ function computeTransform(xArrays: number[][], yArrays: number[][]): Transform {
   return { apply, applyArrays };
 }
 
-export default function TrackMap({ traces, drivers, trackBoundary, drsZones }: TrackMapProps) {
+export default function TrackMap({ traces, drivers, trackBoundary, drsZones, speedUnit = "kph" }: TrackMapProps) {
   const validTraces = traces.filter(
     (t) => t.x && t.y && t.x.length > 1 && t.y.length > 1,
   );
@@ -132,7 +133,10 @@ export default function TrackMap({ traces, drivers, trackBoundary, drsZones }: T
         </svg>
       </div>
 
-      {isSingleDriver && <SpeedLegend />}
+      {isSingleDriver && (() => {
+        const speeds = validTraces[0].speed;
+        return <SpeedLegend minSpeed={Math.min(...speeds)} maxSpeed={Math.max(...speeds)} speedUnit={speedUnit} />;
+      })()}
 
       {drsZones && drsZones.length > 0 && (
         <div className="mt-2 flex items-center justify-center gap-1.5">
@@ -332,17 +336,21 @@ function MultiDriverMap({
   );
 }
 
-function SpeedLegend() {
+const KPH_TO_MPH = 0.621371;
+
+function SpeedLegend({ minSpeed, maxSpeed, speedUnit = "kph" }: { minSpeed: number; maxSpeed: number; speedUnit?: "kph" | "mph" }) {
+  const factor = speedUnit === "mph" ? KPH_TO_MPH : 1;
+  const label = speedUnit === "mph" ? "mph" : "km/h";
   return (
     <div className="mt-3 flex items-center justify-center gap-2">
-      <span className="text-[10px] text-white/40">Slow</span>
+      <span className="text-[10px] text-white/40">{Math.round(minSpeed * factor)} {label}</span>
       <div
         className="h-2.5 w-32 rounded-full"
         style={{
           background: "linear-gradient(to right, hsl(0,85%,50%), hsl(60,85%,50%), hsl(120,85%,50%))",
         }}
       />
-      <span className="text-[10px] text-white/40">Fast</span>
+      <span className="text-[10px] text-white/40">{Math.round(maxSpeed * factor)} {label}</span>
     </div>
   );
 }

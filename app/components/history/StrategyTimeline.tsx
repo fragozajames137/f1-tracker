@@ -36,16 +36,18 @@ export default function StrategyTimeline({ sessionKey }: StrategyTimelineProps) 
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const ac = new AbortController();
     setLoading(true);
     setError(null);
-    fetch(`/api/sessions/${sessionKey}/strategy`)
+    fetch(`/api/sessions/${sessionKey}/strategy`, { signal: ac.signal })
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
       })
       .then(setData)
-      .catch(() => setError("Failed to load strategy data"))
-      .finally(() => setLoading(false));
+      .catch((e) => { if (!ac.signal.aborted) setError("Failed to load strategy data"); })
+      .finally(() => { if (!ac.signal.aborted) setLoading(false); });
+    return () => ac.abort();
   }, [sessionKey]);
 
   if (loading) {

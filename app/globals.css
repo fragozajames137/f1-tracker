@@ -12,6 +12,7 @@
   --font-sans: var(--font-inter);
   --font-display: var(--font-space-grotesk);
   --font-mono: var(--font-space-mono);
+  --font-brand: var(--font-orbitron);
 }
 
 body {

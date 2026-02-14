@@ -1,31 +1,35 @@
 # Pole to Paddock
 
-A real-time Formula 1 dashboard for the 2026 season.
+A Formula 1 dashboard covering the 2026 season and the full history of the sport.
 
-Live race timing, telemetry overlays, driver comparisons, contract tracker, and historical data going back to 1950.
+Live race timing, telemetry overlays, driver comparisons, contract tracker, grid predictor, and historical data going back to 1950.
 
 ## Features
 
 - **Live Race Dashboard** — Real-time positions, gaps, pit stops, tire strategy, race control messages, team radio, weather, and rain radar
-- **Telemetry** — Speed traces, throttle, brake, and gear data for any session
-- **Driver Comparison** — Head-to-head stats: lap times, consistency, stint performance, and pace delta
-- **Silly Season Grid** — 2026 teams and seats, color-coded by contract status with rumors and sources
-- **Race Schedule** — Full calendar with weekend breakdowns, circuit info, and countdown timers
-- **Historical Archive** — Season standings and race results from 1950 to present
+- **Telemetry** — Speed traces, throttle/brake/gear data, and track maps for every session (2018–present)
+- **Driver Comparison** — Head-to-head career and season stats with visual breakdowns
+- **Driver & Team Profiles** — Full career histories, contract details, salary data, social links, and team heritage timelines
+- **Silly Season Tracker** — 2026 grid with color-coded contract statuses, rumors, and sources
+- **2027 Grid Predictor** — Drag-and-drop tool to build your predicted grid, shareable as an image or link
+- **Race Schedule** — Full calendar with weekend session breakdowns, circuit info, and countdown timers
+- **Race Hub** — Detailed race weekend pages with results, standings impact, and session drill-downs
+- **Historical Archive** — Season standings, race results, lap charts, strategy timelines, pit stops, speed traps, weather, race control, track limits, and team radio from 1950 to present
 
 ## Tech Stack
 
 - Next.js 16 (App Router) + React 19
 - TypeScript + Tailwind CSS v4
 - Turso (serverless SQLite) + Drizzle ORM
-- Zustand for state management
-- Live timing worker with schedule-aware sleep/wake
+- Zustand for client state
+- Cloudflare R2 for media storage (telemetry, team radio)
+- Live timing via SignalR with schedule-aware sleep/wake
 
 ## Getting Started
 
 ```bash
 npm install
-cp .env.example .env.local  # add your Turso credentials
+cp .env.example .env.local  # add your Turso + R2 credentials
 npx drizzle-kit push
 npm run dev
 ```

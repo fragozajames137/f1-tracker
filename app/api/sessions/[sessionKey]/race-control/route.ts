@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getRaceControlMessages, getCacheControl } from "@/app/lib/db-queries";
+import { getRaceControlMessages, getCacheControl, getSessionYear } from "@/app/lib/db-queries";
 
 export async function GET(
   _request: Request,
@@ -15,9 +15,12 @@ export async function GET(
     );
   }
 
-  const messages = await getRaceControlMessages(sessionKey);
+  const [year, messages] = await Promise.all([
+    getSessionYear(sessionKey),
+    getRaceControlMessages(sessionKey),
+  ]);
 
   return NextResponse.json(messages, {
-    headers: { "Cache-Control": getCacheControl() },
+    headers: { "Cache-Control": getCacheControl(year ?? undefined) },
   });
 }

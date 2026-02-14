@@ -7,6 +7,9 @@ interface RaceControlMessage {
   lapNumber: number | null;
   category: string | null;
   flag: string | null;
+  scope: string | null;
+  sector: number | null;
+  driverNumber: number | null;
   message: string;
 }
 
@@ -61,16 +64,18 @@ export default function RaceControlFeed({ sessionKey }: RaceControlFeedProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const ac = new AbortController();
     setLoading(true);
     setError(null);
-    fetch(`/api/sessions/${sessionKey}/race-control`)
+    fetch(`/api/sessions/${sessionKey}/race-control`, { signal: ac.signal })
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
       })
       .then(setData)
-      .catch(() => setError("Failed to load race control messages"))
-      .finally(() => setLoading(false));
+      .catch((e) => { if (!ac.signal.aborted) setError("Failed to load race control messages"); })
+      .finally(() => { if (!ac.signal.aborted) setLoading(false); });
+    return () => ac.abort();
   }, [sessionKey]);
 
   if (loading) {
@@ -107,6 +112,16 @@ export default function RaceControlFeed({ sessionKey }: RaceControlFeedProps) {
                 {msg.lapNumber !== null && (
                   <span className="shrink-0 rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-semibold">
                     L{msg.lapNumber}
+                  </span>
+                )}
+                {msg.driverNumber !== null && (
+                  <span className="shrink-0 rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-semibold">
+                    #{msg.driverNumber}
+                  </span>
+                )}
+                {msg.scope === "Sector" && msg.sector !== null && (
+                  <span className="shrink-0 rounded bg-white/10 px-1.5 py-0.5 text-[10px] font-semibold">
+                    S{msg.sector}
                   </span>
                 )}
                 <p className="flex-1">{msg.message}</p>

@@ -20,7 +20,7 @@ const ROOT = path.resolve(import.meta.dirname, "..");
 const PUBLIC = path.join(ROOT, "public");
 
 const DRIVER_SIZES = [48, 96, 192];
-const LOGO_SIZES = [24, 48];
+const LOGO_SIZES = [24, 48, 96];
 const WEBP_QUALITY = 80;
 const BLUR_WIDTH = 10;
 

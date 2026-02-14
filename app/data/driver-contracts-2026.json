@@ -1,24 +1,650 @@
 [
-  { "driver": "Max Verstappen", "number": 3, "team": "Red Bull Racing", "contractThrough": 2028, "dealType": "long-term", "estimatedSalary": "$70M", "notes": "Has said he could leave if 2026 regs aren't fun" },
-  { "driver": "Isack Hadjar", "number": 6, "team": "Red Bull Racing", "contractThrough": 2026, "dealType": "single-year", "notes": "Promoted from junior programme" },
-  { "driver": "George Russell", "number": 63, "team": "Mercedes", "contractThrough": 2026, "dealType": "1+1", "estimatedSalary": "$34M", "notes": "Auto-renews for 2027 if performance clauses met" },
-  { "driver": "Kimi Antonelli", "number": 12, "team": "Mercedes", "contractThrough": 2027, "dealType": "multi-year", "notes": "Understood to be a long-term deal" },
-  { "driver": "Charles Leclerc", "number": 16, "team": "Ferrari", "contractThrough": 2029, "dealType": "long-term", "estimatedSalary": "$34M", "notes": "Extended January 2024" },
-  { "driver": "Lewis Hamilton", "number": 44, "team": "Ferrari", "contractThrough": 2027, "dealType": "multi-year", "estimatedSalary": "$60M", "notes": "Described as a 'pretty long contract', widely believed to include 2027" },
-  { "driver": "Lando Norris", "number": 1, "team": "McLaren", "contractThrough": 2027, "dealType": "long-term", "estimatedSalary": "$30M", "notes": "Long-term extension January 2024. Using #1 as 2025 champion (permanent number is #4)" },
-  { "driver": "Oscar Piastri", "number": 81, "team": "McLaren", "contractThrough": 2028, "dealType": "multi-year", "estimatedSalary": "$13M" },
-  { "driver": "Fernando Alonso", "number": 14, "team": "Aston Martin", "contractThrough": 2026, "dealType": "multi-year", "estimatedSalary": "$20M", "notes": "May retire after 2026 depending on competitiveness" },
-  { "driver": "Lance Stroll", "number": 18, "team": "Aston Martin", "contractThrough": null, "dealType": "indefinite", "notes": "Father Lawrence Stroll owns the team" },
-  { "driver": "Alex Albon", "number": 23, "team": "Williams", "contractThrough": 2027, "dealType": "multi-year", "estimatedSalary": "$12M" },
-  { "driver": "Carlos Sainz Jr.", "number": 55, "team": "Williams", "contractThrough": 2026, "dealType": "multi-year", "estimatedSalary": "$13M", "notes": "Multi-year deal, confirmed through at least 2026" },
-  { "driver": "Esteban Ocon", "number": 31, "team": "Haas", "contractThrough": 2026, "dealType": "multi-year", "notes": "Multi-year contract, at least through 2026" },
-  { "driver": "Oliver Bearman", "number": 87, "team": "Haas", "contractThrough": 2026, "dealType": "2+1", "notes": "Option to extend to 2027" },
-  { "driver": "Nico Hülkenberg", "number": 27, "team": "Audi", "contractThrough": 2026, "dealType": "multi-year", "notes": "At least through 2026" },
-  { "driver": "Gabriel Bortoleto", "number": 5, "team": "Audi", "contractThrough": 2027, "dealType": "multi-year" },
-  { "driver": "Pierre Gasly", "number": 10, "team": "Alpine", "contractThrough": 2028, "dealType": "multi-year", "estimatedSalary": "$12M" },
-  { "driver": "Franco Colapinto", "number": 43, "team": "Alpine", "contractThrough": 2026, "dealType": "single-year" },
-  { "driver": "Liam Lawson", "number": 30, "team": "Racing Bulls", "contractThrough": 2026, "dealType": "single-year" },
-  { "driver": "Arvid Lindblad", "number": 41, "team": "Racing Bulls", "contractThrough": 2026, "dealType": "single-year" },
-  { "driver": "Sergio Pérez", "number": 11, "team": "Cadillac", "contractThrough": 2026, "dealType": "1+1", "notes": "One-year contract with option for 2027" },
-  { "driver": "Valtteri Bottas", "number": 77, "team": "Cadillac", "contractThrough": 2026, "dealType": "single-year" }
+  {
+    "id": "max-verstappen",
+    "driver": "Max Verstappen",
+    "number": 3,
+    "team": "Red Bull Racing",
+    "contractThrough": 2028,
+    "dealType": "long-term",
+    "estimatedSalary": "$65M",
+    "notes": "5-year mega-deal signed early 2024. Performance-based exit clause: can leave if not top 3 in standings by summer break. Marko clause removed Dec 2024. Potential 2027 termination option per Bild.",
+    "careerEarnings": 245400000,
+    "transactions": [
+      {
+        "date": "2024-01-15",
+        "description": "Signed a 5-year extension with Red Bull Racing through 2028, becoming the highest-paid F1 driver in history"
+      },
+      {
+        "date": "2020-01-07",
+        "description": "Signed a contract extension with Red Bull Racing through 2023"
+      },
+      {
+        "date": "2016-05-05",
+        "description": "Promoted from Toro Rosso to Red Bull Racing mid-season, replacing Daniil Kvyat"
+      },
+      {
+        "date": "2014-08-18",
+        "description": "Signed with Toro Rosso to debut in F1 for 2015 at age 17"
+      }
+    ]
+  },
+  {
+    "id": "isack-hadjar",
+    "driver": "Isack Hadjar",
+    "number": 6,
+    "team": "Red Bull Racing",
+    "contractThrough": 2026,
+    "dealType": "1+1",
+    "estimatedSalary": "$7.7M",
+    "notes": "2026 guaranteed, 2027 optional at Red Bull's discretion. Demotion clause: can be sent back to Racing Bulls if he underperforms (salary would drop to ~$4.2M). Salary is ~5x his Racing Bulls pay.",
+    "transactions": [
+      {
+        "date": "2025-12-01",
+        "description": "Promoted to Red Bull Racing for 2026 to partner Verstappen"
+      },
+      {
+        "date": "2024-12-15",
+        "description": "Signed with Racing Bulls for 2025 debut season"
+      }
+    ]
+  },
+  {
+    "id": "george-russell",
+    "driver": "George Russell",
+    "number": 63,
+    "team": "Mercedes",
+    "contractThrough": 2026,
+    "dealType": "1+1",
+    "estimatedSalary": "$35M",
+    "notes": "Contract does NOT guarantee 2027 — Russell confirmed he must hit undisclosed performance targets for auto-extension. Option for 2028 on Mercedes' side. Widely seen as keeping the door open for Verstappen.",
+    "careerEarnings": 75000000,
+    "transactions": [
+      {
+        "date": "2025-10-01",
+        "description": "Extended with Mercedes for 2026 with performance-dependent option for 2027-2028"
+      },
+      {
+        "date": "2023-06-15",
+        "description": "Extended with Mercedes through 2025"
+      },
+      {
+        "date": "2021-09-07",
+        "description": "Signed with Mercedes senior team for 2022, replacing Valtteri Bottas"
+      },
+      {
+        "date": "2018-10-12",
+        "description": "Signed with Williams for 2019, on loan from Mercedes junior programme"
+      }
+    ]
+  },
+  {
+    "id": "kimi-antonelli",
+    "driver": "Kimi Antonelli",
+    "number": 12,
+    "team": "Mercedes",
+    "contractThrough": 2026,
+    "dealType": "single-year",
+    "estimatedSalary": "$2M",
+    "notes": "Year-by-year structure, renewal contingent on 2026 results. Up to $10M with all performance bonuses. Mercedes views him as long-term prospect but providing no multi-year guarantees.",
+    "transactions": [
+      {
+        "date": "2025-11-01",
+        "description": "Contract extended for 2026 at Mercedes"
+      },
+      {
+        "date": "2024-08-31",
+        "description": "Signed to replace Lewis Hamilton at Mercedes for 2025 debut season"
+      }
+    ]
+  },
+  {
+    "id": "charles-leclerc",
+    "driver": "Charles Leclerc",
+    "number": 16,
+    "team": "Ferrari",
+    "contractThrough": 2029,
+    "dealType": "long-term",
+    "estimatedSalary": "$34M",
+    "notes": "Escalating salary structure, potentially reaching ~$50M/year by 2028-2029. Up to $12M in performance bonuses. One of the longest active contracts on the grid. No publicly reported exit clauses.",
+    "careerEarnings": 95000000,
+    "transactions": [
+      {
+        "date": "2024-01-25",
+        "description": "Signed a long-term extension with Ferrari through 2029 with improved financial terms"
+      },
+      {
+        "date": "2019-12-23",
+        "description": "Extended with Ferrari through 2024"
+      },
+      {
+        "date": "2018-09-11",
+        "description": "Signed with Ferrari for 2019, promoted from Alfa Romeo Sauber"
+      },
+      {
+        "date": "2017-11-15",
+        "description": "Signed with Alfa Romeo Sauber for 2018 as Ferrari junior"
+      }
+    ]
+  },
+  {
+    "id": "lewis-hamilton",
+    "driver": "Lewis Hamilton",
+    "number": 44,
+    "team": "Ferrari",
+    "contractThrough": 2027,
+    "dealType": "multi-year",
+    "estimatedSalary": "$60M",
+    "notes": "Total package reportedly ~$80M including $20M to Mission 44 charity. Exor/Agnelli family committed ~€250M to joint investment fund. Bild reports guaranteed 3-year deal through 2027 with 2028 option.",
+    "careerEarnings": 500000000,
+    "transactions": [
+      {
+        "date": "2024-02-01",
+        "description": "Signed with Scuderia Ferrari, ending 12-year tenure at Mercedes"
+      },
+      {
+        "date": "2023-08-10",
+        "description": "Extended with Mercedes through 2025 (ultimately did not complete)"
+      },
+      {
+        "date": "2013-01-28",
+        "description": "Signed with Mercedes, leaving McLaren after 6 seasons"
+      },
+      {
+        "date": "2007-01-01",
+        "description": "Debuted with McLaren, becoming the youngest champion contender in F1 history"
+      }
+    ]
+  },
+  {
+    "id": "lando-norris",
+    "driver": "Lando Norris",
+    "number": 1,
+    "team": "McLaren",
+    "contractThrough": 2027,
+    "dealType": "long-term",
+    "estimatedSalary": "$25M",
+    "notes": "2025 World Champion. Using #1 as reigning champion (permanent #4). Break clause believed to exist for 2026 regulation change assessment. Earned ~$57.5M in 2025 ($18M base + $39.5M bonuses). Likely underpaid relative to champion status — renegotiation expected.",
+    "careerEarnings": 80000000,
+    "transactions": [
+      {
+        "date": "2024-01-22",
+        "description": "Signed extended multi-year contract with McLaren through 2027+"
+      },
+      {
+        "date": "2022-02-09",
+        "description": "Extended with McLaren through 2025"
+      },
+      {
+        "date": "2018-09-03",
+        "description": "Signed with McLaren for 2019 debut season"
+      }
+    ]
+  },
+  {
+    "id": "oscar-piastri",
+    "driver": "Oscar Piastri",
+    "number": 81,
+    "team": "McLaren",
+    "contractThrough": 2028,
+    "dealType": "long-term",
+    "estimatedSalary": "$20M",
+    "notes": "Contract may extend through 2029. Contains 'accumulator clauses' — bonus payments for wins and championship performance. Salary jumped from $6M to $20M+ for 2026. Previous Alpine/McLaren Contract Recognition Board drama in 2022.",
+    "careerEarnings": 14000000,
+    "transactions": [
+      {
+        "date": "2025-03-10",
+        "description": "Extended with McLaren through at least 2028, described as 'until end of the decade'"
+      },
+      {
+        "date": "2023-09-15",
+        "description": "Extended with McLaren through 2026"
+      },
+      {
+        "date": "2022-08-02",
+        "description": "Contract Recognition Board ruled in favor of McLaren over Alpine; signed for 2023 debut"
+      }
+    ]
+  },
+  {
+    "id": "fernando-alonso",
+    "driver": "Fernando Alonso",
+    "number": 14,
+    "team": "Aston Martin",
+    "contractThrough": 2026,
+    "dealType": "lifetime",
+    "estimatedSalary": "$20M",
+    "notes": "Described as 'the longest contract I ever signed' — includes post-F1 ambassador/advisory role at Aston Martin. $100K per championship point bonus (up to $8M). Offered to sacrifice 20% of salary to fund Adrian Newey hiring.",
+    "careerEarnings": 300000000,
+    "transactions": [
+      {
+        "date": "2024-04-25",
+        "description": "Signed 'lifetime' extension with Aston Martin through 2026 racing + post-F1 advisory role"
+      },
+      {
+        "date": "2022-08-01",
+        "description": "Signed with Aston Martin for 2023, leaving Alpine"
+      },
+      {
+        "date": "2020-07-08",
+        "description": "Signed with Alpine (Renault) for F1 return in 2021 after 2 years away"
+      },
+      {
+        "date": "2014-11-20",
+        "description": "Signed with McLaren for 2015, leaving Ferrari"
+      },
+      {
+        "date": "2009-12-01",
+        "description": "Signed with Ferrari for 2010"
+      },
+      {
+        "date": "2005-12-20",
+        "description": "Signed with McLaren for 2007"
+      }
+    ]
+  },
+  {
+    "id": "lance-stroll",
+    "driver": "Lance Stroll",
+    "number": 18,
+    "team": "Aston Martin",
+    "contractThrough": 2026,
+    "dealType": "extension",
+    "estimatedSalary": "$3M",
+    "notes": "Father Lawrence Stroll owns 17% of Aston Martin and is team chairman. Company filings show payments to Stroll's racing company that exceed reported base salary. Aston Martin doubled his pay between 2023 and new deal.",
+    "careerEarnings": 22300000,
+    "transactions": [
+      {
+        "date": "2024-06-15",
+        "description": "Signed 2-year extension with Aston Martin through 2026"
+      },
+      {
+        "date": "2019-01-01",
+        "description": "Joined Racing Point (now Aston Martin) after father's consortium purchased Force India"
+      },
+      {
+        "date": "2016-11-03",
+        "description": "Signed with Williams for 2017 debut season"
+      }
+    ]
+  },
+  {
+    "id": "alex-albon",
+    "driver": "Alex Albon",
+    "number": 23,
+    "team": "Williams",
+    "contractThrough": 2027,
+    "dealType": "extension",
+    "estimatedSalary": "$8M",
+    "notes": "Up to $8M in bonuses (total potential ~$11M). Team leader role alongside higher-paid Sainz. Cited Williams' 'high ceiling' as motivation for extending.",
+    "careerEarnings": 40000000,
+    "transactions": [
+      {
+        "date": "2024-06-20",
+        "description": "Signed 2-year extension with Williams through 2027"
+      },
+      {
+        "date": "2021-09-01",
+        "description": "Signed with Williams for 2022 after year as Red Bull reserve"
+      },
+      {
+        "date": "2019-08-12",
+        "description": "Promoted from Toro Rosso to Red Bull Racing mid-season, replacing Pierre Gasly"
+      },
+      {
+        "date": "2018-11-26",
+        "description": "Signed with Toro Rosso for 2019 debut"
+      }
+    ]
+  },
+  {
+    "id": "carlos-sainz",
+    "driver": "Carlos Sainz Jr.",
+    "number": 55,
+    "team": "Williams",
+    "contractThrough": 2026,
+    "dealType": "multi-year",
+    "estimatedSalary": "$10M",
+    "notes": "Options to extend to 2027/2028. Had an exit clause allowing departure after 2025 for a top team — chose NOT to exercise it. Up to $5M in performance bonuses. Sponsorship income ~$6-10M on top.",
+    "careerEarnings": 86727500,
+    "salaryHistory": [
+      {
+        "year": 2015,
+        "age": 20,
+        "team": "Toro Rosso",
+        "salary": 277500
+      },
+      {
+        "year": 2016,
+        "age": 21,
+        "team": "Toro Rosso",
+        "salary": 650000
+      },
+      {
+        "year": 2017,
+        "age": 22,
+        "team": "Renault",
+        "salary": 750000
+      },
+      {
+        "year": 2018,
+        "age": 23,
+        "team": "McLaren",
+        "salary": 750000
+      },
+      {
+        "year": 2019,
+        "age": 24,
+        "team": "McLaren",
+        "salary": 3300000
+      },
+      {
+        "year": 2020,
+        "age": 25,
+        "team": "Ferrari",
+        "salary": 7000000
+      },
+      {
+        "year": 2021,
+        "age": 26,
+        "team": "Ferrari",
+        "salary": 8000000
+      },
+      {
+        "year": 2022,
+        "age": 27,
+        "team": "Ferrari",
+        "salary": 10000000
+      },
+      {
+        "year": 2023,
+        "age": 28,
+        "team": "Ferrari",
+        "salary": 14000000
+      },
+      {
+        "year": 2024,
+        "age": 29,
+        "team": "Ferrari",
+        "salary": 12000000
+      },
+      {
+        "year": 2025,
+        "age": 30,
+        "team": "Williams",
+        "salary": 10000000
+      },
+      {
+        "year": 2026,
+        "age": 31,
+        "team": "Williams",
+        "salary": 10000000,
+        "isEstimate": true
+      }
+    ],
+    "transactions": [
+      {
+        "date": "2024-07-29",
+        "description": "Signed a multi-year contract with Williams for 2025 and beyond"
+      },
+      {
+        "date": "2022-04-21",
+        "description": "Signed a 2-year contract extension with Ferrari"
+      },
+      {
+        "date": "2020-08-01",
+        "description": "Signed a 2-year contract with Ferrari"
+      },
+      {
+        "date": "2018-08-16",
+        "description": "Signed a 3-year contract with McLaren"
+      }
+    ]
+  },
+  {
+    "id": "esteban-ocon",
+    "driver": "Esteban Ocon",
+    "number": 31,
+    "team": "Haas",
+    "contractThrough": 2026,
+    "dealType": "2+1",
+    "estimatedSalary": "$7M",
+    "notes": "2+1 structure: 2026 guaranteed, 2027 option. $50K per championship point bonus (capped at $2M). Left Alpine after turbulent 2024 (collision with Gasly at Monaco). Reunited with Komatsu from Lotus test days.",
+    "transactions": [
+      {
+        "date": "2024-07-01",
+        "description": "Signed 2+1 year deal with Haas for 2025-2026 with option for 2027"
+      },
+      {
+        "date": "2020-01-15",
+        "description": "Signed with Renault (Alpine) for 2020, returning to full-time racing"
+      },
+      {
+        "date": "2019-01-01",
+        "description": "Joined Mercedes as reserve driver after Racing Point departure"
+      },
+      {
+        "date": "2017-11-10",
+        "description": "Signed with Force India for 2018, promoted from Manor/Mercedes junior"
+      }
+    ]
+  },
+  {
+    "id": "oliver-bearman",
+    "driver": "Oliver Bearman",
+    "number": 87,
+    "team": "Haas",
+    "contractThrough": 2026,
+    "dealType": "2+1",
+    "estimatedSalary": "$1M",
+    "notes": "Ferrari-contracted driver on loan to Haas. Ferrari retains recall rights — Komatsu acknowledged 'Ferrari will not be able to ignore him' if he performs. Salary approximately doubled from ~$500K in 2025. Youngest British F1 driver ever.",
+    "transactions": [
+      {
+        "date": "2024-07-04",
+        "description": "Signed full-time 2+1 year Haas deal for 2025-2026 with option for 2027 (on Ferrari loan)"
+      },
+      {
+        "date": "2024-03-09",
+        "description": "Made F1 debut substituting for Sainz at Saudi Arabian GP, scored points on debut"
+      }
+    ]
+  },
+  {
+    "id": "nico-hulkenberg",
+    "driver": "Nico Hülkenberg",
+    "number": 27,
+    "team": "Audi",
+    "contractThrough": 2026,
+    "dealType": "multi-year",
+    "estimatedSalary": "$7M",
+    "notes": "Option to extend into 2027. €50K per championship point bonus (similar to Raikkonen's Lotus clause). Significant pay rise from Haas (~$2-3M). First confirmed driver for Audi's F1 project.",
+    "careerEarnings": 40000000,
+    "transactions": [
+      {
+        "date": "2024-04-24",
+        "description": "Signed multi-year deal with Sauber/Audi as first confirmed driver for 2025+"
+      },
+      {
+        "date": "2022-11-17",
+        "description": "Signed with Haas for 2023, returning to F1 after 3 years as reserve/substitute"
+      },
+      {
+        "date": "2016-10-13",
+        "description": "Signed with Renault for 2017"
+      },
+      {
+        "date": "2014-01-15",
+        "description": "Signed with Force India for 2014"
+      }
+    ]
+  },
+  {
+    "id": "gabriel-bortoleto",
+    "driver": "Gabriel Bortoleto",
+    "number": 5,
+    "team": "Audi",
+    "contractThrough": 2027,
+    "dealType": "multi-year",
+    "estimatedSalary": "$2M",
+    "notes": "2024 F2 champion. McLaren charged zero buyout fee to release him as they had no available seat. Joint lowest-paid on the 2026 grid alongside Bearman and Antonelli.",
+    "transactions": [
+      {
+        "date": "2024-11-06",
+        "description": "Signed multi-year deal with Sauber/Audi for 2025 debut, released by McLaren at no cost"
+      }
+    ]
+  },
+  {
+    "id": "pierre-gasly",
+    "driver": "Pierre Gasly",
+    "number": 10,
+    "team": "Alpine",
+    "contractThrough": 2028,
+    "dealType": "long-term",
+    "estimatedSalary": "$10M",
+    "notes": "Escalating salary: €10M (2026) → €13M (2027) → €16M (2028). Up to €10M World Championship bonus. Performance exit clause: can leave if Alpine fails to deliver on competitiveness promises. Described as a 'super contract'.",
+    "transactions": [
+      {
+        "date": "2025-09-05",
+        "description": "Signed 3-year extension with Alpine through 2028, described as a 'super contract'"
+      },
+      {
+        "date": "2022-10-08",
+        "description": "Signed with Alpine for 2023, leaving AlphaTauri"
+      },
+      {
+        "date": "2019-08-12",
+        "description": "Demoted from Red Bull Racing back to Toro Rosso mid-season"
+      },
+      {
+        "date": "2018-10-01",
+        "description": "Promoted to Red Bull Racing for 2019"
+      }
+    ]
+  },
+  {
+    "id": "franco-colapinto",
+    "driver": "Franco Colapinto",
+    "number": 43,
+    "team": "Alpine",
+    "contractThrough": 2026,
+    "dealType": "loan",
+    "estimatedSalary": "$1M",
+    "notes": "On loan from Williams under a 5-year agreement. Williams retains long-term contractual rights. Alpine paid ~$20M to Williams for the loan. Backed by Mercado Libre (~$30M/year sponsorship with naming rights).",
+    "transactions": [
+      {
+        "date": "2025-01-15",
+        "description": "Loaned from Williams to Alpine for 2025-2026 under a 5-year arrangement"
+      },
+      {
+        "date": "2024-08-27",
+        "description": "Made F1 debut with Williams mid-season, replacing Logan Sargeant"
+      }
+    ]
+  },
+  {
+    "id": "liam-lawson",
+    "driver": "Liam Lawson",
+    "number": 30,
+    "team": "Racing Bulls",
+    "contractThrough": 2026,
+    "dealType": "single-year",
+    "estimatedSalary": "$1M",
+    "notes": "Was promoted to Red Bull Racing for 2025 but demoted after just 2 races due to poor qualifying. Returned to Racing Bulls. 1-year deal reflects ongoing performance evaluation. Under pressure to prove himself.",
+    "transactions": [
+      {
+        "date": "2025-11-01",
+        "description": "Retained at Racing Bulls for 2026 after demonstrating improved form"
+      },
+      {
+        "date": "2025-04-01",
+        "description": "Demoted from Red Bull Racing back to Racing Bulls after 2 races"
+      },
+      {
+        "date": "2024-12-01",
+        "description": "Promoted to Red Bull Racing for 2025 to replace Sergio Pérez"
+      },
+      {
+        "date": "2024-07-01",
+        "description": "Signed full-time with Racing Bulls for second half of 2024, replacing Ricciardo"
+      }
+    ]
+  },
+  {
+    "id": "arvid-lindblad",
+    "driver": "Arvid Lindblad",
+    "number": 41,
+    "team": "Racing Bulls",
+    "contractThrough": 2026,
+    "dealType": "single-year",
+    "estimatedSalary": "$500K",
+    "notes": "Only rookie on the 2026 grid. Youngest-ever Briton to race in F1. Graduated after single F2 season. Red Bull Junior Team member — contract likely includes options for future promotion.",
+    "transactions": [
+      {
+        "date": "2025-12-10",
+        "description": "Signed with Racing Bulls for 2026 debut season"
+      }
+    ]
+  },
+  {
+    "id": "sergio-perez",
+    "driver": "Sergio Pérez",
+    "number": 11,
+    "team": "Cadillac",
+    "contractThrough": 2027,
+    "dealType": "multi-year",
+    "estimatedSalary": "$8M",
+    "notes": "2-year deal with option for 2028. 'Special' merchandise clause — receives percentage of all Cadillac merch bearing his name (was responsible for ~65% of Red Bull online merch sales). Equal status with Bottas. Received €14-18M severance from Red Bull.",
+    "careerEarnings": 96570000,
+    "transactions": [
+      {
+        "date": "2025-08-15",
+        "description": "Signed 2+1 year deal with Cadillac for 2026-2027, returning to F1 after a year away"
+      },
+      {
+        "date": "2024-12-18",
+        "description": "Released by Red Bull Racing (received €14-18M severance)"
+      },
+      {
+        "date": "2020-09-10",
+        "description": "Signed with Red Bull Racing for 2021, replacing Alex Albon"
+      },
+      {
+        "date": "2013-11-14",
+        "description": "Signed with Force India for 2014 after single season at McLaren"
+      }
+    ]
+  },
+  {
+    "id": "valtteri-bottas",
+    "driver": "Valtteri Bottas",
+    "number": 77,
+    "team": "Cadillac",
+    "contractThrough": 2027,
+    "dealType": "multi-year",
+    "estimatedSalary": "$5M",
+    "notes": "2-year deal. Brings Mercedes experience to help build the new Cadillac team. Dual role: race driver + team development/mentoring. Was Mercedes reserve in 2025, mentoring Antonelli. Equal status with Pérez.",
+    "careerEarnings": 90000000,
+    "transactions": [
+      {
+        "date": "2025-08-15",
+        "description": "Signed 2-year deal with Cadillac for 2026-2027, returning to F1 racing"
+      },
+      {
+        "date": "2025-01-01",
+        "description": "Joined Mercedes as reserve driver for 2025"
+      },
+      {
+        "date": "2021-09-06",
+        "description": "Signed with Alfa Romeo Sauber for 2022, leaving Mercedes"
+      },
+      {
+        "date": "2016-10-10",
+        "description": "Signed with Mercedes for 2017, replacing Nico Rosberg"
+      },
+      {
+        "date": "2012-11-28",
+        "description": "Signed with Williams for 2013 debut"
+      }
+    ]
+  }
 ]

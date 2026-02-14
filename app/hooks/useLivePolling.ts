@@ -8,6 +8,11 @@ const SLOW_POLL_MS = 15_000;
 export function useLivePolling() {
   const fastPollingRef = useRef(false);
   const slowPollingRef = useRef(false);
+  const fastTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const slowTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const fetchFastRef = useRef<(() => void) | null>(null);
+  const fetchSlowRef = useRef<(() => void) | null>(null);
+  const isLiveRef = useRef(false);
 
   const sessions = useLiveSessionStore((s) => s.sessions);
   const selectedSessionKey = useLiveSessionStore((s) => s.selectedSessionKey);
@@ -34,8 +39,6 @@ export function useLivePolling() {
 
     const abortController = new AbortController();
     const signal = abortController.signal;
-    let fastTimer: ReturnType<typeof setInterval> | null = null;
-    let slowTimer: ReturnType<typeof setInterval> | null = null;
 
     async function fetchFastUpdates() {
       if (fastPollingRef.current || signal.aborted) return;
@@ -92,6 +95,22 @@ export function useLivePolling() {
       }
     }
 
+    // Store fetch functions in refs so visibility handler can access them
+    fetchFastRef.current = fetchFastUpdates;
+    fetchSlowRef.current = fetchSlowUpdates;
+
+    function startTimers() {
+      if (fastTimerRef.current) clearInterval(fastTimerRef.current);
+      if (slowTimerRef.current) clearInterval(slowTimerRef.current);
+      fastTimerRef.current = setInterval(fetchFastUpdates, FAST_POLL_MS);
+      slowTimerRef.current = setInterval(fetchSlowUpdates, SLOW_POLL_MS);
+    }
+
+    function stopTimers() {
+      if (fastTimerRef.current) { clearInterval(fastTimerRef.current); fastTimerRef.current = null; }
+      if (slowTimerRef.current) { clearInterval(slowTimerRef.current); slowTimerRef.current = null; }
+    }
+
     loadSessionData(selectedSessionKey, signal).then(() => {
       if (signal.aborted) return;
 
@@ -108,17 +127,32 @@ export function useLivePolling() {
         ? new Date(currentSession.date_end).getTime()
         : sessionStart + 4 * 60 * 60 * 1000; // default 4h window
       const isLive = now >= sessionStart && now <= sessionEnd;
+      isLiveRef.current = isLive;
 
-      if (isLive) {
-        fastTimer = setInterval(fetchFastUpdates, FAST_POLL_MS);
-        slowTimer = setInterval(fetchSlowUpdates, SLOW_POLL_MS);
+      if (isLive && !document.hidden) {
+        startTimers();
       }
     });
 
+    // Pause polling when tab is hidden, resume when visible
+    function handleVisibilityChange() {
+      if (signal.aborted || !isLiveRef.current) return;
+      if (document.hidden) {
+        stopTimers();
+      } else {
+        startTimers();
+        // Fetch immediately on resume to catch up
+        fetchFastUpdates();
+        fetchSlowUpdates();
+      }
+    }
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
     return () => {
       abortController.abort();
-      if (fastTimer) clearInterval(fastTimer);
-      if (slowTimer) clearInterval(slowTimer);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      stopTimers();
+      isLiveRef.current = false;
       fastPollingRef.current = false;
       slowPollingRef.current = false;
     };

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getStrategy, getCacheControl } from "@/app/lib/db-queries";
+import { getStrategy, getCacheControl, getSessionYear } from "@/app/lib/db-queries";
 
 export async function GET(
   _request: Request,
@@ -15,9 +15,12 @@ export async function GET(
     );
   }
 
-  const strategy = await getStrategy(sessionKey);
+  const [year, strategy] = await Promise.all([
+    getSessionYear(sessionKey),
+    getStrategy(sessionKey),
+  ]);
 
   return NextResponse.json(strategy, {
-    headers: { "Cache-Control": getCacheControl() },
+    headers: { "Cache-Control": getCacheControl(year ?? undefined) },
   });
 }

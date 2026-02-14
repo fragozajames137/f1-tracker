@@ -8,14 +8,14 @@ import { GridData } from "@/app/types";
 const data = gridData as GridData;
 
 export const metadata: Metadata = {
-  title: "Pole to Paddock — F1 Silly Season Tracker",
+  title: "Pole to Paddock — 2026 F1 Driver Grid",
   description:
-    "Track every F1 driver contract, seat swap, and rumor for the 2026 season. See which seats are locked, expiring, and open across all 11 teams.",
+    "The complete 2026 Formula 1 driver grid. See all 11 teams, 22 drivers, contract status, and team lineups at a glance.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "Pole to Paddock — F1 Silly Season Tracker",
+    title: "Pole to Paddock — 2026 F1 Driver Grid",
     description:
-      "Track every F1 driver contract, seat swap, and rumor for the 2026 season.",
+      "The complete 2026 Formula 1 driver grid with contract status for all 11 teams.",
     url: "/",
   },
 };
@@ -29,7 +29,7 @@ function JsonLd() {
         name: "Pole to Paddock",
         url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://poletopaddock.com",
         description:
-          "Track every F1 driver contract, seat swap, and rumor for the 2026 season.",
+          "The complete 2026 Formula 1 driver grid with contract status for all 11 teams.",
         potentialAction: {
           "@type": "SearchAction",
           target: {
@@ -78,29 +78,9 @@ export default function Home() {
       <Header season={data.season} isHome />
 
       <main id="main-content" className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
-        <div role="list" aria-label="Contract status legend" className="mb-6 flex flex-wrap items-center gap-4 text-sm text-white/40">
-          <span role="listitem" className="flex items-center gap-1.5">
-            <span aria-hidden="true" className="inline-block h-2 w-2 rounded-full bg-green-500" />
-            Locked
-          </span>
-          <span role="listitem" className="flex items-center gap-1.5">
-            <span aria-hidden="true" className="inline-block h-2 w-2 rounded-full bg-yellow-500" />
-            Expiring
-          </span>
-          <span role="listitem" className="flex items-center gap-1.5">
-            <span aria-hidden="true" className="inline-block h-2 w-2 rounded-full bg-red-500" />
-            Open
-          </span>
-          <span className="ml-auto text-xs text-white/30">
-            Last Updated:{" "}
-            {new Date(data.lastUpdated + "T00:00:00").toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            })}
-          </span>
-        </div>
-
+        <h1 className="font-display mb-6 text-2xl font-bold text-white">
+          2026 F1 Driver Grid
+        </h1>
         <SeatMap data={data} />
       </main>
 

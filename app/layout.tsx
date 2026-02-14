@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Space_Grotesk, Space_Mono } from "next/font/google";
+import { Inter, Space_Grotesk, Space_Mono, Orbitron } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import ServiceWorkerRegistration from "@/app/components/ServiceWorkerRegistration";
+import NavigationProgress from "@/app/components/NavigationProgress";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -17,6 +19,11 @@ const spaceMono = Space_Mono({
   variable: "--font-space-mono",
   subsets: ["latin"],
   weight: ["400", "700"],
+});
+
+const orbitron = Orbitron({
+  variable: "--font-orbitron",
+  subsets: ["latin"],
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://poletopaddock.com";
@@ -91,8 +98,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${inter.variable} ${spaceGrotesk.variable} ${spaceMono.variable} antialiased min-h-screen bg-[#0a0a0a] text-white`}
+        className={`${inter.variable} ${spaceGrotesk.variable} ${spaceMono.variable} ${orbitron.variable} antialiased min-h-screen bg-[#0a0a0a] text-white`}
       >
+        <Suspense>
+          <NavigationProgress />
+        </Suspense>
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-black focus:shadow-lg"

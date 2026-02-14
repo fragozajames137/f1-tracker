@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { loadTelemetrySession } from "@/app/lib/telemetry";
+import { getCacheControl } from "@/app/lib/db-queries";
 
 export async function GET(request: NextRequest) {
   const filename = request.nextUrl.searchParams.get("file");
@@ -15,7 +16,7 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json(session, {
     headers: {
-      "Cache-Control": "public, max-age=3600, s-maxage=86400",
+      "Cache-Control": getCacheControl(session.year),
     },
   });
 }

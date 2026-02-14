@@ -1,4 +1,4 @@
-import { eq, and, asc, desc, sql } from "drizzle-orm";
+import { eq, and, asc, desc, sql, inArray } from "drizzle-orm";
 import { getDb } from "@/db";
 import * as schema from "@/db/schema";
 
@@ -9,6 +9,17 @@ export function getCacheControl(year?: number) {
   return isPast
     ? "public, max-age=3600, s-maxage=604800, stale-while-revalidate=86400"
     : "public, max-age=300, s-maxage=3600, stale-while-revalidate=300";
+}
+
+export async function getSessionYear(sessionKey: number): Promise<number | null> {
+  const db = getDb();
+  const [row] = await db
+    .select({ year: schema.meetings.year })
+    .from(schema.sessions)
+    .innerJoin(schema.meetings, eq(schema.sessions.meetingKey, schema.meetings.key))
+    .where(eq(schema.sessions.key, sessionKey))
+    .limit(1);
+  return row?.year ?? null;
 }
 
 // ---------------------------------------------------------------------------
@@ -216,6 +227,28 @@ export async function getRaceControlMessages(sessionKey: number) {
 }
 
 // ---------------------------------------------------------------------------
+// Speed Traps
+// ---------------------------------------------------------------------------
+
+export async function getSpeedTraps(sessionKey: number) {
+  const db = getDb();
+  return db
+    .select({
+      driverNumber: schema.sessionDrivers.driverNumber,
+      abbreviation: schema.sessionDrivers.abbreviation,
+      teamColor: schema.sessionDrivers.teamColor,
+      speedTrapBest: schema.sessionDrivers.speedTrapBest,
+      sector1SpeedBest: schema.sessionDrivers.sector1SpeedBest,
+      sector2SpeedBest: schema.sessionDrivers.sector2SpeedBest,
+      finishLineSpeedBest: schema.sessionDrivers.finishLineSpeedBest,
+      finalPosition: schema.sessionDrivers.finalPosition,
+    })
+    .from(schema.sessionDrivers)
+    .where(eq(schema.sessionDrivers.sessionKey, sessionKey))
+    .orderBy(asc(schema.sessionDrivers.finalPosition));
+}
+
+// ---------------------------------------------------------------------------
 // Pit Stops
 // ---------------------------------------------------------------------------
 
@@ -243,4 +276,82 @@ export async function getPitStops(sessionKey: number) {
     ...stop,
     driver: driverMap.get(stop.driverNumber) ?? null,
   }));
+}
+
+// ---------------------------------------------------------------------------
+// Driver Profile — years available in DB
+// ---------------------------------------------------------------------------
+
+export async function getDriverYears(fullName: string): Promise<number[]> {
+  const db = getDb();
+  const rows = await db
+    .selectDistinct({ year: schema.meetings.year })
+    .from(schema.sessionDrivers)
+    .innerJoin(schema.sessions, eq(schema.sessionDrivers.sessionKey, schema.sessions.key))
+    .innerJoin(schema.meetings, eq(schema.sessions.meetingKey, schema.meetings.key))
+    .where(sql`LOWER(${schema.sessionDrivers.fullName}) = ${fullName.toLowerCase()}`)
+    .orderBy(desc(schema.meetings.year));
+  return rows.map((r) => r.year);
+}
+
+// ---------------------------------------------------------------------------
+// Driver Profile — per-season summary stats (Race sessions only)
+// ---------------------------------------------------------------------------
+
+export async function getDriverSeasonStats(fullName: string) {
+  const db = getDb();
+  return db
+    .select({
+      year: schema.meetings.year,
+      races: sql<number>`count(*)`,
+      wins: sql<number>`sum(case when ${schema.sessionDrivers.finalPosition} = 1 then 1 else 0 end)`,
+      podiums: sql<number>`sum(case when ${schema.sessionDrivers.finalPosition} <= 3 then 1 else 0 end)`,
+      points: sql<number>`sum(coalesce(${schema.sessionDrivers.points}, 0))`,
+      bestFinish: sql<number>`min(${schema.sessionDrivers.finalPosition})`,
+      dnfs: sql<number>`sum(case when ${schema.sessionDrivers.status} like '%DNF%' or ${schema.sessionDrivers.status} like '%Retired%' then 1 else 0 end)`,
+    })
+    .from(schema.sessionDrivers)
+    .innerJoin(schema.sessions, eq(schema.sessionDrivers.sessionKey, schema.sessions.key))
+    .innerJoin(schema.meetings, eq(schema.sessions.meetingKey, schema.meetings.key))
+    .where(
+      and(
+        sql`LOWER(${schema.sessionDrivers.fullName}) = ${fullName.toLowerCase()}`,
+        eq(schema.sessions.type, "Race"),
+      ),
+    )
+    .groupBy(schema.meetings.year)
+    .orderBy(desc(schema.meetings.year));
+}
+
+// ---------------------------------------------------------------------------
+// Driver Profile — race-by-race results for a given year
+// ---------------------------------------------------------------------------
+
+export async function getDriverRaceResults(fullName: string, year?: number) {
+  const db = getDb();
+  const conditions = [
+    sql`LOWER(${schema.sessionDrivers.fullName}) = ${fullName.toLowerCase()}`,
+    eq(schema.sessions.type, "Race"),
+  ];
+  if (year) conditions.push(eq(schema.meetings.year, year));
+
+  return db
+    .select({
+      round: schema.meetings.round,
+      raceName: schema.meetings.name,
+      location: schema.meetings.location,
+      country: schema.meetings.country,
+      date: schema.sessions.startDate,
+      gridPosition: schema.sessionDrivers.gridPosition,
+      finalPosition: schema.sessionDrivers.finalPosition,
+      status: schema.sessionDrivers.status,
+      points: schema.sessionDrivers.points,
+      bestLapTime: schema.sessionDrivers.bestLapTime,
+      pitCount: schema.sessionDrivers.pitCount,
+    })
+    .from(schema.sessionDrivers)
+    .innerJoin(schema.sessions, eq(schema.sessionDrivers.sessionKey, schema.sessions.key))
+    .innerJoin(schema.meetings, eq(schema.sessions.meetingKey, schema.meetings.key))
+    .where(and(...conditions))
+    .orderBy(asc(schema.meetings.round));
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { RaceWithResults } from "@/app/types/history";
 import { NationalityFlag, DriverImg, TeamLogo } from "./shared";
 import SessionDrillDown from "./SessionDrillDown";
@@ -17,17 +17,21 @@ export default function RaceResultsView({ races, season, driverHeadshots }: Race
   );
   const [sessionKey, setSessionKey] = useState<number | null>(null);
   const [availableRounds, setAvailableRounds] = useState<Map<number, number>>(new Map());
+  const drillDownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (season < 2018) return;
-    fetch(`/api/sessions?year=${season}&type=Race`)
+    const ac = new AbortController();
+    fetch(`/api/sessions?year=${season}&type=Race`, { signal: ac.signal })
       .then((r) => (r.ok ? r.json() : []))
       .then((sessions: Array<{ round: number; sessionKey: number }>) => {
+        if (ac.signal.aborted) return;
         const map = new Map<number, number>();
         for (const s of sessions) map.set(s.round, s.sessionKey);
         setAvailableRounds(map);
       })
       .catch(() => {});
+    return () => ac.abort();
   }, [season]);
 
   if (races.length === 0) {
@@ -47,6 +51,10 @@ export default function RaceResultsView({ races, season, driverHeadshots }: Race
   function handleViewSession() {
     if (roundSessionKey) {
       setSessionKey(roundSessionKey);
+      // Scroll to the drill-down after React renders it
+      requestAnimationFrame(() => {
+        drillDownRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
     }
   }
 
@@ -159,10 +167,12 @@ export default function RaceResultsView({ races, season, driverHeadshots }: Race
 
       {/* Session drill-down */}
       {sessionKey && (
-        <SessionDrillDown
-          sessionKey={sessionKey}
-          onClose={() => setSessionKey(null)}
-        />
+        <div ref={drillDownRef}>
+          <SessionDrillDown
+            sessionKey={sessionKey}
+            onClose={() => setSessionKey(null)}
+          />
+        </div>
       )}
     </div>
   );

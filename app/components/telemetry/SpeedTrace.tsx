@@ -52,13 +52,23 @@ export default function SpeedTrace({ traces, drivers, speedUnit = "kph", drsZone
     return point;
   });
 
-  const driverKeys = traces.map((t) => {
-    const driver = drivers.find((d) => d.number === t.driverNumber);
-    return {
-      key: driver?.abbreviation ?? `#${t.driverNumber}`,
-      color: driver?.teamColor ?? "#666",
-    };
-  });
+  const DASH_PATTERNS: (string | undefined)[] = [undefined, "6 3", "2 4"];
+  const driverKeys = (() => {
+    const keys = traces.map((t) => {
+      const driver = drivers.find((d) => d.number === t.driverNumber);
+      return {
+        key: driver?.abbreviation ?? `#${t.driverNumber}`,
+        color: driver?.teamColor ?? "#666",
+      };
+    });
+    const colorIndex = new Map<string, number>();
+    return keys.map((dk) => {
+      const idx = colorIndex.get(dk.color) ?? 0;
+      colorIndex.set(dk.color, idx + 1);
+      return { ...dk, dash: DASH_PATTERNS[idx] };
+    });
+  })();
+  const hasTeammates = driverKeys.some((dk) => dk.dash !== undefined);
 
   // Compute clean X-axis ticks based on the track distance
   const maxDistMeters = refTrace.distance[refTrace.distance.length - 1] ?? 0;
@@ -78,9 +88,16 @@ export default function SpeedTrace({ traces, drivers, speedUnit = "kph", drsZone
 
   return (
     <div className="rounded-lg border border-white/10 bg-white/5 p-4">
-      <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-white/40">
-        Speed Trace — Fastest Laps
-      </h3>
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-white/40">
+          Speed Trace — Fastest Laps
+        </h3>
+        {hasTeammates && (
+          <span className="text-[10px] text-white/30">
+            Dashed/dotted = teammates
+          </span>
+        )}
+      </div>
       <ResponsiveContainer width="100%" height={250} className="sm:!h-[300px]">
         <LineChart data={data}>
           <XAxis
@@ -142,12 +159,13 @@ export default function SpeedTrace({ traces, drivers, speedUnit = "kph", drsZone
               }}
             />
           ))}
-          {driverKeys.map(({ key, color }) => (
+          {driverKeys.map(({ key, color, dash }) => (
             <Line
               key={key}
               type="monotone"
               dataKey={key}
               stroke={color}
+              strokeDasharray={dash}
               dot={false}
               strokeWidth={1.5}
             />

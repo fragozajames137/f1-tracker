@@ -46,3 +46,22 @@ export function formatGap(gap: number | null): string {
   if (gap === 0) return "Leader";
   return `+${gap.toFixed(3)}`;
 }
+
+// ---------------------------------------------------------------------------
+// Salary / contract formatting
+// ---------------------------------------------------------------------------
+
+export function formatSalary(amount: number): string {
+  if (amount >= 1_000_000)
+    return `$${(amount / 1_000_000).toFixed(amount % 1_000_000 === 0 ? 0 : 1)}M`;
+  if (amount >= 1_000) return `$${(amount / 1_000).toFixed(0)}K`;
+  return `$${amount.toLocaleString()}`;
+}
+
+export function formatDate(iso: string): string {
+  return new Date(iso + "T00:00:00").toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}

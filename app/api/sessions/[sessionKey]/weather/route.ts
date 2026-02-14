@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getWeather, getCacheControl } from "@/app/lib/db-queries";
+import { getWeather, getCacheControl, getSessionYear } from "@/app/lib/db-queries";
 
 export async function GET(
   _request: Request,
@@ -15,9 +15,12 @@ export async function GET(
     );
   }
 
-  const weather = await getWeather(sessionKey);
+  const [year, weather] = await Promise.all([
+    getSessionYear(sessionKey),
+    getWeather(sessionKey),
+  ]);
 
   return NextResponse.json(weather, {
-    headers: { "Cache-Control": getCacheControl() },
+    headers: { "Cache-Control": getCacheControl(year ?? undefined) },
   });
 }

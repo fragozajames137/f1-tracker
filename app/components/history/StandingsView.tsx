@@ -1,14 +1,104 @@
 "use client";
 
-import type { DriverStanding, ConstructorStanding } from "@/app/types/history";
+import { useMemo } from "react";
+import type {
+  DriverStanding,
+  ConstructorStanding,
+  RaceWithResults,
+} from "@/app/types/history";
 import dominantEngines from "@/app/data/dominant-engines.json";
 import { NationalityFlag, DriverImg, TeamLogo } from "./shared";
+
+// ---------------------------------------------------------------------------
+// Position change computation
+// ---------------------------------------------------------------------------
+
+/** Compute position changes by comparing cumulative standings before and after the last race. */
+function computeDriverPositionChanges(
+  races: RaceWithResults[],
+  currentStandings: DriverStanding[],
+): Map<string, number> {
+  const changes = new Map<string, number>();
+  if (races.length < 2) return changes;
+
+  // Accumulate points from all races except the last
+  const pointsBeforeLast = new Map<string, number>();
+  for (let i = 0; i < races.length - 1; i++) {
+    for (const result of races[i].Results) {
+      const id = result.Driver.driverId;
+      pointsBeforeLast.set(id, (pointsBeforeLast.get(id) ?? 0) + parseFloat(result.points));
+    }
+  }
+
+  // Sort by points descending to get previous positions
+  const prevSorted = [...pointsBeforeLast.entries()]
+    .sort(([, a], [, b]) => b - a);
+  const prevPositions = new Map<string, number>();
+  prevSorted.forEach(([id], idx) => prevPositions.set(id, idx + 1));
+
+  // Compare with current standings
+  for (const s of currentStandings) {
+    const prevPos = prevPositions.get(s.Driver.driverId);
+    const currPos = parseInt(s.position, 10);
+    if (prevPos !== undefined) {
+      changes.set(s.Driver.driverId, prevPos - currPos); // positive = gained positions
+    }
+  }
+
+  return changes;
+}
+
+function computeConstructorPositionChanges(
+  races: RaceWithResults[],
+  currentStandings: ConstructorStanding[],
+): Map<string, number> {
+  const changes = new Map<string, number>();
+  if (races.length < 2) return changes;
+
+  const pointsBeforeLast = new Map<string, number>();
+  for (let i = 0; i < races.length - 1; i++) {
+    for (const result of races[i].Results) {
+      const id = result.Constructor.constructorId;
+      pointsBeforeLast.set(id, (pointsBeforeLast.get(id) ?? 0) + parseFloat(result.points));
+    }
+  }
+
+  const prevSorted = [...pointsBeforeLast.entries()]
+    .sort(([, a], [, b]) => b - a);
+  const prevPositions = new Map<string, number>();
+  prevSorted.forEach(([id], idx) => prevPositions.set(id, idx + 1));
+
+  for (const s of currentStandings) {
+    const prevPos = prevPositions.get(s.Constructor.constructorId);
+    const currPos = parseInt(s.position, 10);
+    if (prevPos !== undefined) {
+      changes.set(s.Constructor.constructorId, prevPos - currPos);
+    }
+  }
+
+  return changes;
+}
+
+function PositionChange({ delta }: { delta: number | undefined }) {
+  if (delta === undefined || delta === 0) {
+    return <span className="text-white/20">&ndash;</span>;
+  }
+  if (delta > 0) {
+    return <span className="text-emerald-400">&#9650;{delta}</span>;
+  }
+  return <span className="text-red-400">&#9660;{Math.abs(delta)}</span>;
+}
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
 
 interface StandingsViewProps {
   season: number;
   driverStandings: DriverStanding[];
   constructorStandings: ConstructorStanding[];
   driverHeadshots?: Record<string, string>;
+  races?: RaceWithResults[];
 }
 
 export default function StandingsView({
@@ -16,8 +106,19 @@ export default function StandingsView({
   driverStandings,
   constructorStandings,
   driverHeadshots,
+  races = [],
 }: StandingsViewProps) {
   const engine = dominantEngines[String(season) as keyof typeof dominantEngines] ?? null;
+
+  const driverChanges = useMemo(
+    () => computeDriverPositionChanges(races, driverStandings),
+    [races, driverStandings],
+  );
+  const constructorChanges = useMemo(
+    () => computeConstructorPositionChanges(races, constructorStandings),
+    [races, constructorStandings],
+  );
+  const showChanges = races.length >= 2;
 
   if (driverStandings.length === 0 && constructorStandings.length === 0) {
     return (
@@ -68,7 +169,14 @@ export default function StandingsView({
                     className="border-b border-white/5 text-white/70"
                   >
                     <td className="py-2 pr-3 font-mono text-xs text-white/40">
-                      {s.position}
+                      <span className="flex items-center gap-1.5">
+                        {s.position}
+                        {showChanges && (
+                          <span className="text-[10px]">
+                            <PositionChange delta={driverChanges.get(s.Driver.driverId)} />
+                          </span>
+                        )}
+                      </span>
                     </td>
                     <td className="py-2 pr-3">
                       <span className="flex items-center gap-2">
@@ -147,7 +255,14 @@ export default function StandingsView({
                     className="border-b border-white/5 text-white/70"
                   >
                     <td className="py-2 pr-3 font-mono text-xs text-white/40">
-                      {s.position}
+                      <span className="flex items-center gap-1.5">
+                        {s.position}
+                        {showChanges && (
+                          <span className="text-[10px]">
+                            <PositionChange delta={constructorChanges.get(s.Constructor.constructorId)} />
+                          </span>
+                        )}
+                      </span>
                     </td>
                     <td className="py-2 pr-3">
                       <span className="flex items-center gap-2 font-medium text-white">

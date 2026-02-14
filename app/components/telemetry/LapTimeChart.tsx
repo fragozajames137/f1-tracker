@@ -76,13 +76,24 @@ export default function LapTimeChart({
     return point;
   });
 
-  const driverKeys = selectedDriverNumbers.map((num) => {
-    const driver = drivers.find((d) => d.number === num);
-    return {
-      key: driver?.abbreviation ?? `#${num}`,
-      color: driver?.teamColor ?? "#666",
-    };
-  });
+  const DASH_PATTERNS: (string | undefined)[] = [undefined, "6 3", "2 4"];
+  const driverKeys = (() => {
+    const keys = selectedDriverNumbers.map((num) => {
+      const driver = drivers.find((d) => d.number === num);
+      return {
+        key: driver?.abbreviation ?? `#${num}`,
+        color: driver?.teamColor ?? "#666",
+      };
+    });
+    // Assign dash patterns so teammates sharing a color are distinguishable
+    const colorIndex = new Map<string, number>();
+    return keys.map((dk) => {
+      const idx = colorIndex.get(dk.color) ?? 0;
+      colorIndex.set(dk.color, idx + 1);
+      return { ...dk, dash: DASH_PATTERNS[idx] };
+    });
+  })();
+  const hasTeammates = driverKeys.some((dk) => dk.dash !== undefined);
 
   // Compute tight Y-axis bounds from actual data, excluding outliers
   const allTimes = filteredLaps
@@ -102,9 +113,16 @@ export default function LapTimeChart({
 
   return (
     <div className="rounded-lg border border-white/10 bg-white/5 p-4">
-      <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-white/40">
-        Lap Times
-      </h3>
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-white/40">
+          Lap Times
+        </h3>
+        {hasTeammates && (
+          <span className="text-[10px] text-white/30">
+            Dashed/dotted = teammates
+          </span>
+        )}
+      </div>
       <ResponsiveContainer width="100%" height={250} className="sm:!h-[300px]">
         <LineChart data={data}>
           <XAxis
@@ -132,12 +150,13 @@ export default function LapTimeChart({
             formatter={(value) => [formatTime(value as number)]}
           />
           <Legend wrapperStyle={{ fontSize: 12, color: "#999", fontFamily: MONO_FONT }} />
-          {driverKeys.map(({ key, color }) => (
+          {driverKeys.map(({ key, color, dash }) => (
             <Line
               key={key}
               type="monotone"
               dataKey={key}
               stroke={color}
+              strokeDasharray={dash}
               dot={false}
               strokeWidth={1.5}
               connectNulls

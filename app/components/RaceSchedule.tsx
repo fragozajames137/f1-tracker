@@ -2,9 +2,11 @@
 
 import { Race } from "@/app/types";
 import RaceCard from "./RaceCard";
+import type { RaceEnrichment } from "./RaceCard";
 
 interface RaceScheduleProps {
   races: Race[];
+  enrichments?: Record<string, RaceEnrichment>;
 }
 
 function getNextRaceIndex(races: Race[]): number {
@@ -31,7 +33,7 @@ function groupByMonth(races: Race[]): Map<string, Race[]> {
   return groups;
 }
 
-export default function RaceSchedule({ races }: RaceScheduleProps) {
+export default function RaceSchedule({ races, enrichments }: RaceScheduleProps) {
   const nextRaceIndex = getNextRaceIndex(races);
   const grouped = groupByMonth(races);
 
@@ -50,6 +52,7 @@ export default function RaceSchedule({ races }: RaceScheduleProps) {
                   key={race.round}
                   race={race}
                   isNext={index === nextRaceIndex}
+                  enrichment={enrichments?.[race.round]}
                 />
               );
             })}

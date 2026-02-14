@@ -89,32 +89,24 @@ export default function WeatherBar({ weather }: WeatherBarProps) {
           </span>
         </div>
       )}
-      <button
-        onClick={toggleUnits}
-        className="col-span-2 relative flex cursor-pointer items-center rounded-full bg-white/10 p-0.5 text-xs font-medium sm:col-span-1 sm:ml-auto"
-      >
-        <span
-          className={`relative z-10 rounded-full px-2.5 py-0.5 transition-colors ${
-            !isMetric ? "text-white" : "text-white/50"
+      <div className="col-span-2 flex overflow-hidden rounded-lg border border-white/10 sm:col-span-1 sm:ml-auto">
+        <button
+          onClick={() => { if (isMetric) toggleUnits(); }}
+          className={`cursor-pointer px-3 py-1.5 text-xs font-medium transition-colors ${
+            !isMetric ? "bg-white/10 text-white" : "text-white/40 hover:text-white/70"
           }`}
         >
           Standard
-        </span>
-        <span
-          className={`relative z-10 rounded-full px-2.5 py-0.5 transition-colors ${
-            isMetric ? "text-white" : "text-white/50"
+        </button>
+        <button
+          onClick={() => { if (!isMetric) toggleUnits(); }}
+          className={`cursor-pointer px-3 py-1.5 text-xs font-medium transition-colors ${
+            isMetric ? "bg-white/10 text-white" : "text-white/40 hover:text-white/70"
           }`}
         >
           Metric
-        </span>
-        <span
-          className="absolute top-0.5 bottom-0.5 rounded-full bg-white/20 transition-all duration-200"
-          style={{
-            left: isMetric ? "calc(50% + 2px)" : "2px",
-            width: isMetric ? "calc(50% - 4px)" : "calc(50% - 4px)",
-          }}
-        />
-      </button>
+        </button>
+      </div>
     </div>
   );
 }

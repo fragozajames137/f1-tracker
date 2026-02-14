@@ -3,7 +3,13 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import RaceSchedule from "@/app/components/RaceSchedule";
 import { fetchRaceSchedule } from "@/app/lib/schedule";
+import {
+  getCircuitByName,
+  getContractByRaceName,
+  getHostNation,
+} from "@/app/lib/schedule-data";
 import type { Race } from "@/app/types";
+import type { RaceEnrichment } from "@/app/components/RaceCard";
 
 export const metadata: Metadata = {
   title: "2026 Race Schedule",
@@ -63,8 +69,28 @@ function ScheduleJsonLd({ races }: { races: Race[] }) {
   );
 }
 
+function buildEnrichments(races: Race[]): Record<string, RaceEnrichment> {
+  const map: Record<string, RaceEnrichment> = {};
+
+  for (const race of races) {
+    const circuit = getCircuitByName(race.Circuit.circuitName);
+    const contract = getContractByRaceName(race.raceName);
+    const nation = getHostNation(race.Circuit.Location.country);
+
+    map[race.round] = {
+      circuitRaces: circuit?.totalRaces ?? null,
+      contractEnd: contract?.contractEnds ?? circuit?.contractedUntil ?? null,
+      hostNationRaces: nation?.totalRaces ?? null,
+      hostNationCircuits: nation?.circuitsUsed ?? null,
+    };
+  }
+
+  return map;
+}
+
 export default async function SchedulePage() {
   const races = await fetchRaceSchedule();
+  const enrichments = buildEnrichments(races);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -72,10 +98,10 @@ export default async function SchedulePage() {
       <Header season={2026} />
 
       <main id="main-content" className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6">
-        <h1 className="font-display mb-6 text-xl font-bold text-white">
+        <h1 className="font-display mb-6 text-2xl font-bold text-white">
           2026 Race Schedule
         </h1>
-        <RaceSchedule races={races} />
+        <RaceSchedule races={races} enrichments={enrichments} />
       </main>
 
       <Footer />

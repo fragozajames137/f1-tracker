@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import {
-  LineChart,
+  ComposedChart,
   Line,
+  Bar,
   XAxis,
   YAxis,
   Tooltip,
@@ -19,6 +20,7 @@ interface WeatherEntry {
   airTemp: number | null;
   trackTemp: number | null;
   humidity: number | null;
+  pressure: number | null;
   rainfall: boolean | number | null;
   windSpeed: number | null;
   windDirection: number | null;
@@ -42,16 +44,18 @@ export default function WeatherChart({ sessionKey }: WeatherChartProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const ac = new AbortController();
     setLoading(true);
     setError(null);
-    fetch(`/api/sessions/${sessionKey}/weather`)
+    fetch(`/api/sessions/${sessionKey}/weather`, { signal: ac.signal })
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
       })
       .then(setData)
-      .catch(() => setError("Failed to load weather data"))
-      .finally(() => setLoading(false));
+      .catch((e) => { if (!ac.signal.aborted) setError("Failed to load weather data"); })
+      .finally(() => { if (!ac.signal.aborted) setLoading(false); });
+    return () => ac.abort();
   }, [sessionKey]);
 
   if (loading) {
@@ -71,8 +75,13 @@ export default function WeatherChart({ sessionKey }: WeatherChartProps) {
     time: entry.utc ? formatTime(entry.utc) : `${i}`,
     airTemp: entry.airTemp,
     trackTemp: entry.trackTemp,
+    humidity: entry.humidity,
+    windSpeed: entry.windSpeed,
     rainfall: entry.rainfall ? 1 : 0,
   }));
+
+  const hasHumidity = chartData.some((d) => d.humidity !== null);
+  const hasWind = chartData.some((d) => d.windSpeed !== null);
 
   // Find rainfall regions (contiguous spans)
   const rainfallRegions: Array<{ start: number; end: number }> = [];
@@ -102,7 +111,7 @@ export default function WeatherChart({ sessionKey }: WeatherChartProps) {
         Weather
       </h3>
       <ResponsiveContainer width="100%" height={250} className="sm:!h-[300px]">
-        <LineChart data={chartData}>
+        <ComposedChart data={chartData}>
           {rainfallRegions.map((region, i) => (
             <ReferenceArea
               key={i}
@@ -121,12 +130,24 @@ export default function WeatherChart({ sessionKey }: WeatherChartProps) {
             interval={Math.max(Math.floor(chartData.length / 8), 1)}
           />
           <YAxis
+            yAxisId="temp"
             stroke="#666"
             tick={{ fontSize: 10, fill: "#666", fontFamily: MONO_FONT }}
             width={35}
             domain={[minTemp, maxTemp]}
             tickFormatter={(v: number) => `${v}°`}
           />
+          {(hasHumidity || hasWind) && (
+            <YAxis
+              yAxisId="pct"
+              orientation="right"
+              stroke="#666"
+              tick={{ fontSize: 10, fill: "#555", fontFamily: MONO_FONT }}
+              width={35}
+              domain={[0, hasHumidity ? 100 : "auto"]}
+              tickFormatter={(v: number) => hasHumidity ? `${v}%` : `${v}`}
+            />
+          )}
           <Tooltip
             contentStyle={{
               backgroundColor: "#1a1a1a",
@@ -136,16 +157,31 @@ export default function WeatherChart({ sessionKey }: WeatherChartProps) {
               fontFamily: MONO_FONT,
             }}
             labelFormatter={(i) => chartData[Number(i)]?.time ?? ""}
-            formatter={(value, name) => [
-              `${Number(value)?.toFixed(1)}°C`,
-              name === "airTemp" ? "Air" : "Track",
-            ]}
+            formatter={(value, name) => {
+              const v = Number(value);
+              switch (name) {
+                case "airTemp": return [`${v.toFixed(1)}°C`, "Air"];
+                case "trackTemp": return [`${v.toFixed(1)}°C`, "Track"];
+                case "humidity": return [`${v.toFixed(0)}%`, "Humidity"];
+                case "windSpeed": return [`${v.toFixed(1)} km/h`, "Wind"];
+                default: return [`${v}`, name];
+              }
+            }}
           />
           <Legend
             wrapperStyle={{ fontSize: 10, color: "#999", fontFamily: MONO_FONT }}
-            formatter={(value: string) => (value === "airTemp" ? "Air Temp" : "Track Temp")}
+            formatter={(value: string) => {
+              switch (value) {
+                case "airTemp": return "Air Temp";
+                case "trackTemp": return "Track Temp";
+                case "humidity": return "Humidity";
+                case "windSpeed": return "Wind Speed";
+                default: return value;
+              }
+            }}
           />
           <Line
+            yAxisId="temp"
             type="monotone"
             dataKey="airTemp"
             stroke="#60a5fa"
@@ -154,6 +190,7 @@ export default function WeatherChart({ sessionKey }: WeatherChartProps) {
             connectNulls
           />
           <Line
+            yAxisId="temp"
             type="monotone"
             dataKey="trackTemp"
             stroke="#fb923c"
@@ -161,7 +198,31 @@ export default function WeatherChart({ sessionKey }: WeatherChartProps) {
             strokeWidth={1.5}
             connectNulls
           />
-        </LineChart>
+          {hasHumidity && (
+            <Line
+              yAxisId="pct"
+              type="monotone"
+              dataKey="humidity"
+              stroke="#34d399"
+              dot={false}
+              strokeWidth={1}
+              strokeDasharray="4 2"
+              connectNulls
+            />
+          )}
+          {hasWind && (
+            <Line
+              yAxisId="pct"
+              type="monotone"
+              dataKey="windSpeed"
+              stroke="#a78bfa"
+              dot={false}
+              strokeWidth={1}
+              strokeDasharray="4 2"
+              connectNulls
+            />
+          )}
+        </ComposedChart>
       </ResponsiveContainer>
       {rainfallRegions.length > 0 && (
         <p className="mt-2 text-xs text-blue-400/60">

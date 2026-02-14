@@ -4,6 +4,10 @@
   "teams": [
     {
       "id": "red-bull",
+      "constructorId": "Red Bull Racing",
+      "twitter": "redbullracing",
+      "instagram": "redbullracing",
+      "website": "https://www.redbullracing.com",
       "name": "Red Bull Racing",
       "color": "#3671C6",
       "logoUrl": "/logos/red-bull.webp",
@@ -15,17 +19,22 @@
         }
       ],
       "seat1": {
-        "id": "verstappen",
+        "id": "max-verstappen",
         "name": "Max Verstappen",
         "number": 3,
         "nationality": "NED",
         "contractStatus": "locked",
         "contractEnd": "2028",
         "headshotUrl": "/drivers/verstappen.webp",
-        "rumors": []
+        "rumors": [],
+        "socials": {
+          "twitter": "Max33Verstappen",
+          "instagram": "maxverstappen1",
+          "youtube": null
+        }
       },
       "seat2": {
-        "id": "hadjar",
+        "id": "isack-hadjar",
         "name": "Isack Hadjar",
         "number": 6,
         "nationality": "FRA",
@@ -39,11 +48,20 @@
             "url": "https://formula1.com",
             "date": "2025-12-01"
           }
-        ]
+        ],
+        "socials": {
+          "twitter": "Isack_Hadjar",
+          "instagram": "isackhadjar",
+          "youtube": null
+        }
       }
     },
     {
       "id": "mclaren",
+      "constructorId": "McLaren",
+      "twitter": "McLarenF1",
+      "instagram": "mclarenf1",
+      "website": "https://www.mclaren.com/racing/formula-1/",
       "name": "McLaren",
       "color": "#FF8000",
       "logoUrl": "/logos/mclaren.webp",
@@ -55,28 +73,42 @@
         }
       ],
       "seat1": {
-        "id": "norris",
+        "id": "lando-norris",
         "name": "Lando Norris",
         "number": 1,
         "nationality": "GBR",
         "contractStatus": "locked",
         "contractEnd": "2027",
         "headshotUrl": "/drivers/norris.webp",
-        "rumors": []
+        "rumors": [],
+        "socials": {
+          "twitter": "LandoNorris",
+          "instagram": "lando",
+          "youtube": "LandoNorris"
+        }
       },
       "seat2": {
-        "id": "piastri",
+        "id": "oscar-piastri",
         "name": "Oscar Piastri",
         "number": 81,
         "nationality": "AUS",
         "contractStatus": "locked",
         "contractEnd": "2028",
         "headshotUrl": "/drivers/piastri.webp",
-        "rumors": []
+        "rumors": [],
+        "socials": {
+          "twitter": "OscarPiastri",
+          "instagram": "oscarpiastri",
+          "youtube": null
+        }
       }
     },
     {
       "id": "ferrari",
+      "constructorId": "Ferrari",
+      "twitter": "ScuderiaFerrari",
+      "instagram": "scuderiaferrari",
+      "website": "https://www.ferrari.com/en-EN/formula1",
       "name": "Ferrari",
       "color": "#E8002D",
       "logoUrl": "/logos/ferrari.webp",
@@ -88,17 +120,22 @@
         }
       ],
       "seat1": {
-        "id": "leclerc",
+        "id": "charles-leclerc",
         "name": "Charles Leclerc",
         "number": 16,
         "nationality": "MON",
         "contractStatus": "locked",
         "contractEnd": "2029",
         "headshotUrl": "/drivers/leclerc.webp",
-        "rumors": []
+        "rumors": [],
+        "socials": {
+          "twitter": "Charles_Leclerc",
+          "instagram": "charles_leclerc",
+          "youtube": null
+        }
       },
       "seat2": {
-        "id": "hamilton",
+        "id": "lewis-hamilton",
         "name": "Lewis Hamilton",
         "number": 44,
         "nationality": "GBR",
@@ -118,11 +155,20 @@
             "url": "https://f1-insider.com",
             "date": "2026-02-01"
           }
-        ]
+        ],
+        "socials": {
+          "twitter": "LewisHamilton",
+          "instagram": "lewishamilton",
+          "youtube": null
+        }
       }
     },
     {
       "id": "mercedes",
+      "constructorId": "Mercedes",
+      "twitter": "MercedesAMGF1",
+      "instagram": "mercedesamgf1",
+      "website": "https://www.mercedesamgf1.com",
       "name": "Mercedes",
       "color": "#27F4D2",
       "logoUrl": "/logos/mercedes.webp",
@@ -134,7 +180,7 @@
         }
       ],
       "seat1": {
-        "id": "russell",
+        "id": "george-russell",
         "name": "George Russell",
         "number": 63,
         "nationality": "GBR",
@@ -148,10 +194,15 @@
             "url": "https://skysports.com/f1",
             "date": "2026-01-10"
           }
-        ]
+        ],
+        "socials": {
+          "twitter": "GeorgeRussell63",
+          "instagram": "georgerussell63",
+          "youtube": null
+        }
       },
       "seat2": {
-        "id": "antonelli",
+        "id": "kimi-antonelli",
         "name": "Kimi Antonelli",
         "number": 12,
         "nationality": "ITA",
@@ -165,11 +216,20 @@
             "url": "https://skysports.com/f1",
             "date": "2026-01-10"
           }
-        ]
+        ],
+        "socials": {
+          "twitter": null,
+          "instagram": "kimi.antonelli",
+          "youtube": null
+        }
       }
     },
     {
       "id": "aston-martin",
+      "constructorId": "Aston Martin",
+      "twitter": "AstonMartinF1",
+      "instagram": "astonmartinf1",
+      "website": "https://www.astonmartinf1.com",
       "name": "Aston Martin",
       "color": "#229971",
       "logoUrl": "/logos/aston-martin.webp",
@@ -181,7 +241,7 @@
         }
       ],
       "seat1": {
-        "id": "alonso",
+        "id": "fernando-alonso",
         "name": "Fernando Alonso",
         "number": 14,
         "nationality": "ESP",
@@ -201,21 +261,35 @@
             "url": "https://bbc.co.uk/sport/f1",
             "date": "2026-01-28"
           }
-        ]
+        ],
+        "socials": {
+          "twitter": "alo_oficial",
+          "instagram": "fernandoalo_oficial",
+          "youtube": null
+        }
       },
       "seat2": {
-        "id": "stroll",
+        "id": "lance-stroll",
         "name": "Lance Stroll",
         "number": 18,
         "nationality": "CAN",
         "contractStatus": "locked",
         "contractEnd": "2030",
         "headshotUrl": "/drivers/stroll.webp",
-        "rumors": []
+        "rumors": [],
+        "socials": {
+          "twitter": "lance_stroll",
+          "instagram": "lance_stroll",
+          "youtube": null
+        }
       }
     },
     {
       "id": "alpine",
+      "constructorId": "Alpine",
+      "twitter": "AlpineF1Team",
+      "instagram": "alpinef1team",
+      "website": "https://www.alpinef1.com",
       "name": "Alpine",
       "color": "#FF87BC",
       "logoUrl": "/logos/alpine.webp",
@@ -232,17 +306,22 @@
         }
       ],
       "seat1": {
-        "id": "gasly",
+        "id": "pierre-gasly",
         "name": "Pierre Gasly",
         "number": 10,
         "nationality": "FRA",
         "contractStatus": "locked",
         "contractEnd": "2028",
         "headshotUrl": "/drivers/gasly.webp",
-        "rumors": []
+        "rumors": [],
+        "socials": {
+          "twitter": "PierreGASLY",
+          "instagram": "pierregasly",
+          "youtube": null
+        }
       },
       "seat2": {
-        "id": "colapinto",
+        "id": "franco-colapinto",
         "name": "Franco Colapinto",
         "number": 43,
         "nationality": "ARG",
@@ -256,11 +335,20 @@
             "url": "https://autosport.com",
             "date": "2025-09-15"
           }
-        ]
+        ],
+        "socials": {
+          "twitter": "FranColapinto",
+          "instagram": "francolapinto",
+          "youtube": null
+        }
       }
     },
     {
       "id": "williams",
+      "constructorId": "Atlassian Williams",
+      "twitter": "WilliamsF1",
+      "instagram": "williamsf1official",
+      "website": "https://www.williamsf1.com",
       "name": "Williams",
       "color": "#64C4FF",
       "logoUrl": "/logos/williams.webp",
@@ -277,7 +365,7 @@
         }
       ],
       "seat1": {
-        "id": "albon",
+        "id": "alex-albon",
         "name": "Alex Albon",
         "number": 23,
         "nationality": "THA",
@@ -291,21 +379,35 @@
             "url": "https://autosport.com",
             "date": "2026-01-18"
           }
-        ]
+        ],
+        "socials": {
+          "twitter": "alex_albon",
+          "instagram": "alex_albon",
+          "youtube": null
+        }
       },
       "seat2": {
-        "id": "sainz",
+        "id": "carlos-sainz",
         "name": "Carlos Sainz",
         "number": 55,
         "nationality": "ESP",
         "contractStatus": "expiring",
         "contractEnd": "2026",
         "headshotUrl": "/drivers/sainz.webp",
-        "rumors": []
+        "rumors": [],
+        "socials": {
+          "twitter": "Carlossainz55",
+          "instagram": "carlossainz55",
+          "youtube": null
+        }
       }
     },
     {
       "id": "racing-bulls",
+      "constructorId": "Racing Bulls",
+      "twitter": "visacashapprb",
+      "instagram": "visacashapprb",
+      "website": "https://www.visacashapprb.com",
       "name": "Racing Bulls",
       "color": "#6692FF",
       "logoUrl": "/logos/racing-bulls.webp",
@@ -317,7 +419,7 @@
         }
       ],
       "seat1": {
-        "id": "lawson",
+        "id": "liam-lawson",
         "name": "Liam Lawson",
         "number": 30,
         "nationality": "NZL",
@@ -331,10 +433,15 @@
             "url": "https://the-race.com",
             "date": "2025-12-15"
           }
-        ]
+        ],
+        "socials": {
+          "twitter": "LiamLawson30",
+          "instagram": "liamlawson30",
+          "youtube": null
+        }
       },
       "seat2": {
-        "id": "lindblad",
+        "id": "arvid-lindblad",
         "name": "Arvid Lindblad",
         "number": 41,
         "nationality": "GBR",
@@ -348,38 +455,61 @@
             "url": "https://formula1.com",
             "date": "2025-11-20"
           }
-        ]
+        ],
+        "socials": {
+          "twitter": "ArvidRacing",
+          "instagram": "arvid.lindblad",
+          "youtube": null
+        }
       }
     },
     {
       "id": "audi",
+      "constructorId": "Audi",
+      "twitter": null,
+      "instagram": "audif1",
+      "website": "https://www.audif1.com",
       "name": "Audi",
       "color": "#F50537",
       "logoUrl": "/logos/audi.webp",
       "reserveDrivers": [],
       "seat1": {
-        "id": "hulkenberg",
+        "id": "nico-hulkenberg",
         "name": "Nico Hulkenberg",
         "number": 27,
         "nationality": "GER",
         "contractStatus": "expiring",
         "contractEnd": "2026",
         "headshotUrl": "/drivers/hulkenberg.webp",
-        "rumors": []
+        "rumors": [],
+        "socials": {
+          "twitter": "HulkHulkenberg",
+          "instagram": "hulkhulkenberg",
+          "youtube": null
+        }
       },
       "seat2": {
-        "id": "bortoleto",
+        "id": "gabriel-bortoleto",
         "name": "Gabriel Bortoleto",
         "number": 5,
         "nationality": "BRA",
         "contractStatus": "expiring",
         "contractEnd": "2026",
         "headshotUrl": "/drivers/bortoleto.webp",
-        "rumors": []
+        "rumors": [],
+        "socials": {
+          "twitter": "gabortoleto85",
+          "instagram": "gabrielbortoleto_",
+          "youtube": null
+        }
       }
     },
     {
       "id": "haas",
+      "constructorId": "Haas",
+      "twitter": "HaasF1Team",
+      "instagram": "haasf1team",
+      "website": "https://www.haasf1team.com",
       "name": "Haas",
       "color": "#B6BABD",
       "logoUrl": "/logos/haas.webp",
@@ -396,17 +526,22 @@
         }
       ],
       "seat1": {
-        "id": "ocon",
+        "id": "esteban-ocon",
         "name": "Esteban Ocon",
         "number": 31,
         "nationality": "FRA",
         "contractStatus": "locked",
         "contractEnd": "2027",
         "headshotUrl": "/drivers/ocon.webp",
-        "rumors": []
+        "rumors": [],
+        "socials": {
+          "twitter": "OconEsteban",
+          "instagram": "estebanocon",
+          "youtube": null
+        }
       },
       "seat2": {
-        "id": "bearman",
+        "id": "oliver-bearman",
         "name": "Oliver Bearman",
         "number": 87,
         "nationality": "GBR",
@@ -420,11 +555,20 @@
             "url": "https://motorsport.com",
             "date": "2026-01-30"
           }
-        ]
+        ],
+        "socials": {
+          "twitter": "OllieBearman",
+          "instagram": "olliebearman",
+          "youtube": null
+        }
       }
     },
     {
       "id": "cadillac",
+      "constructorId": "Cadillac",
+      "twitter": "Cadillac_F1",
+      "instagram": "cadillacf1",
+      "website": "https://www.cadillacf1team.com",
       "name": "Cadillac F1",
       "color": "#1E1E1E",
       "logoUrl": "/logos/cadillac.webp",
@@ -441,24 +585,34 @@
         }
       ],
       "seat1": {
-        "id": "perez",
+        "id": "sergio-perez",
         "name": "Sergio Perez",
         "number": 11,
         "nationality": "MEX",
         "contractStatus": "locked",
         "contractEnd": "2027",
         "headshotUrl": "/drivers/perez.webp",
-        "rumors": []
+        "rumors": [],
+        "socials": {
+          "twitter": "SChecoPerez",
+          "instagram": "schecoperez",
+          "youtube": null
+        }
       },
       "seat2": {
-        "id": "bottas",
+        "id": "valtteri-bottas",
         "name": "Valtteri Bottas",
         "number": 77,
         "nationality": "FIN",
         "contractStatus": "locked",
         "contractEnd": "2027",
         "headshotUrl": "/drivers/bottas.webp",
-        "rumors": []
+        "rumors": [],
+        "socials": {
+          "twitter": "ValtteriBottas",
+          "instagram": "valtteribottas",
+          "youtube": null
+        }
       }
     }
   ]

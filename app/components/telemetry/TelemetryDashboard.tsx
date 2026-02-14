@@ -7,6 +7,7 @@ import TrackMap from "./TrackMap";
 import SpeedTrace from "./SpeedTrace";
 import LapTimeChart from "./LapTimeChart";
 import TireStrategyChart from "./TireStrategyChart";
+import LazyChart from "./LazyChart";
 
 interface TelemetryDashboardProps {
   files: TelemetryFileInfo[];
@@ -260,27 +261,34 @@ export default function TelemetryDashboard({
             drivers={session.drivers}
             trackBoundary={session.trackBoundary}
             drsZones={session.drsZones}
-          />
-
-          <SpeedTrace
-            traces={session.telemetryData.filter((t) =>
-              selectedDriverNumbers.includes(t.driverNumber),
-            )}
-            drivers={session.drivers}
             speedUnit={speedUnit}
-            drsZones={session.drsZones}
           />
 
-          <LapTimeChart
-            laps={session.lapData}
-            drivers={session.drivers}
-            selectedDriverNumbers={selectedDriverNumbers}
-          />
+          <LazyChart key={`speed-${selectedFile}`} title="Speed Trace — Fastest Laps">
+            <SpeedTrace
+              traces={session.telemetryData.filter((t) =>
+                selectedDriverNumbers.includes(t.driverNumber),
+              )}
+              drivers={session.drivers}
+              speedUnit={speedUnit}
+              drsZones={session.drsZones}
+            />
+          </LazyChart>
 
-          <TireStrategyChart
-            stints={session.stintData}
-            drivers={session.drivers}
-          />
+          <LazyChart key={`laps-${selectedFile}`} title="Lap Times">
+            <LapTimeChart
+              laps={session.lapData}
+              drivers={session.drivers}
+              selectedDriverNumbers={selectedDriverNumbers}
+            />
+          </LazyChart>
+
+          <LazyChart key={`strat-${selectedFile}`} title="Tire Strategy">
+            <TireStrategyChart
+              stints={session.stintData}
+              drivers={session.drivers}
+            />
+          </LazyChart>
         </>
       )}
     </div>

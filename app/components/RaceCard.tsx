@@ -1,19 +1,30 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Race } from "@/app/types";
 import { countryToIso } from "@/app/lib/flags";
+import { CIRCUIT_TIMEZONES } from "@/app/lib/circuit-timezones";
 import Flag from "./Flag";
 import SessionTime from "./SessionTime";
+
+export interface RaceEnrichment {
+  circuitRaces: number | null;
+  contractEnd: number | null;
+  hostNationRaces: number | null;
+  hostNationCircuits: number | null;
+}
 
 interface RaceCardProps {
   race: Race;
   isNext: boolean;
+  enrichment?: RaceEnrichment;
 }
 
-export default function RaceCard({ race, isNext }: RaceCardProps) {
+export default function RaceCard({ race, isNext, enrichment }: RaceCardProps) {
   const [expanded, setExpanded] = useState(isNext);
   const isSprint = !!race.Sprint;
+  const circuitTz = CIRCUIT_TIMEZONES[race.Circuit.circuitId];
 
   const sessions: { label: string; date: string; time: string }[] = [];
 
@@ -61,9 +72,13 @@ export default function RaceCard({ race, isNext }: RaceCardProps) {
               {countryToIso(race.Circuit.Location.country) && (
                 <Flag iso={countryToIso(race.Circuit.Location.country)!} size={16} className="shrink-0" />
               )}
-              <h3 className="font-display truncate font-semibold text-white">
+              <Link
+                href={`/race/${race.season}/${race.round}`}
+                onClick={(e) => e.stopPropagation()}
+                className="font-display truncate font-semibold text-white hover:underline"
+              >
                 {race.raceName}
-              </h3>
+              </Link>
             </div>
             <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
               {isNext && (
@@ -110,8 +125,41 @@ export default function RaceCard({ race, isNext }: RaceCardProps) {
               label={s.label}
               date={s.date}
               time={s.time}
+              circuitTimezone={circuitTz}
             />
           ))}
+
+          {enrichment && (enrichment.circuitRaces || enrichment.contractEnd || enrichment.hostNationRaces) && (
+            <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 border-t border-white/5 pt-2 text-[11px] text-white/40">
+              {enrichment.circuitRaces && (
+                <span>{enrichment.circuitRaces} races at this circuit</span>
+              )}
+              {enrichment.contractEnd && (
+                <>
+                  <span>&middot;</span>
+                  <span>
+                    Contract until {enrichment.contractEnd}
+                    {enrichment.contractEnd === 2026 && (
+                      <span className="ml-1.5 rounded bg-red-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-red-400">
+                        Final Year
+                      </span>
+                    )}
+                  </span>
+                </>
+              )}
+              {enrichment.hostNationRaces && (
+                <>
+                  <span>&middot;</span>
+                  <span>
+                    Nation: {enrichment.hostNationRaces} races
+                    {enrichment.hostNationCircuits && enrichment.hostNationCircuits > 1
+                      ? ` across ${enrichment.hostNationCircuits} circuits`
+                      : ""}
+                  </span>
+                </>
+              )}
+            </div>
+          )}
         </div>
       )}
     </button>

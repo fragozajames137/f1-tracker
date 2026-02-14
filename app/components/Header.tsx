@@ -7,32 +7,32 @@ interface HeaderProps {
 }
 
 export default function Header({ season, isHome }: HeaderProps) {
-  const brandClassName = "font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl";
+  const brandClassName = "font-sans text-2xl font-bold uppercase tracking-widest text-white sm:text-3xl";
 
   return (
     <header className="border-b border-white/10 bg-white/[0.02]">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
-          <div>
-            {isHome ? (
-              <h1 className={brandClassName}>Pole to Paddock</h1>
-            ) : (
-              <p className={brandClassName}>
-                <Link href="/" className="hover:text-white/80 transition-colors">
-                  Pole to Paddock
-                </Link>
-              </p>
-            )}
-            <nav className="mt-3 flex gap-3 sm:gap-4">
-              <NavLink href="/">Grid</NavLink>
-              <NavLink href="/schedule">Schedule</NavLink>
-              <NavLink href="/live">Live</NavLink>
-              <NavLink href="/telemetry">Telemetry</NavLink>
-              <NavLink href="/compare">H2H</NavLink>
-              <NavLink href="/history">History</NavLink>
-            </nav>
-          </div>
+      <div className="mx-auto max-w-7xl px-4 pt-6 pb-0 sm:px-6 lg:px-8">
+        <div className="text-center">
+          {isHome ? (
+            <h1 className={brandClassName}>Pole to Paddock</h1>
+          ) : (
+            <p className={brandClassName}>
+              <Link href="/" className="hover:text-white/80 transition-colors">
+                Pole to Paddock
+              </Link>
+            </p>
+          )}
         </div>
+        <nav className="mt-4 grid grid-cols-8">
+          <NavLink href="/">Grid</NavLink>
+          <NavLink href="/silly-season">Silly Season</NavLink>
+          <NavLink href="/schedule">Schedule</NavLink>
+          <NavLink href="/race">Race Hub</NavLink>
+          <NavLink href="/telemetry">Telemetry</NavLink>
+          <NavLink href="/compare">H2H</NavLink>
+          <NavLink href="/predict">Predict</NavLink>
+          <NavLink href="/history">History</NavLink>
+        </nav>
       </div>
     </header>
   );

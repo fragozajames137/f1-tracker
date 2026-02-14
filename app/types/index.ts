@@ -7,6 +7,12 @@ export interface Rumor {
   date: string;
 }
 
+export interface DriverSocials {
+  twitter: string | null;
+  instagram: string | null;
+  youtube: string | null;
+}
+
 export interface Driver {
   id: string;
   name: string;
@@ -16,6 +22,7 @@ export interface Driver {
   contractEnd: string | null;
   headshotUrl?: string;
   rumors: Rumor[];
+  socials?: DriverSocials;
 }
 
 export interface ReserveDriver {
@@ -29,6 +36,10 @@ export interface Team {
   name: string;
   color: string;
   logoUrl?: string;
+  constructorId?: string;
+  twitter?: string | null;
+  instagram?: string | null;
+  website?: string | null;
   reserveDrivers?: ReserveDriver[];
   seat1: Driver;
   seat2: Driver;
@@ -38,6 +49,63 @@ export interface GridData {
   season: number;
   lastUpdated: string;
   teams: Team[];
+}
+
+// Contract / salary types (Spotrac)
+
+export interface SalaryYear {
+  year: number;
+  age: number;
+  team: string;
+  salary: number;
+  isEstimate?: boolean;
+}
+
+export interface ContractTransaction {
+  date: string;       // ISO date, e.g. "2024-07-29"
+  description: string;
+}
+
+export interface DriverContract {
+  id?: string;
+  driver: string;
+  number: number;
+  team: string;
+  contractThrough: number | null;
+  dealType: string;
+  estimatedSalary?: string;
+  notes?: string;
+  careerEarnings?: number;
+  salaryHistory?: SalaryYear[];
+  transactions?: ContractTransaction[];
+}
+
+// Constructor types (f1-constructors.json)
+
+export interface Constructor {
+  constructor: string;
+  engine: string;
+  licensedIn: string | string[];
+  basedIn: string | string[];
+  seasons: string;
+  racesEntered: number;
+  racesStarted: number;
+  drivers: number;
+  totalEntries: number;
+  wins: number;
+  points: number | null;
+  poles: number;
+  fastestLaps: number;
+  podiums: number;
+  wcc: number | null;
+  wdc: number;
+  antecedentTeams?: string[];
+  note?: string;
+}
+
+export interface ConstructorsData {
+  current: Constructor[];
+  former: Constructor[];
 }
 
 // Schedule types (Jolpica API)
