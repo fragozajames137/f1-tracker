@@ -78,3 +78,40 @@ export interface ConsistencyGroup {
   maxPoints: number;
   variance: number;
 }
+
+export interface FiaDecisionPenalties {
+  penaltyPoints: number;
+  timePenalty: number | null;
+  gridPenalty: number | null;
+  driveThrough: boolean;
+  reprimand: boolean;
+  disqualified: boolean;
+  fine: string | null;
+}
+
+export interface FiaDecision {
+  id: string;
+  season: number;
+  round: number | null;
+  raceName: string;
+  eventId: number;
+  docNumber: number | null;
+  title: string;
+  pdfUrl: string;
+  publishedDate: string;
+  carNumber: number | null;
+  driverName: string | null;
+  competitor: string | null;
+  session: string | null;
+  fact: string | null;
+  offence: string | null;
+  decisionText: string | null;
+  reason: string | null;
+  penalties: FiaDecisionPenalties;
+  noFurtherAction: boolean;
+}
+
+export interface FiaDecisionsData {
+  lastUpdated: string | null;
+  decisions: FiaDecision[];
+}

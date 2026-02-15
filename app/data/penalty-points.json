@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-02-14",
+  "lastUpdated": "2026-02-15",
   "incidents": [
     {
       "id": "INC-2024-053",
@@ -244,7 +244,7 @@
       "incidentDescription": "Causing a collision with Gabriel Bortoleto",
       "decision": {
         "penaltyPoints": 2,
-        "timePenalty": null,
+        "timePenalty": 10,
         "gridPenalty": null,
         "driveThrough": false,
         "reprimand": false,
@@ -252,7 +252,7 @@
         "fine": null,
         "other": null
       },
-      "document": "DOC-2025-LP"
+      "document": "DOC-2025-049"
     },
     {
       "id": "INC-2025-066",
@@ -267,7 +267,7 @@
       "incidentDescription": "Forcing Isack Hadjar off the track",
       "decision": {
         "penaltyPoints": 2,
-        "timePenalty": null,
+        "timePenalty": 10,
         "gridPenalty": null,
         "driveThrough": false,
         "reprimand": false,
@@ -275,7 +275,7 @@
         "fine": null,
         "other": null
       },
-      "document": "DOC-2025-LP"
+      "document": "DOC-2025-072"
     },
     {
       "id": "INC-2025-004",
@@ -551,7 +551,7 @@
         "fine": null,
         "other": null
       },
-      "document": "DOC-2025-LP"
+      "document": "DOC-2025-031"
     },
     {
       "id": "INC-2025-012",
@@ -612,7 +612,7 @@
       "incidentDescription": "Causing a collision with Franco Colapinto",
       "decision": {
         "penaltyPoints": 2,
-        "timePenalty": null,
+        "timePenalty": 10,
         "gridPenalty": null,
         "driveThrough": false,
         "reprimand": false,
@@ -620,7 +620,7 @@
         "fine": null,
         "other": null
       },
-      "document": "DOC-2025-LP"
+      "document": "DOC-2025-040"
     },
     {
       "id": "INC-2025-014",
@@ -681,7 +681,7 @@
       "incidentDescription": "Causing a collision with Oliver Bearman",
       "decision": {
         "penaltyPoints": 1,
-        "timePenalty": null,
+        "timePenalty": 10,
         "gridPenalty": null,
         "driveThrough": false,
         "reprimand": false,
@@ -689,7 +689,7 @@
         "fine": null,
         "other": null
       },
-      "document": "DOC-2025-LP"
+      "document": "DOC-2025-040"
     },
     {
       "id": "INC-2025-016",
@@ -1141,7 +1141,7 @@
       "incidentDescription": "Causing a collision with Lance Stroll",
       "decision": {
         "penaltyPoints": 2,
-        "timePenalty": null,
+        "timePenalty": 10,
         "gridPenalty": null,
         "driveThrough": false,
         "reprimand": false,
@@ -1149,7 +1149,7 @@
         "fine": null,
         "other": null
       },
-      "document": "DOC-2025-LP"
+      "document": "DOC-2025-059"
     },
     {
       "id": "INC-2025-034",

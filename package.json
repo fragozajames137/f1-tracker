@@ -12,10 +12,11 @@
     "optimize-images": "node scripts/optimize-images.mjs",
     "sync:penalties": "node scripts/sync-penalty-points.mjs --write",
     "sync:penalties:dry": "node scripts/sync-penalty-points.mjs",
-    "sync:fia": "node scripts/enrich-fia-documents.mjs --write",
+    "sync:fia": "node scripts/enrich-fia-documents.mjs --sync --write",
     "sync:fia:dry": "node scripts/enrich-fia-documents.mjs",
-    "cron:install": "bash scripts/install-launchd.sh",
-    "cron:uninstall": "bash scripts/install-launchd.sh --uninstall"
+    "backfill:fia": "node scripts/backfill-fia-decisions.mjs --write",
+    "backfill:fia:dry": "node scripts/backfill-fia-decisions.mjs",
+    "backfill:fia:resume": "node scripts/backfill-fia-decisions.mjs --write --resume"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

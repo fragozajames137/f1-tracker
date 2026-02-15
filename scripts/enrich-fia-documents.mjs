@@ -2,23 +2,29 @@
 
 /**
  * Enriches penalty-points.json with full penalty details from FIA stewards
- * decision PDFs. Targets incidents sourced from Liquipedia (document = "DOC-*-LP").
+ * decision data stored in fia-decisions.json.
  *
  * Usage:
- *   node scripts/enrich-fia-documents.mjs                          # dry-run
- *   node scripts/enrich-fia-documents.mjs --write                   # writes changes
- *   node scripts/enrich-fia-documents.mjs --race "Abu Dhabi Grand Prix"
- *   node scripts/enrich-fia-documents.mjs --all                     # all LP incidents
+ *   node scripts/enrich-fia-documents.mjs                # dry-run, match LP incidents
+ *   node scripts/enrich-fia-documents.mjs --write        # writes changes
+ *   node scripts/enrich-fia-documents.mjs --all --write  # re-match all LP incidents
+ *   node scripts/enrich-fia-documents.mjs --sync --write # fetch new docs + enrich (for cron)
  */
 
-import { readFileSync, writeFileSync } from "fs";
+import { readFileSync, writeFileSync, existsSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
-import { fetchEventDocuments, downloadPdf } from "./lib/fia-scraper.mjs";
+import {
+  fetchEventDocuments,
+  fetchEventDocumentsByEventId,
+  fetchEventIds,
+  downloadPdf,
+} from "./lib/fia-scraper.mjs";
 import { parseFiaDecisionPdf } from "./lib/fia-pdf-parser.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const DATA_PATH = join(__dirname, "..", "app", "data", "penalty-points.json");
+const PP_PATH = join(__dirname, "..", "app", "data", "penalty-points.json");
+const FIA_PATH = join(__dirname, "..", "app", "data", "fia-decisions.json");
 const GRID_PATH = join(__dirname, "..", "app", "data", "grid-2026.json");
 const NUMBERS_PATH = join(__dirname, "..", "app", "data", "driver-numbers.json");
 
@@ -98,18 +104,121 @@ function findIncidentMatch(decision, incidents, carMap) {
   return null;
 }
 
+// ── Sync: fetch new FIA docs for current event and add to fia-decisions.json ─
+async function syncCurrentEvent(fiaData, season) {
+  let events;
+  try {
+    events = await fetchEventIds(season);
+  } catch (err) {
+    console.error(`⚠ Could not fetch ${season} events: ${err.message}`);
+    return 0;
+  }
+
+  const existingUrls = new Set(fiaData.decisions.map((d) => d.pdfUrl));
+  let newCount = 0;
+
+  // Process all events for the season (the scraper caches, so only new ones hit the network)
+  for (const [eventName, eventId] of Object.entries(events)) {
+    if (/test|pre-?season/i.test(eventName)) continue;
+
+    let docs;
+    try {
+      docs = await fetchEventDocumentsByEventId(eventId, eventName);
+    } catch {
+      continue;
+    }
+
+    // Only process docs not already in the dataset
+    const newDocs = docs.filter((d) => !existingUrls.has(d.pdfUrl));
+    if (newDocs.length === 0) continue;
+
+    console.log(`  Syncing ${eventName}: ${newDocs.length} new docs`);
+
+    for (const doc of newDocs) {
+      let parsed;
+      try {
+        const buffer = await downloadPdf(doc.pdfUrl);
+        parsed = await parseFiaDecisionPdf(buffer);
+      } catch (err) {
+        console.error(`    ⚠ Parse failed: ${doc.title} — ${err.message}`);
+        continue;
+      }
+
+      fiaData.decisions.push({
+        id: `FIA-${season}-${eventId}-${doc.docNumber || "x"}`,
+        season,
+        round: null, // Could resolve from calendar but not critical for sync
+        raceName: eventName,
+        eventId,
+        docNumber: doc.docNumber || parsed.documentNumber,
+        title: doc.title,
+        pdfUrl: doc.pdfUrl,
+        publishedDate: doc.publishedDate,
+        carNumber: doc.carNumber || parsed.carNumber,
+        driverName: parsed.driverName,
+        competitor: parsed.competitor,
+        session: parsed.session,
+        fact: parsed.fact,
+        offence: parsed.offence,
+        decisionText: parsed.decisionText,
+        reason: parsed.reason,
+        penalties: {
+          penaltyPoints: parsed.penalties.penaltyPoints,
+          timePenalty: parsed.penalties.timePenalty,
+          gridPenalty: parsed.penalties.gridPenalty,
+          driveThrough: parsed.penalties.driveThrough,
+          reprimand: parsed.penalties.reprimand,
+          disqualified: parsed.penalties.disqualified,
+          fine: parsed.penalties.fine,
+        },
+        noFurtherAction: parsed.noFurtherAction,
+      });
+
+      existingUrls.add(doc.pdfUrl);
+      newCount++;
+    }
+  }
+
+  return newCount;
+}
+
 // ── Main ────────────────────────────────────────────────────────────────────
 async function main() {
   const writeMode = process.argv.includes("--write");
   const allMode = process.argv.includes("--all");
+  const syncMode = process.argv.includes("--sync");
   const raceIdx = process.argv.indexOf("--race");
   const targetRace = raceIdx !== -1 ? process.argv[raceIdx + 1] : null;
 
-  const data = JSON.parse(readFileSync(DATA_PATH, "utf-8"));
+  const ppData = JSON.parse(readFileSync(PP_PATH, "utf-8"));
 
-  // Find incidents needing enrichment (Liquipedia-sourced)
-  const lpIncidents = data.incidents.filter((inc) =>
-    inc.document && inc.document.match(/^DOC-\d+-LP$/),
+  // Load FIA decisions data
+  let fiaData;
+  if (existsSync(FIA_PATH)) {
+    fiaData = JSON.parse(readFileSync(FIA_PATH, "utf-8"));
+  } else {
+    fiaData = { lastUpdated: null, decisions: [] };
+  }
+
+  // Phase 1: Sync new FIA docs if requested
+  if (syncMode) {
+    const currentYear = new Date().getFullYear();
+    console.log(`Syncing FIA documents for ${currentYear}...\n`);
+    const newDocs = await syncCurrentEvent(fiaData, currentYear);
+    if (newDocs > 0) {
+      console.log(`\n  Added ${newDocs} new FIA decisions\n`);
+      if (writeMode) {
+        fiaData.lastUpdated = new Date().toISOString().slice(0, 10);
+        writeFileSync(FIA_PATH, JSON.stringify(fiaData, null, 2) + "\n");
+      }
+    } else {
+      console.log("  No new FIA documents found\n");
+    }
+  }
+
+  // Phase 2: Enrich LP incidents from fia-decisions.json
+  const lpIncidents = ppData.incidents.filter(
+    (inc) => inc.document && inc.document.match(/^DOC-\d+-LP$/),
   );
 
   if (lpIncidents.length === 0) {
@@ -127,25 +236,19 @@ async function main() {
 
   console.log(`Found ${lpIncidents.length} LP-sourced incidents across ${byRace.size} races\n`);
 
-  // Filter to target races
+  // Filter target races
   let targetRaces = [...byRace.keys()];
   if (targetRace) {
     targetRaces = targetRaces.filter((k) =>
       k.toLowerCase().includes(targetRace.toLowerCase()),
     );
-    if (targetRaces.length === 0) {
-      console.log(`No LP incidents found for race matching "${targetRace}"`);
-      return;
-    }
   } else if (!allMode) {
-    // Default: only process the most recent race
     targetRaces.sort();
     targetRaces = [targetRaces[targetRaces.length - 1]];
   }
 
   let totalEnriched = 0;
   let totalFailed = 0;
-  let totalNew = 0;
 
   for (const raceKey of targetRaces) {
     const [seasonStr, raceName] = raceKey.split("|");
@@ -155,53 +258,33 @@ async function main() {
 
     console.log(`── ${raceName} (${season}) — ${raceIncidents.length} LP incidents ──`);
 
-    // Fetch FIA documents for this event
-    let fiaDocs;
-    try {
-      fiaDocs = await fetchEventDocuments(raceName, season);
-    } catch (err) {
-      console.log(`  ⚠ Could not fetch FIA documents: ${err.message}`);
-      continue;
-    }
-
-    if (fiaDocs.length === 0) {
-      console.log("  No FIA decision documents found for this event.");
-      continue;
-    }
-
-    console.log(`  Found ${fiaDocs.length} FIA decision documents`);
-
-    // Download and parse each PDF
-    const parsedDecisions = [];
-    for (const doc of fiaDocs) {
-      try {
-        const buffer = await downloadPdf(doc.pdfUrl);
-        const parsed = await parseFiaDecisionPdf(buffer);
-        parsed._doc = doc; // keep reference
-        parsedDecisions.push(parsed);
-      } catch (err) {
-        console.log(`  ⚠ Failed to parse ${doc.title}: ${err.message}`);
-      }
-    }
-
-    console.log(`  Parsed ${parsedDecisions.length} decisions`);
-
-    // Filter to decisions with actual penalties (not "no further action")
-    const penaltyDecisions = parsedDecisions.filter(
-      (d) => !d.noFurtherAction && d.penalties.penaltyPoints > 0,
+    // Find FIA decisions for this race from fia-decisions.json
+    const raceDecisions = fiaData.decisions.filter(
+      (d) =>
+        d.season === season &&
+        d.raceName.toLowerCase().includes(raceName.toLowerCase().replace(/ grand prix$/i, "")) &&
+        !d.noFurtherAction &&
+        d.penalties.penaltyPoints > 0,
     );
 
-    // Match FIA decisions to existing LP incidents
+    if (raceDecisions.length === 0) {
+      console.log("  No matching FIA decisions found in dataset.");
+      totalFailed += raceIncidents.length;
+      continue;
+    }
+
+    console.log(`  Found ${raceDecisions.length} penalty-point decisions in dataset`);
+
+    // Match decisions to incidents
     const matched = new Set();
-    for (const decision of penaltyDecisions) {
+    for (const decision of raceDecisions) {
       const incident = findIncidentMatch(decision, raceIncidents, carMap);
 
       if (incident && !matched.has(incident.id)) {
         matched.add(incident.id);
 
-        // Update the incident's decision fields
-        const fiaDocRef = decision._doc.docNumber
-          ? `DOC-${season}-${String(decision._doc.docNumber).padStart(3, "0")}`
+        const fiaDocRef = decision.docNumber
+          ? `DOC-${season}-${String(decision.docNumber).padStart(3, "0")}`
           : incident.document;
 
         const updates = {
@@ -214,28 +297,20 @@ async function main() {
         };
 
         console.log(
-          `  ✓ ${incident.driverId} (${incident.session}): ${incident.decision.penaltyPoints}pts → enriched from Doc ${decision._doc.docNumber}`,
+          `  ✓ ${incident.driverId} (${incident.session}): ${incident.decision.penaltyPoints}pts → enriched from Doc ${decision.docNumber}`,
         );
 
-        if (updates.timePenalty) console.log(`    + time penalty: ${updates.timePenalty}s`);
-        if (updates.gridPenalty) console.log(`    + grid penalty: ${updates.gridPenalty} places`);
-        if (updates.driveThrough) console.log(`    + drive-through penalty`);
-        if (updates.reprimand) console.log(`    + reprimand`);
-        if (updates.fine) console.log(`    + fine: ${updates.fine}`);
-
         if (writeMode) {
-          // Find and update the incident in the main data array
-          const idx = data.incidents.findIndex((i) => i.id === incident.id);
+          const idx = ppData.incidents.findIndex((i) => i.id === incident.id);
           if (idx !== -1) {
-            Object.assign(data.incidents[idx].decision, updates);
-            data.incidents[idx].document = fiaDocRef;
+            Object.assign(ppData.incidents[idx].decision, updates);
+            ppData.incidents[idx].document = fiaDocRef;
           }
         }
         totalEnriched++;
       }
     }
 
-    // Report unmatched LP incidents
     const unmatched = raceIncidents.filter((i) => !matched.has(i.id));
     if (unmatched.length > 0) {
       console.log(`  ⚠ ${unmatched.length} LP incidents could not be matched:`);
@@ -245,26 +320,6 @@ async function main() {
       totalFailed += unmatched.length;
     }
 
-    // Report FIA decisions with penalty points that don't match any LP incident
-    const unmatchedFia = penaltyDecisions.filter((d) => {
-      const carInfo = carMap.get(d.carNumber);
-      if (!carInfo) return true;
-      return !raceIncidents.some(
-        (i) =>
-          i.driverId === carInfo.driverId &&
-          i.decision.penaltyPoints === d.penalties.penaltyPoints,
-      );
-    });
-    if (unmatchedFia.length > 0) {
-      console.log(`  ✚ ${unmatchedFia.length} FIA decisions not in existing data:`);
-      for (const d of unmatchedFia) {
-        console.log(
-          `    - Car ${d.carNumber} (${d.session}): ${d.penalties.penaltyPoints}pts — ${d.fact?.slice(0, 80) || "unknown"}`,
-        );
-      }
-      totalNew += unmatchedFia.length;
-    }
-
     console.log();
   }
 
@@ -272,12 +327,11 @@ async function main() {
   console.log("── Summary ──");
   console.log(`  Enriched: ${totalEnriched}`);
   console.log(`  Unmatched LP: ${totalFailed}`);
-  console.log(`  New FIA decisions: ${totalNew}`);
 
   if (writeMode && totalEnriched > 0) {
-    data.lastUpdated = new Date().toISOString().slice(0, 10);
-    writeFileSync(DATA_PATH, JSON.stringify(data, null, 2) + "\n");
-    console.log(`\n✓ Updated ${totalEnriched} incidents in ${DATA_PATH}`);
+    ppData.lastUpdated = new Date().toISOString().slice(0, 10);
+    writeFileSync(PP_PATH, JSON.stringify(ppData, null, 2) + "\n");
+    console.log(`\n✓ Updated ${totalEnriched} incidents in ${PP_PATH}`);
   } else if (totalEnriched > 0) {
     console.log(`\nRun with --write to save enrichment changes.`);
   }
