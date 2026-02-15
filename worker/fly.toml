@@ -9,8 +9,8 @@ primary_region = 'lhr'
 [processes]
   worker = "node dist/index.js"
 
-[restart]
-  policy = "no"
+[[restart]]
+  policy = "never"
 
 [[vm]]
   size = 'shared-cpu-1x'
