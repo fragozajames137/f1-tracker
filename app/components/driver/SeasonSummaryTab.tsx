@@ -22,11 +22,14 @@ export default function SeasonSummaryTab({ driverId, teamColor }: SeasonSummaryT
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/driver/${driverId}/stats`)
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    fetch(`/api/driver/${driverId}/stats`, { signal: controller.signal })
       .then((r) => r.json())
       .then((data) => setStats(data))
       .catch(() => setStats([]))
-      .finally(() => setLoading(false));
+      .finally(() => { clearTimeout(timeout); setLoading(false); });
+    return () => { controller.abort(); clearTimeout(timeout); };
   }, [driverId]);
 
   if (loading) {

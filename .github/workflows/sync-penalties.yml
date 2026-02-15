@@ -2,7 +2,7 @@ name: Sync Penalty Points
 
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "0 * * * *"
   workflow_dispatch:
     inputs:
       force:
@@ -41,6 +41,7 @@ jobs:
 
             let isRaceWeekend = false;
             let runEnrichment = false;
+            let startWorker = false;
 
             for (const w of windows) {
               // Liquipedia sync: FP1 start → race end + 2h (the normal window)
@@ -61,6 +62,13 @@ jobs:
                 runEnrichment = true;
                 console.error('FIA enrichment window: ' + w.raceName);
               }
+
+              // Start Fly worker: 2h before FP1 through end of weekend
+              const twoHoursBefore = new Date(w.windowStart.getTime() - 2 * 3600000);
+              if (now >= twoHoursBefore && now <= w.windowEnd) {
+                startWorker = true;
+                console.error('Worker needed for: ' + w.raceName);
+              }
             }
 
             if (!isRaceWeekend) {
@@ -74,6 +82,7 @@ jobs:
             const out = process.env.GITHUB_OUTPUT;
             fs.appendFileSync(out, 'is_race_weekend=' + isRaceWeekend + '\n');
             fs.appendFileSync(out, 'run_enrichment=' + runEnrichment + '\n');
+            fs.appendFileSync(out, 'start_worker=' + startWorker + '\n');
           "
 
       - name: Install dependencies
@@ -86,17 +95,36 @@ jobs:
 
       - name: Enrich with FIA documents
         if: steps.check.outputs.run_enrichment == 'true' || inputs.run_enrichment
-        run: node scripts/enrich-fia-documents.mjs --write
+        run: node scripts/enrich-fia-documents.mjs --sync --write
 
       - name: Commit and push changes
         if: steps.check.outputs.is_race_weekend == 'true' || inputs.force
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add app/data/penalty-points.json
+          git add app/data/penalty-points.json app/data/fia-decisions.json
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
             git commit -m "chore: sync penalty points [automated]"
             git push
           fi
+
+      - name: Start Fly.io worker for race weekend
+        if: steps.check.outputs.start_worker == 'true'
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          curl -sL https://fly.io/install.sh | sh
+          export PATH="$HOME/.fly/bin:$PATH"
+          # Start all stopped machines for the app (idempotent if already running)
+          for id in $(flyctl machines list --app f1-tracker-worker --json | python3 -c "
+            import json, sys
+            machines = json.load(sys.stdin)
+            for m in machines:
+              if m.get('state') == 'stopped':
+                print(m['id'])
+          "); do
+            echo "Starting machine $id"
+            flyctl machines start "$id" --app f1-tracker-worker
+          done

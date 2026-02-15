@@ -296,6 +296,7 @@ export const liveState = sqliteTable(
   },
   (table) => [
     uniqueIndex("live_state_pk").on(table.sessionKey, table.topic),
+    index("live_state_updated_at_idx").on(table.updatedAt),
   ],
 );
 

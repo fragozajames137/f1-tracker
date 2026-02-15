@@ -130,22 +130,22 @@ export async function getLaps(
 
 export async function getLapChart(sessionKey: number) {
   const db = getDb();
-  const positions = await db
-    .select()
-    .from(schema.lapPositions)
-    .where(eq(schema.lapPositions.sessionKey, sessionKey))
-    .orderBy(asc(schema.lapPositions.lapNumber), asc(schema.lapPositions.position));
-
-  // Get driver info for labeling
-  const drivers = await db
-    .select({
-      driverNumber: schema.sessionDrivers.driverNumber,
-      abbreviation: schema.sessionDrivers.abbreviation,
-      teamName: schema.sessionDrivers.teamName,
-      teamColor: schema.sessionDrivers.teamColor,
-    })
-    .from(schema.sessionDrivers)
-    .where(eq(schema.sessionDrivers.sessionKey, sessionKey));
+  const [positions, drivers] = await Promise.all([
+    db
+      .select()
+      .from(schema.lapPositions)
+      .where(eq(schema.lapPositions.sessionKey, sessionKey))
+      .orderBy(asc(schema.lapPositions.lapNumber), asc(schema.lapPositions.position)),
+    db
+      .select({
+        driverNumber: schema.sessionDrivers.driverNumber,
+        abbreviation: schema.sessionDrivers.abbreviation,
+        teamName: schema.sessionDrivers.teamName,
+        teamColor: schema.sessionDrivers.teamColor,
+      })
+      .from(schema.sessionDrivers)
+      .where(eq(schema.sessionDrivers.sessionKey, sessionKey)),
+  ]);
 
   const driverMap = new Map(drivers.map((d) => [d.driverNumber, d]));
 
@@ -173,29 +173,29 @@ export async function getLapChart(sessionKey: number) {
 
 export async function getStrategy(sessionKey: number) {
   const db = getDb();
-  const stintsData = await db
-    .select()
-    .from(schema.stints)
-    .where(eq(schema.stints.sessionKey, sessionKey))
-    .orderBy(asc(schema.stints.driverNumber), asc(schema.stints.stintNumber));
-
-  const pitStopsData = await db
-    .select()
-    .from(schema.pitStops)
-    .where(eq(schema.pitStops.sessionKey, sessionKey))
-    .orderBy(asc(schema.pitStops.driverNumber), asc(schema.pitStops.lapNumber));
-
-  const drivers = await db
-    .select({
-      driverNumber: schema.sessionDrivers.driverNumber,
-      abbreviation: schema.sessionDrivers.abbreviation,
-      teamName: schema.sessionDrivers.teamName,
-      teamColor: schema.sessionDrivers.teamColor,
-      finalPosition: schema.sessionDrivers.finalPosition,
-    })
-    .from(schema.sessionDrivers)
-    .where(eq(schema.sessionDrivers.sessionKey, sessionKey))
-    .orderBy(asc(schema.sessionDrivers.finalPosition));
+  const [stintsData, pitStopsData, drivers] = await Promise.all([
+    db
+      .select()
+      .from(schema.stints)
+      .where(eq(schema.stints.sessionKey, sessionKey))
+      .orderBy(asc(schema.stints.driverNumber), asc(schema.stints.stintNumber)),
+    db
+      .select()
+      .from(schema.pitStops)
+      .where(eq(schema.pitStops.sessionKey, sessionKey))
+      .orderBy(asc(schema.pitStops.driverNumber), asc(schema.pitStops.lapNumber)),
+    db
+      .select({
+        driverNumber: schema.sessionDrivers.driverNumber,
+        abbreviation: schema.sessionDrivers.abbreviation,
+        teamName: schema.sessionDrivers.teamName,
+        teamColor: schema.sessionDrivers.teamColor,
+        finalPosition: schema.sessionDrivers.finalPosition,
+      })
+      .from(schema.sessionDrivers)
+      .where(eq(schema.sessionDrivers.sessionKey, sessionKey))
+      .orderBy(asc(schema.sessionDrivers.finalPosition)),
+  ]);
 
   return { drivers, stints: stintsData, pitStops: pitStopsData };
 }
@@ -254,21 +254,22 @@ export async function getSpeedTraps(sessionKey: number) {
 
 export async function getPitStops(sessionKey: number) {
   const db = getDb();
-  const stops = await db
-    .select()
-    .from(schema.pitStops)
-    .where(eq(schema.pitStops.sessionKey, sessionKey))
-    .orderBy(asc(schema.pitStops.lapNumber));
-
-  const drivers = await db
-    .select({
-      driverNumber: schema.sessionDrivers.driverNumber,
-      abbreviation: schema.sessionDrivers.abbreviation,
-      teamName: schema.sessionDrivers.teamName,
-      teamColor: schema.sessionDrivers.teamColor,
-    })
-    .from(schema.sessionDrivers)
-    .where(eq(schema.sessionDrivers.sessionKey, sessionKey));
+  const [stops, drivers] = await Promise.all([
+    db
+      .select()
+      .from(schema.pitStops)
+      .where(eq(schema.pitStops.sessionKey, sessionKey))
+      .orderBy(asc(schema.pitStops.lapNumber)),
+    db
+      .select({
+        driverNumber: schema.sessionDrivers.driverNumber,
+        abbreviation: schema.sessionDrivers.abbreviation,
+        teamName: schema.sessionDrivers.teamName,
+        teamColor: schema.sessionDrivers.teamColor,
+      })
+      .from(schema.sessionDrivers)
+      .where(eq(schema.sessionDrivers.sessionKey, sessionKey)),
+  ]);
 
   const driverMap = new Map(drivers.map((d) => [d.driverNumber, d]));
 
