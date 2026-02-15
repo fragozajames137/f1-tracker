@@ -249,6 +249,22 @@ export async function getSpeedTraps(sessionKey: number) {
 }
 
 // ---------------------------------------------------------------------------
+// Pit Stops — years with data
+// ---------------------------------------------------------------------------
+
+export async function getPitStopYears(): Promise<number[]> {
+  const db = getDb();
+  const rows = await db
+    .selectDistinct({ year: schema.meetings.year })
+    .from(schema.pitStops)
+    .innerJoin(schema.sessions, eq(schema.pitStops.sessionKey, schema.sessions.key))
+    .innerJoin(schema.meetings, eq(schema.sessions.meetingKey, schema.meetings.key))
+    .where(eq(schema.sessions.type, "Race"))
+    .orderBy(desc(schema.meetings.year));
+  return rows.map((r) => r.year);
+}
+
+// ---------------------------------------------------------------------------
 // Pit Stops
 // ---------------------------------------------------------------------------
 
@@ -264,6 +280,7 @@ export async function getPitStops(sessionKey: number) {
       .select({
         driverNumber: schema.sessionDrivers.driverNumber,
         abbreviation: schema.sessionDrivers.abbreviation,
+        fullName: schema.sessionDrivers.fullName,
         teamName: schema.sessionDrivers.teamName,
         teamColor: schema.sessionDrivers.teamColor,
       })
@@ -277,6 +294,84 @@ export async function getPitStops(sessionKey: number) {
     ...stop,
     driver: driverMap.get(stop.driverNumber) ?? null,
   }));
+}
+
+// ---------------------------------------------------------------------------
+// Season Pit Stops (aggregated across all Race sessions for a year)
+// ---------------------------------------------------------------------------
+
+export async function getSeasonPitStops(year: number) {
+  const db = getDb();
+
+  // Get all Race sessions for the year
+  const raceSessions = await db
+    .select({
+      sessionKey: schema.sessions.key,
+      meetingName: schema.meetings.name,
+      round: schema.meetings.round,
+    })
+    .from(schema.sessions)
+    .innerJoin(schema.meetings, eq(schema.sessions.meetingKey, schema.meetings.key))
+    .where(
+      and(
+        eq(schema.meetings.year, year),
+        eq(schema.sessions.type, "Race"),
+        sql`${schema.sessions.ingestedAt} IS NOT NULL`,
+      ),
+    )
+    .orderBy(asc(schema.meetings.round));
+
+  if (raceSessions.length === 0) return { stops: [], sessions: [] };
+
+  const sessionKeys = raceSessions.map((s) => s.sessionKey);
+
+  // Get all pit stops for those sessions
+  const [stops, drivers] = await Promise.all([
+    db
+      .select()
+      .from(schema.pitStops)
+      .where(inArray(schema.pitStops.sessionKey, sessionKeys))
+      .orderBy(asc(schema.pitStops.sessionKey), asc(schema.pitStops.lapNumber)),
+    db
+      .select({
+        sessionKey: schema.sessionDrivers.sessionKey,
+        driverNumber: schema.sessionDrivers.driverNumber,
+        abbreviation: schema.sessionDrivers.abbreviation,
+        teamName: schema.sessionDrivers.teamName,
+        teamColor: schema.sessionDrivers.teamColor,
+      })
+      .from(schema.sessionDrivers)
+      .where(inArray(schema.sessionDrivers.sessionKey, sessionKeys)),
+  ]);
+
+  // Build driver lookup: sessionKey-driverNumber -> driver info
+  const driverMap = new Map<string, { abbreviation: string; teamName: string; teamColor: string }>();
+  for (const d of drivers) {
+    driverMap.set(`${d.sessionKey}-${d.driverNumber}`, {
+      abbreviation: d.abbreviation,
+      teamName: d.teamName ?? "Unknown",
+      teamColor: d.teamColor ?? "666",
+    });
+  }
+
+  // Build session lookup
+  const sessionMap = new Map(raceSessions.map((s) => [s.sessionKey, s]));
+
+  const enrichedStops = stops.map((stop) => {
+    const driver = driverMap.get(`${stop.sessionKey}-${stop.driverNumber}`);
+    const session = sessionMap.get(stop.sessionKey);
+    return {
+      ...stop,
+      driver: driver ?? null,
+      meetingName: session?.meetingName ?? "Unknown",
+      round: session?.round ?? 0,
+    };
+  });
+
+  return {
+    stops: enrichedStops,
+    sessions: raceSessions,
+  };
 }
 
 // ---------------------------------------------------------------------------

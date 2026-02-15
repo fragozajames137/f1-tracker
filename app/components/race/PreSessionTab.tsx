@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import type { Race } from "@/app/types";
 import { CIRCUIT_TIMEZONES } from "@/app/lib/circuit-timezones";
 import SessionTime from "../SessionTime";
+import QualifyingGapChart from "./QualifyingGapChart";
 
 interface SessionInfo {
   sessionKey: number;
@@ -231,7 +232,11 @@ export default function PreSessionTab({ race, sessions, qualiSessionKey, year }:
         </div>
       )}
 
-      {/* Starting Grid (from qualifying) */}
+      {/* Qualifying Gap Chart + Starting Grid */}
+      {qualiSessionKey && (
+        <QualifyingGapChart sessionKey={qualiSessionKey} />
+      )}
+
       {qualiResults && qualiResults.length > 0 && (
         <div className="rounded-lg border border-white/10 bg-white/5 p-4">
           <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-white/40">

@@ -10,10 +10,12 @@
   },
   "dependencies": {
     "@libsql/client": "^0.17.0",
-    "node-signalr": "^2.0.2"
+    "node-signalr": "^2.0.2",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@types/web-push": "^3.6.4",
     "tsx": "^4.19.0",
     "typescript": "^5"
   }

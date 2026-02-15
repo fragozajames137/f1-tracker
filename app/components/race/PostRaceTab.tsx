@@ -10,7 +10,8 @@ import TrackDominance from "./TrackDominance";
 import LapChart from "../history/LapChart";
 import RaceControlFeed from "../history/RaceControlFeed";
 import WeatherChart from "../history/WeatherChart";
-import PitStopTable from "../history/PitStopTable";
+import QualifyingGapChart from "./QualifyingGapChart";
+import PitStopRankings from "./PitStopRankings";
 import DOTDCard from "../fan-favorites/DOTDCard";
 import { getDOTDByRound } from "@/app/lib/dotd";
 
@@ -34,6 +35,7 @@ interface SessionInfo {
 interface PostRaceTabProps {
   sessions: SessionInfo[];
   raceSessionKey: number | null;
+  qualiSessionKey: number | null;
   year: number;
   round: number;
   race: Race | null;
@@ -41,6 +43,7 @@ interface PostRaceTabProps {
 
 const SECTIONS = [
   { id: "results", label: "Results" },
+  { id: "quali", label: "Qualifying" },
   { id: "dotd", label: "DOTD" },
   { id: "positions", label: "Positions" },
   { id: "strategy", label: "Strategy" },
@@ -51,7 +54,7 @@ const SECTIONS = [
   { id: "pits", label: "Pits" },
 ];
 
-export default function PostRaceTab({ sessions, raceSessionKey, year, round, race }: PostRaceTabProps) {
+export default function PostRaceTab({ sessions, raceSessionKey, qualiSessionKey, year, round, race }: PostRaceTabProps) {
   const dotdRace = getDOTDByRound(round);
 
   // Find the race session key — prefer explicit prop, fallback to finding it
@@ -86,6 +89,12 @@ export default function PostRaceTab({ sessions, raceSessionKey, year, round, rac
           <ResultsTable sessionKey={sessionKey} />
         </section>
 
+        {qualiSessionKey && (
+          <section id="quali" className="scroll-mt-16">
+            <QualifyingGapChart sessionKey={qualiSessionKey} />
+          </section>
+        )}
+
         {dotdRace && (
           <section id="dotd" className="scroll-mt-16">
             <DOTDCard race={dotdRace} />
@@ -117,7 +126,7 @@ export default function PostRaceTab({ sessions, raceSessionKey, year, round, rac
         </section>
 
         <section id="pits" className="scroll-mt-16">
-          <PitStopTable sessionKey={sessionKey} />
+          <PitStopRankings sessionKey={sessionKey} />
         </section>
       </div>
     </div>

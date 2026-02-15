@@ -86,15 +86,25 @@ async function ingestSession(
   sessionName: string,
 ): Promise<boolean> {
   // Check if already ingested
+  let upgradingLiveData = false;
   if (!forceFlag) {
     const existing = await db
-      .select({ ingestedAt: schema.sessions.ingestedAt })
+      .select({
+        ingestedAt: schema.sessions.ingestedAt,
+        liveIngestedAt: schema.sessions.liveIngestedAt,
+      })
       .from(schema.sessions)
       .where(eq(schema.sessions.key, sessionKey))
       .limit(1);
     if (existing[0]?.ingestedAt) {
-      console.log(`    Skipping ${sessionName} (already ingested)`);
-      return false;
+      if (existing[0].liveIngestedAt) {
+        // Live-only data — upgrade with archive data
+        console.log(`    Upgrading ${sessionName} (replacing live data with archive)...`);
+        upgradingLiveData = true;
+      } else {
+        console.log(`    Skipping ${sessionName} (already ingested from archive)`);
+        return false;
+      }
     }
   }
 
@@ -159,8 +169,8 @@ async function ingestSession(
     : [];
   const totalLaps = parseLapCount(lapCount);
 
-  // If --force, delete existing child rows first
-  if (forceFlag) {
+  // If --force or upgrading live data, delete existing child rows first
+  if (forceFlag || upgradingLiveData) {
     await db.delete(schema.sessionDrivers).where(eq(schema.sessionDrivers.sessionKey, sessionKey));
     await db.delete(schema.laps).where(eq(schema.laps.sessionKey, sessionKey));
     await db.delete(schema.lapPositions).where(eq(schema.lapPositions.sessionKey, sessionKey));
@@ -201,12 +211,13 @@ async function ingestSession(
     console.log(`      ${parsedStatus.length} status entries`);
   }
 
-  // Update session with totalLaps + ingestedAt
+  // Update session with totalLaps + ingestedAt, clear liveIngestedAt (archive replaces live)
   await db
     .update(schema.sessions)
     .set({
       totalLaps,
       ingestedAt: new Date().toISOString(),
+      liveIngestedAt: null,
     })
     .where(eq(schema.sessions.key, sessionKey));
 

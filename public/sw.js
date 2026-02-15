@@ -36,6 +36,36 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+// ---------- Push ----------
+self.addEventListener("push", (event) => {
+  const data = event.data?.json() ?? {};
+  const { title, body, icon, badge, tag, url } = data;
+  event.waitUntil(
+    self.registration.showNotification(title || "F1 Tracker", {
+      body: body || "",
+      icon: icon || "/icons/icon-192x192.png",
+      badge: badge || "/icons/icon-72x72.png",
+      tag: tag || undefined,
+      data: { url: url || "/" },
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url || "/";
+  event.waitUntil(
+    self.clients.matchAll({ type: "window" }).then((windowClients) => {
+      for (const client of windowClients) {
+        if (client.url.includes(self.location.origin) && "focus" in client) {
+          return client.focus().then((c) => c.navigate(url));
+        }
+      }
+      return self.clients.openWindow(url);
+    })
+  );
+});
+
 // ---------- Fetch ----------
 self.addEventListener("fetch", (event) => {
   const { request } = event;

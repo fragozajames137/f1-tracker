@@ -1,6 +1,7 @@
 import Link from "next/link";
 import NavLink from "./NavLink";
 import SettingsDropdown from "./SettingsDropdown";
+import NotificationBell from "./NotificationBell";
 import WelcomeModal from "./WelcomeModal";
 import EmailBanner from "./EmailBanner";
 import gridData from "@/app/data/grid-2026.json";
@@ -32,7 +33,8 @@ export default function Header({ season, isHome }: HeaderProps) {
               </p>
             )}
           </div>
-          <div className="flex flex-1 justify-end">
+          <div className="flex flex-1 items-center justify-end gap-1">
+            <NotificationBell />
             <SettingsDropdown teams={grid.teams} />
           </div>
         </div>
@@ -49,6 +51,7 @@ export default function Header({ season, isHome }: HeaderProps) {
             <NavLink href="/predict">Predict</NavLink>
             <NavLink href="/penalties">Penalties</NavLink>
             <NavLink href="/fan-favorites">Fan Favorites</NavLink>
+            <NavLink href="/pit-crews">Pit Crews</NavLink>
             <NavLink href="/history">History</NavLink>
           </nav>
         </div>

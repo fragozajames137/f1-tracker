@@ -5,6 +5,10 @@ import { SignalRClient } from "./signalr-client.js";
 import { StateManager } from "./state-manager.js";
 import { TursoWriter } from "./turso-writer.js";
 import { ingestStaleSessions } from "./post-session-ingest.js";
+import { persistLiveSnapshot } from "./persist-live-snapshot.js";
+import { PushSender } from "./push-sender.js";
+import { NotificationTriggers } from "./notification-triggers.js";
+import type { RaceControlEntry } from "./types.js";
 
 // ---------------------------------------------------------------------------
 // Configuration
@@ -30,6 +34,10 @@ async function main(): Promise<void> {
 
   const writer = new TursoWriter();
   const stateManager = new StateManager();
+  const pushSender = new PushSender();
+  const triggers = new NotificationTriggers();
+  const sentReminders = new Set<string>();
+  const sentPreviews = new Set<number>();
 
   // Ingest any stale sessions from previous weekends before doing anything else
   await ingestStaleSessions();
@@ -67,13 +75,43 @@ async function main(): Promise<void> {
       }
 
       if (wakeup.sleepMs > 0) {
-        const hours = Math.round(wakeup.sleepMs / (1000 * 60 * 60) * 10) / 10;
         log(
           `Next weekend: ${wakeup.session.raceName} ` +
           `at ${wakeup.session.startTime.toUTCString()}`,
         );
-        log(`Sleeping ${hours}h until 1h before weekend...`);
-        await sleep(wakeup.sleepMs);
+
+        // Check if we should wake briefly to send a race week preview (~48h before)
+        const PREVIEW_BEFORE_MS = 48 * 60 * 60 * 1000;
+        const previewTimeMs = wakeup.session.startTime.getTime() - PREVIEW_BEFORE_MS;
+        const wakeTimeMs = wakeup.session.startTime.getTime() - 60 * 60 * 1000;
+        const nowMs = Date.now();
+
+        if (nowMs < previewTimeMs && previewTimeMs < wakeTimeMs) {
+          const previewSleepMs = previewTimeMs - nowMs;
+          const previewHours = Math.round(previewSleepMs / (1000 * 60 * 60) * 10) / 10;
+          log(`Sleeping ${previewHours}h until race week preview...`);
+          await sleep(previewSleepMs);
+
+          if (!shutdownRequested) {
+            try {
+              const preview = triggers.checkRaceWeekPreview(schedule, sentPreviews);
+              if (preview) {
+                await pushSender.sendToAll(preview, { reminders: true });
+                log(`Sent race week preview for ${wakeup.session.raceName}`);
+              }
+            } catch (err) {
+              logError("Race week preview error (non-fatal):", err);
+            }
+          }
+        }
+
+        // Sleep remaining time until 1h before first session
+        const remainingMs = Math.max(0, wakeTimeMs - Date.now());
+        if (remainingMs > 0) {
+          const hours = Math.round(remainingMs / (1000 * 60 * 60) * 10) / 10;
+          log(`Sleeping ${hours}h until 1h before weekend...`);
+          await sleep(remainingMs);
+        }
 
         if (shutdownRequested) break;
         log(`Waking up for ${wakeup.session.raceName} weekend`);
@@ -98,6 +136,16 @@ async function main(): Promise<void> {
         }
 
         if (!session) {
+          // Check for session reminders while waiting
+          try {
+            const reminderPayloads = triggers.checkSessionReminders(schedule, sentReminders);
+            for (const p of reminderPayloads) {
+              await pushSender.sendToAll(p, { reminders: true });
+            }
+          } catch (err) {
+            logError("Session reminder error (non-fatal):", err);
+          }
+
           // No live session right now — wait and check again
           const remainingMs = weekendEndMs - Date.now();
           const remainingHours = Math.round(remainingMs / (1000 * 60 * 60) * 10) / 10;
@@ -113,6 +161,7 @@ async function main(): Promise<void> {
 
         stateManager.reset();
         writer.resetForNewSession();
+        let prevRCMessages: RaceControlEntry[] = [];
 
         const signalR = new SignalRClient((topic, data) => {
           stateManager.handleTopic(topic, data);
@@ -124,6 +173,14 @@ async function main(): Promise<void> {
         const flushTimer = setInterval(async () => {
           try {
             await writer.flush(stateManager, session!.sessionKey);
+
+            // Check for notification-worthy race control events
+            const currentRC = stateManager.getState().raceControlMessages;
+            const rcPayloads = triggers.checkRaceControl(prevRCMessages, currentRC);
+            for (const p of rcPayloads) {
+              await pushSender.sendToAll(p, { liveEvents: true });
+            }
+            prevRCMessages = [...currentRC];
           } catch (err) {
             logError("Flush error:", err);
           }
@@ -151,6 +208,30 @@ async function main(): Promise<void> {
 
         clearInterval(flushTimer);
         signalR.disconnect();
+
+        // Persist the final live snapshot to normalized tables
+        try {
+          await persistLiveSnapshot(session.sessionKey);
+        } catch (err) {
+          logError("Failed to persist live snapshot (non-fatal):", err);
+        }
+
+        // Send post-race results notification if this was a Race or Sprint
+        if (session.type === "Race" || session.type === "Sprint Race") {
+          try {
+            const postRace = triggers.buildPostRaceNotification(
+              stateManager.getState(),
+              session.sessionKey,
+              session.name,
+            );
+            if (postRace) {
+              await pushSender.sendToAll(postRace, { liveEvents: true });
+              log(`Sent post-race results notification`);
+            }
+          } catch (err) {
+            logError("Post-race notification error (non-fatal):", err);
+          }
+        }
 
         log(`Session ${session.sessionKey} processing complete`);
 

@@ -47,6 +47,7 @@ export const sessions = sqliteTable(
     path: text("path").notNull(), // e.g. "2025/2025-03-14_Australian_Grand_Prix/2025-03-16_Race/"
     totalLaps: integer("total_laps"),
     ingestedAt: text("ingested_at"), // ISO datetime — null = not yet ingested
+    liveIngestedAt: text("live_ingested_at"), // ISO datetime — set by live snapshot persistence
   },
   (table) => [
     index("sessions_meeting_key_idx").on(table.meetingKey),
@@ -328,3 +329,8 @@ export const subscribers = sqliteTable("subscribers", {
     .notNull()
     .$defaultFn(() => new Date().toISOString()),
 });
+
+// ---------------------------------------------------------------------------
+// Push subscriptions — re-exported from separate file
+// ---------------------------------------------------------------------------
+export { pushSubscriptions } from "./push-schema";

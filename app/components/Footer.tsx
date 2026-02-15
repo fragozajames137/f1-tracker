@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
         <a href="#" className="hover:text-white/50 transition-colors">X</a>
         <span className="text-white/10">&middot;</span>
-        <a href="#" className="hover:text-white/50 transition-colors">Contact</a>
+        <a href="mailto:hello@poletopaddock.com" className="hover:text-white/50 transition-colors">Contact</a>
         <span className="text-white/10">&middot;</span>
         <Link href="/about" className="hover:text-white/50 transition-colors">About</Link>
       </div>

@@ -134,6 +134,7 @@ export default function RaceHub({ year, round, race, sessions, initialState }: R
             <PostRaceTab
               sessions={ingestedSessions}
               raceSessionKey={raceSession?.sessionKey ?? null}
+              qualiSessionKey={qualiSession?.sessionKey ?? null}
               year={year}
               round={round}
               race={race}
