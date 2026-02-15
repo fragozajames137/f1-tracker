@@ -59,7 +59,7 @@ export default function DriverProfileTabs({
       <div
         role="tablist"
         aria-label="Driver profile sections"
-        className="mt-6 flex gap-1 border-b border-white/10"
+        className="mt-6 flex gap-1 overflow-x-auto border-b border-white/10 scrollbar-none"
       >
         {visibleTabs.map((tab) => (
           <button
@@ -67,7 +67,7 @@ export default function DriverProfileTabs({
             role="tab"
             aria-selected={activeTab === tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`cursor-pointer px-4 py-2 text-sm font-medium transition-colors ${
+            className={`shrink-0 cursor-pointer px-4 py-2.5 text-sm font-medium transition-colors ${
               activeTab === tab.key
                 ? "border-b-2 text-white"
                 : "text-white/40 hover:text-white/70"

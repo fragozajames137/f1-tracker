@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePreferencesStore } from "@/app/stores/preferences";
 
 interface SessionTimeProps {
   label: string;
@@ -10,6 +11,7 @@ interface SessionTimeProps {
 }
 
 export default function SessionTime({ label, date, time, circuitTimezone }: SessionTimeProps) {
+  const timeFormat = usePreferencesStore((s) => s.timeFormat);
   const [times, setTimes] = useState<{ circuit: string | null; local: string | null }>({
     circuit: null,
     local: null,
@@ -17,6 +19,7 @@ export default function SessionTime({ label, date, time, circuitTimezone }: Sess
 
   useEffect(() => {
     const utc = new Date(`${date}T${time}`);
+    const hour12 = timeFormat === "12h";
 
     const localFormatted = new Intl.DateTimeFormat(undefined, {
       weekday: "short",
@@ -24,6 +27,7 @@ export default function SessionTime({ label, date, time, circuitTimezone }: Sess
       day: "numeric",
       hour: "numeric",
       minute: "2-digit",
+      hour12,
       timeZoneName: "short",
     }).format(utc);
 
@@ -35,6 +39,7 @@ export default function SessionTime({ label, date, time, circuitTimezone }: Sess
         day: "numeric",
         hour: "numeric",
         minute: "2-digit",
+        hour12,
         timeZoneName: "short",
         timeZone: circuitTimezone,
       }).format(utc);
@@ -46,7 +51,7 @@ export default function SessionTime({ label, date, time, circuitTimezone }: Sess
     }
 
     setTimes({ circuit: circuitFormatted, local: localFormatted });
-  }, [date, time, circuitTimezone]);
+  }, [date, time, circuitTimezone, timeFormat]);
 
   return (
     <div className="flex items-start justify-between gap-2 py-1.5 text-sm">

@@ -3,7 +3,12 @@
 import { memo } from "react";
 import { DriverWithDetails } from "@/app/types/openf1";
 import { formatLapTime, formatGap } from "@/app/lib/format";
+import { usePreferencesStore } from "@/app/stores/preferences";
 import TireIcon from "./TireIcon";
+
+function nameToSlug(name: string): string {
+  return name.toLowerCase().replace(/\s+/g, "-");
+}
 
 interface PositionTableProps {
   drivers: DriverWithDetails[];
@@ -16,6 +21,8 @@ export default memo(function PositionTable({
   selectedDriverNumber,
   onSelectDriver,
 }: PositionTableProps) {
+  const favoriteDriverIds = usePreferencesStore((s) => s.favoriteDriverIds);
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
@@ -35,13 +42,14 @@ export default memo(function PositionTable({
             const isSelected =
               selectedDriverNumber === d.driver.driver_number;
             const compound = d.currentStint?.compound ?? "";
+            const isFav = favoriteDriverIds.includes(nameToSlug(d.driver.full_name));
 
             return (
               <tr
                 key={d.driver.driver_number}
                 onClick={() => onSelectDriver(d.driver.driver_number)}
                 className={`cursor-pointer border-b border-white/5 transition-colors hover:bg-white/5 ${
-                  isSelected ? "bg-white/10" : ""
+                  isSelected ? "bg-white/10" : isFav ? "bg-white/[0.04]" : ""
                 }`}
               >
                 <td className="px-2 py-3 font-mono font-bold text-white/80 sm:px-3 sm:py-2">

@@ -26,7 +26,7 @@ export default function CareerTab({ historicalDriver: d, teamColor }: CareerTabP
         <p className="mb-4 text-sm text-white/50">
           {d.nationality} &middot; Seasons: {d.seasons}
         </p>
-        <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <StatBox label="Championships" value={d.championships} />
           <StatBox label="Wins" value={d.wins} />
           <StatBox label="Poles" value={d.poles} />

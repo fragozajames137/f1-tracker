@@ -7,7 +7,12 @@ import type {
   RaceWithResults,
 } from "@/app/types/history";
 import dominantEngines from "@/app/data/dominant-engines.json";
+import { usePreferencesStore } from "@/app/stores/preferences";
 import { NationalityFlag, DriverImg, TeamLogo } from "./shared";
+
+function nameToSlug(given: string, family: string): string {
+  return `${given}-${family}`.toLowerCase().replace(/\s+/g, "-");
+}
 
 // ---------------------------------------------------------------------------
 // Position change computation
@@ -109,6 +114,7 @@ export default function StandingsView({
   races = [],
 }: StandingsViewProps) {
   const engine = dominantEngines[String(season) as keyof typeof dominantEngines] ?? null;
+  const favoriteDriverIds = usePreferencesStore((s) => s.favoriteDriverIds);
 
   const driverChanges = useMemo(
     () => computeDriverPositionChanges(races, driverStandings),
@@ -142,7 +148,7 @@ export default function StandingsView({
           </span>
         </div>
       )}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2">
       {/* Driver Standings */}
       <div className="rounded-lg border border-white/10 bg-white/5 p-4">
         <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-white/40">
@@ -163,10 +169,12 @@ export default function StandingsView({
                 </tr>
               </thead>
               <tbody>
-                {driverStandings.map((s) => (
+                {driverStandings.map((s) => {
+                  const isFav = favoriteDriverIds.includes(nameToSlug(s.Driver.givenName, s.Driver.familyName));
+                  return (
                   <tr
                     key={s.Driver.driverId}
-                    className="border-b border-white/5 text-white/70"
+                    className={`border-b border-white/5 text-white/70 ${isFav ? "bg-white/[0.04]" : ""}`}
                   >
                     <td className="py-2 pr-3 font-mono text-xs text-white/40">
                       <span className="flex items-center gap-1.5">
@@ -218,7 +226,8 @@ export default function StandingsView({
                       {s.points}
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

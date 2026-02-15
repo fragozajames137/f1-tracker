@@ -25,7 +25,6 @@ function kphToMph(kph: number): number {
 export default function WeatherBar({ weather }: WeatherBarProps) {
   const tempUnit = usePreferencesStore((s) => s.tempUnit);
   const speedUnit = usePreferencesStore((s) => s.speedUnit);
-  const toggleUnits = usePreferencesStore((s) => s.toggleUnits);
 
   if (!weather) {
     return (
@@ -89,24 +88,6 @@ export default function WeatherBar({ weather }: WeatherBarProps) {
           </span>
         </div>
       )}
-      <div className="col-span-2 flex overflow-hidden rounded-lg border border-white/10 sm:col-span-1 sm:ml-auto">
-        <button
-          onClick={() => { if (isMetric) toggleUnits(); }}
-          className={`cursor-pointer px-3 py-1.5 text-xs font-medium transition-colors ${
-            !isMetric ? "bg-white/10 text-white" : "text-white/40 hover:text-white/70"
-          }`}
-        >
-          Standard
-        </button>
-        <button
-          onClick={() => { if (!isMetric) toggleUnits(); }}
-          className={`cursor-pointer px-3 py-1.5 text-xs font-medium transition-colors ${
-            isMetric ? "bg-white/10 text-white" : "text-white/40 hover:text-white/70"
-          }`}
-        >
-          Metric
-        </button>
-      </div>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Race } from "@/app/types";
 import { countryToIso } from "@/app/lib/flags";
 import { CIRCUIT_TIMEZONES } from "@/app/lib/circuit-timezones";
+import { generateICS, downloadICS } from "@/app/lib/ics";
 import Flag from "./Flag";
 import SessionTime from "./SessionTime";
 
@@ -128,6 +129,32 @@ export default function RaceCard({ race, isNext, enrichment }: RaceCardProps) {
               circuitTimezone={circuitTz}
             />
           ))}
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              const ics = generateICS([race]);
+              const slug = race.raceName.toLowerCase().replace(/\s+/g, "-");
+              downloadICS(ics, `f1-${race.season}-${slug}.ics`);
+            }}
+            className="mt-2 inline-flex items-center gap-1.5 rounded border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-white/50 transition-colors hover:bg-white/[0.08] hover:text-white"
+          >
+            <svg
+              aria-hidden="true"
+              className="h-3.5 w-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            Add to Calendar
+          </button>
 
           {enrichment && (enrichment.circuitRaces || enrichment.contractEnd || enrichment.hostNationRaces) && (
             <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 border-t border-white/5 pt-2 text-[11px] text-white/40">

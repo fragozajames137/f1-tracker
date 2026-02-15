@@ -60,7 +60,7 @@ export default function AddDriverModal({ onClose }: AddDriverModalProps) {
     <dialog
       ref={dialogRef}
       onClose={onClose}
-      className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md rounded-xl border border-white/10 bg-[#1a1a1a] p-6 text-white backdrop:bg-black/60"
+      className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-md rounded-xl border border-white/10 bg-[#1a1a1a] p-6 text-white backdrop:bg-black/60"
     >
       <h2 className="mb-4 text-lg font-bold">Add Custom Driver</h2>
 

@@ -317,3 +317,14 @@ export const sessionStatus = sqliteTable(
   },
   (table) => [index("session_status_session_idx").on(table.sessionKey)],
 );
+
+// ---------------------------------------------------------------------------
+// subscribers — email collection for newsletter / future accounts
+// ---------------------------------------------------------------------------
+export const subscribers = sqliteTable("subscribers", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  email: text("email").notNull().unique(),
+  createdAt: text("created_at")
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+});

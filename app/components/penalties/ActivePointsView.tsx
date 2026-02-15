@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import type { DriverPenaltySummary, Incident } from "@/app/types/penalties";
 import { BAN_THRESHOLD, formatPenaltySummary, isPointActive, getExpiryDate } from "@/app/lib/penalties";
 import { nationalityToFlag } from "@/app/lib/flags";
+import { usePreferencesStore } from "@/app/stores/preferences";
 
 type SortKey = "driver" | "team" | "activePoints" | "totalIncidents" | "nextExpiry";
 type SortDir = "asc" | "desc";
@@ -104,6 +105,7 @@ export default function ActivePointsView({
   const [sortKey, setSortKey] = useState<SortKey>("activePoints");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [expandedDriver, setExpandedDriver] = useState<string | null>(null);
+  const favoriteDriverIds = usePreferencesStore((s) => s.favoriteDriverIds);
 
   const driversNearBan = useMemo(
     () => summaries.filter((s) => s.activePoints >= 8),
@@ -146,12 +148,12 @@ export default function ActivePointsView({
     }
   };
 
-  const cols: { key: SortKey; label: string; className?: string }[] = [
+  const cols: { key: SortKey; label: string; className?: string; hideClass?: string }[] = [
     { key: "driver", label: "Driver" },
-    { key: "team", label: "Team" },
-    { key: "activePoints", label: "Active Points" },
+    { key: "team", label: "Team", hideClass: "hidden sm:table-cell" },
+    { key: "activePoints", label: "Points" },
     { key: "totalIncidents", label: "Incidents", className: "text-center" },
-    { key: "nextExpiry", label: "Next Expiry" },
+    { key: "nextExpiry", label: "Next Expiry", hideClass: "hidden md:table-cell" },
   ];
 
   return (
@@ -164,12 +166,12 @@ export default function ActivePointsView({
           </h3>
           <div className="space-y-1.5">
             {driversNearBan.map((d) => (
-              <div key={d.driverId} className="flex items-center gap-2 text-sm">
+              <div key={d.driverId} className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
                 <span className="font-medium text-white">{d.driverName}</span>
                 <span className="font-mono text-red-400">
                   {d.activePoints}/{BAN_THRESHOLD}
                 </span>
-                <span className="text-white/30">
+                <span className="hidden text-white/30 sm:inline">
                   — {BAN_THRESHOLD - d.activePoints} point{BAN_THRESHOLD - d.activePoints !== 1 ? "s" : ""} from ban
                 </span>
                 <StatusBadge status={d.status} />
@@ -187,7 +189,7 @@ export default function ActivePointsView({
               {cols.map((col) => (
                 <th
                   key={col.key}
-                  className={`cursor-pointer select-none whitespace-nowrap px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-white/50 hover:text-white/70 ${col.className ?? ""}`}
+                  className={`cursor-pointer select-none whitespace-nowrap px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-white/50 hover:text-white/70 ${col.className ?? ""} ${col.hideClass ?? ""}`}
                   onClick={() => handleSort(col.key)}
                 >
                   {col.label}
@@ -203,6 +205,7 @@ export default function ActivePointsView({
             {sorted.map((d) => {
               const flag = nationalityToFlag(d.nationality);
               const isExpanded = expandedDriver === d.driverId;
+              const isFav = favoriteDriverIds.includes(d.driverId);
               return (
                 <tr
                   key={d.driverId}
@@ -210,7 +213,7 @@ export default function ActivePointsView({
                     d.activeIncidents.length > 0
                       ? "cursor-pointer hover:bg-white/[0.03]"
                       : ""
-                  } ${isExpanded ? "bg-white/[0.02]" : ""}`}
+                  } ${isExpanded ? "bg-white/[0.02]" : ""} ${isFav ? "bg-white/[0.04]" : ""}`}
                   onClick={() =>
                     d.activeIncidents.length > 0 &&
                     setExpandedDriver(isExpanded ? null : d.driverId)
@@ -233,7 +236,7 @@ export default function ActivePointsView({
                       </div>
                     )}
                   </td>
-                  <td className="px-3 py-3">
+                  <td className="hidden px-3 py-3 sm:table-cell">
                     <div className="flex items-center gap-2">
                       <div
                         className="h-3 w-3 rounded-full shrink-0"
@@ -242,13 +245,13 @@ export default function ActivePointsView({
                       <span className="text-white/60">{d.teamName}</span>
                     </div>
                   </td>
-                  <td className="px-3 py-3 min-w-[140px]">
+                  <td className="px-3 py-3">
                     <ProgressBar points={d.activePoints} color={d.teamColor} />
                   </td>
                   <td className="px-3 py-3 text-center text-white/50">
                     {d.totalIncidents}
                   </td>
-                  <td className="px-3 py-3 text-xs">
+                  <td className="hidden px-3 py-3 text-xs md:table-cell">
                     {d.nextExpiry ? (
                       <span className="text-white/40">
                         {new Date(d.nextExpiry.date + "T00:00:00").toLocaleDateString("en-GB", {

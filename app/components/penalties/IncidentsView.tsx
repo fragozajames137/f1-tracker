@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import type { Incident, IncidentType } from "@/app/types/penalties";
 import type { DriverPenaltySummary } from "@/app/types/penalties";
 import { INCIDENT_TYPE_LABELS, formatPenaltySummary, isPointActive } from "@/app/lib/penalties";
+import { usePreferencesStore } from "@/app/stores/preferences";
 
 type SortKey = "date" | "driver" | "team" | "race" | "incidentType" | "penaltyPoints";
 type SortDir = "asc" | "desc";
@@ -29,6 +30,7 @@ export default function IncidentsView({
   const [filterType, setFilterType] = useState<IncidentType | "all">("all");
   const [sortKey, setSortKey] = useState<SortKey>("date");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const favoriteDriverIds = usePreferencesStore((s) => s.favoriteDriverIds);
 
   // Unique values for dropdowns
   const drivers = useMemo(
@@ -122,18 +124,18 @@ export default function IncidentsView({
   return (
     <div className="space-y-4">
       {/* Search + Filters */}
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-3">
         <input
           type="text"
-          placeholder="Search driver, race, description..."
+          placeholder="Search..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white placeholder-white/30 outline-none focus:border-white/20 w-full sm:w-64"
+          className="col-span-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/30 outline-none focus:border-white/20 sm:w-64"
         />
         <select
           value={filterDriver}
           onChange={(e) => setFilterDriver(e.target.value)}
-          className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white outline-none"
+          className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none"
         >
           <option value="all">All Drivers</option>
           {drivers.map((d) => (
@@ -145,7 +147,7 @@ export default function IncidentsView({
         <select
           value={filterTeam}
           onChange={(e) => setFilterTeam(e.target.value)}
-          className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white outline-none"
+          className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none"
         >
           <option value="all">All Teams</option>
           {teams.map((t) => (
@@ -157,7 +159,7 @@ export default function IncidentsView({
         <select
           value={filterType}
           onChange={(e) => setFilterType(e.target.value as IncidentType | "all")}
-          className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white outline-none"
+          className="col-span-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none sm:col-span-1"
         >
           <option value="all">All Types</option>
           {incidentTypes.map((t) => (
@@ -184,22 +186,22 @@ export default function IncidentsView({
                 [
                   { key: "date", label: "Date" },
                   { key: "driver", label: "Driver" },
-                  { key: "team", label: "Team" },
-                  { key: "race", label: "Race" },
+                  { key: "team", label: "Team", hideClass: "hidden sm:table-cell" },
+                  { key: "race", label: "Race", hideClass: "hidden md:table-cell" },
                   { key: "incidentType", label: "Type" },
                   { key: "penaltyPoints", label: "Pts", className: "text-center" },
-                ] as { key: SortKey; label: string; className?: string }[]
+                ] as { key: SortKey; label: string; className?: string; hideClass?: string }[]
               ).map((col) => (
                 <th
                   key={col.key}
-                  className={`cursor-pointer select-none whitespace-nowrap px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-white/50 hover:text-white/70 ${col.className ?? ""}`}
+                  className={`cursor-pointer select-none whitespace-nowrap px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-white/50 hover:text-white/70 ${col.className ?? ""} ${col.hideClass ?? ""}`}
                   onClick={() => handleSort(col.key)}
                 >
                   {col.label}
                   <SortIcon active={sortKey === col.key} dir={sortDir} />
                 </th>
               ))}
-              <th className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-white/50">
+              <th className="hidden px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-white/50 md:table-cell">
                 Penalty
               </th>
             </tr>
@@ -211,10 +213,11 @@ export default function IncidentsView({
               const driverName =
                 summaries.find((s) => s.driverId === inc.driverId)?.driverName ?? inc.driverId;
 
+              const isFav = favoriteDriverIds.includes(inc.driverId);
               return (
                 <tr
                   key={inc.id}
-                  className={`${!active ? "opacity-40" : ""}`}
+                  className={`${!active ? "opacity-40" : ""} ${isFav && active ? "bg-white/[0.04]" : ""}`}
                   style={{ borderLeftWidth: 2, borderLeftColor: teamColor }}
                 >
                   <td className="whitespace-nowrap px-3 py-2.5 text-white/50 text-xs">
@@ -227,7 +230,7 @@ export default function IncidentsView({
                   <td className="px-3 py-2.5 font-medium text-white">
                     {driverName}
                   </td>
-                  <td className="px-3 py-2.5">
+                  <td className="hidden px-3 py-2.5 sm:table-cell">
                     <div className="flex items-center gap-1.5">
                       <div
                         className="h-2.5 w-2.5 rounded-full shrink-0"
@@ -238,7 +241,7 @@ export default function IncidentsView({
                       </span>
                     </div>
                   </td>
-                  <td className="px-3 py-2.5 text-white/60 text-xs">
+                  <td className="hidden px-3 py-2.5 text-white/60 text-xs md:table-cell">
                     R{inc.round} {inc.raceName}
                   </td>
                   <td className="px-3 py-2.5 text-white/50 text-xs">
@@ -253,7 +256,7 @@ export default function IncidentsView({
                       <span className="text-white/20">—</span>
                     )}
                   </td>
-                  <td className="px-3 py-2.5 text-xs text-white/40 max-w-[200px] truncate">
+                  <td className="hidden px-3 py-2.5 text-xs text-white/40 max-w-[200px] truncate md:table-cell">
                     {formatPenaltySummary(inc.decision)}
                   </td>
                 </tr>

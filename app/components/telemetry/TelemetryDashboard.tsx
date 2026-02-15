@@ -14,12 +14,29 @@ interface TelemetryDashboardProps {
   initialSession: TelemetrySession | null;
 }
 
-function getTop3Drivers(session: TelemetrySession): number[] {
-  return session.drivers
+function nameToSlug(name: string): string {
+  return name.toLowerCase().replace(/\s+/g, "-");
+}
+
+function getTop3Drivers(session: TelemetrySession, favoriteIds?: string[]): number[] {
+  const sorted = session.drivers
     .filter((d) => d.position !== null)
-    .sort((a, b) => (a.position ?? 99) - (b.position ?? 99))
-    .slice(0, 3)
-    .map((d) => d.number);
+    .sort((a, b) => (a.position ?? 99) - (b.position ?? 99));
+
+  // Start with favorites that are in this session
+  const result: number[] = [];
+  if (favoriteIds) {
+    for (const favId of favoriteIds) {
+      const match = sorted.find((d) => nameToSlug(d.fullName) === favId);
+      if (match && !result.includes(match.number)) result.push(match.number);
+    }
+  }
+  // Fill remaining with top drivers
+  for (const d of sorted) {
+    if (result.length >= 3) break;
+    if (!result.includes(d.number)) result.push(d.number);
+  }
+  return result;
 }
 
 function formatSlug(slug: string): string {
@@ -30,6 +47,7 @@ export default function TelemetryDashboard({
   files,
   initialSession,
 }: TelemetryDashboardProps) {
+  const favoriteDriverIds = usePreferencesStore((s) => s.favoriteDriverIds);
   const [session, setSession] = useState<TelemetrySession | null>(initialSession);
   const [selectedFile, setSelectedFile] = useState<string>(
     files[0]?.filename ?? "",
@@ -40,10 +58,9 @@ export default function TelemetryDashboard({
   const [loadingSession, setLoadingSession] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [selectedDriverNumbers, setSelectedDriverNumbers] = useState<number[]>(
-    () => (initialSession ? getTop3Drivers(initialSession) : []),
+    () => (initialSession ? getTop3Drivers(initialSession, favoriteDriverIds) : []),
   );
   const speedUnit = usePreferencesStore((s) => s.speedUnit);
-  const setSpeedUnit = usePreferencesStore((s) => s.setSpeedUnit);
 
   const years = useMemo(
     () => [...new Set(files.map((f) => f.year))].sort((a, b) => b - a),
@@ -67,7 +84,7 @@ export default function TelemetryDashboard({
     const cached = cacheRef.current.get(filename);
     if (cached) {
       setSession(cached);
-      setSelectedDriverNumbers(getTop3Drivers(cached));
+      setSelectedDriverNumbers(getTop3Drivers(cached, favoriteDriverIds));
       return;
     }
 
@@ -86,7 +103,7 @@ export default function TelemetryDashboard({
       const data: TelemetrySession = await res.json();
       cacheRef.current.set(filename, data);
       setSession(data);
-      setSelectedDriverNumbers(getTop3Drivers(data));
+      setSelectedDriverNumbers(getTop3Drivers(data, favoriteDriverIds));
     } catch {
       setFetchError("Network error. Please check your connection and try again.");
     } finally {
@@ -149,30 +166,6 @@ export default function TelemetryDashboard({
             </option>
           ))}
         </select>
-
-        {/* Speed unit toggle */}
-        <div className="flex rounded-lg border border-white/10 overflow-hidden">
-          <button
-            onClick={() => setSpeedUnit("kph")}
-            className={`cursor-pointer px-3 py-1.5 text-xs font-medium transition-colors ${
-              speedUnit === "kph"
-                ? "bg-white/10 text-white"
-                : "text-white/40 hover:text-white/70"
-            }`}
-          >
-            KPH
-          </button>
-          <button
-            onClick={() => setSpeedUnit("mph")}
-            className={`cursor-pointer px-3 py-1.5 text-xs font-medium transition-colors ${
-              speedUnit === "mph"
-                ? "bg-white/10 text-white"
-                : "text-white/40 hover:text-white/70"
-            }`}
-          >
-            MPH
-          </button>
-        </div>
 
         {loadingSession && (
           <span className="text-sm text-white/40">Loading...</span>

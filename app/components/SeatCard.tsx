@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Driver } from "@/app/types";
+import { usePreferencesStore } from "@/app/stores/preferences";
 import { nationalityToIso } from "@/app/lib/flags";
 import Flag from "./Flag";
 import { getInitials } from "@/app/lib/drivers";
@@ -21,12 +22,16 @@ export default function SeatCard({ driver, teamColor, seatLabel }: SeatCardProps
   const [imgError, setImgError] = useState(false);
   const slug = extractSlug(driver.headshotUrl, "drivers");
   const blur = slug ? getBlurPlaceholder(`drivers/${slug}`) : undefined;
+  const favoriteDriverIds = usePreferencesStore((s) => s.favoriteDriverIds);
+  const isFavorite = favoriteDriverIds.includes(driver.id);
 
   return (
     <Link
       href={`/driver/${driver.id}`}
       aria-label={driver.name}
-      className="group relative w-full rounded-xl border border-white/10 border-l-[3px] bg-white/5 p-4 text-left transition-all hover:bg-white/10 hover:border-white/20 block"
+      className={`group relative w-full rounded-xl border border-l-[3px] bg-white/5 p-4 text-left transition-all hover:bg-white/10 hover:border-white/20 block ${
+        isFavorite ? "border-white/20 ring-1 ring-white/10" : "border-white/10"
+      }`}
       style={{ borderLeftColor: teamColor }}
     >
       <div className="flex items-center gap-3">
@@ -78,10 +83,17 @@ export default function SeatCard({ driver, teamColor, seatLabel }: SeatCardProps
         </div>
       </div>
 
-      <div className="absolute top-3 right-3 text-white/20 transition-colors group-hover:text-white/50">
-        <svg aria-hidden="true" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-        </svg>
+      <div className="absolute top-3 right-3 flex items-center gap-1">
+        {isFavorite && (
+          <svg aria-hidden="true" className="h-4 w-4 text-yellow-400/70" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          </svg>
+        )}
+        <span className="text-white/20 transition-colors group-hover:text-white/50">
+          <svg aria-hidden="true" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </span>
       </div>
     </Link>
   );

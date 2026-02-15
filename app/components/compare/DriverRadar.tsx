@@ -30,7 +30,7 @@ export default function DriverRadar({
       <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-white/40">
         Driver Profile
       </h3>
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height={250} className="sm:!h-[300px]">
         <RadarChart data={data} cx="50%" cy="50%" outerRadius="70%">
           <PolarGrid stroke="#333" />
           <PolarAngleAxis

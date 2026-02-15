@@ -15,7 +15,7 @@ export default function RumorCard({ rumor, driverName, teamColor }: RumorCardPro
       className="block rounded-lg border border-white/10 bg-white/5 p-4 transition-colors hover:bg-white/10 hover:border-white/20"
     >
       <p className="text-sm text-white/80 leading-relaxed">{rumor.text}</p>
-      <div className="mt-2 flex items-center justify-between">
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-y-1">
         <div className="flex items-center gap-2">
           <span
             className="inline-block h-2 w-2 rounded-full"

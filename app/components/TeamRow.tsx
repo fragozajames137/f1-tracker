@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Team } from "@/app/types";
@@ -7,15 +9,16 @@ import { getBlurPlaceholder } from "@/app/lib/blur-placeholders";
 
 interface TeamRowProps {
   team: Team;
+  isFavorite?: boolean;
 }
 
-export default function TeamRow({ team }: TeamRowProps) {
+export default function TeamRow({ team, isFavorite }: TeamRowProps) {
   const slug = extractSlug(team.logoUrl, "logos");
   const blur = slug ? getBlurPlaceholder(`logos/${slug}`) : undefined;
   const accentColor = team.id === "cadillac" ? "#FFFFFF" : team.color;
 
   return (
-    <div className="group">
+    <div className={`group${isFavorite ? " rounded-xl border border-white/10 bg-white/[0.03] p-4" : ""}`}>
       <div className="mb-3 flex items-center gap-3">
         <div
           className="flex h-8 w-8 items-center justify-center rounded-md"

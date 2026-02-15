@@ -1,6 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePreferencesStore } from "@/app/stores/preferences";
+
+function nameToSlug(name: string): string {
+  return name.toLowerCase().replace(/\s+/g, "-");
+}
 
 interface DriverResult {
   driverNumber: number;
@@ -62,6 +67,7 @@ export default function ResultsTable({ sessionKey }: ResultsTableProps) {
     return <p className="py-8 text-center text-sm text-red-400">{error ?? "No data"}</p>;
   }
 
+  const favoriteDriverIds = usePreferencesStore((s) => s.favoriteDriverIds);
   const drivers = data.drivers;
 
   if (drivers.length === 0) {
@@ -104,11 +110,13 @@ export default function ResultsTable({ sessionKey }: ResultsTableProps) {
                 d.bestLapTimeSeconds !== null &&
                 d.bestLapTimeSeconds > 0 &&
                 d.bestLapTimeSeconds === fastestLapSeconds;
+              const driverFullName = d.fullName ?? `${d.firstName ?? ""} ${d.lastName ?? ""}`.trim();
+              const isFav = driverFullName ? favoriteDriverIds.includes(nameToSlug(driverFullName)) : false;
 
               return (
                 <tr
                   key={d.driverNumber}
-                  className="border-b border-white/5 text-white/70"
+                  className={`border-b border-white/5 text-white/70 ${isFav ? "bg-white/[0.04]" : ""}`}
                 >
                   <td className="py-2 pr-3 font-mono text-xs text-white/40">
                     {d.finalPosition ?? "—"}

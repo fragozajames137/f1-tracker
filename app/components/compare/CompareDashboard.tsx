@@ -3,6 +3,7 @@
 import { useState, useMemo, useRef } from "react";
 import type { TelemetrySession, TelemetryFileInfo } from "@/app/types/telemetry";
 import { computeComparison } from "@/app/lib/compare";
+import { usePreferencesStore } from "@/app/stores/preferences";
 import StatBars from "./StatBars";
 import DrivingDNA from "./DrivingDNA";
 import LapTimeOverlay from "./LapTimeOverlay";
@@ -12,15 +13,37 @@ import SectorDelta from "./SectorDelta";
 import DriverRadar from "./DriverRadar";
 import StrategyComparison from "./StrategyComparison";
 
+function nameToSlug(name: string): string {
+  return name.toLowerCase().replace(/\s+/g, "-");
+}
+
 interface CompareDashboardProps {
   files: TelemetryFileInfo[];
   initialSession: TelemetrySession | null;
 }
 
-function getDefaultDrivers(session: TelemetrySession): [number, number] {
+function getDefaultDrivers(
+  session: TelemetrySession,
+  favoriteIds?: string[],
+): [number, number] {
   const sorted = session.drivers
     .filter((d) => d.position !== null)
     .sort((a, b) => (a.position ?? 99) - (b.position ?? 99));
+
+  // Try to match favorites to session drivers
+  if (favoriteIds && favoriteIds.length > 0) {
+    const favNumbers: number[] = [];
+    for (const favId of favoriteIds) {
+      const match = sorted.find((d) => nameToSlug(d.fullName) === favId);
+      if (match) favNumbers.push(match.number);
+    }
+    if (favNumbers.length >= 2) return [favNumbers[0], favNumbers[1]];
+    if (favNumbers.length === 1) {
+      const otherDriver = sorted.find((d) => d.number !== favNumbers[0]);
+      return [favNumbers[0], otherDriver?.number ?? sorted[1]?.number ?? 0];
+    }
+  }
+
   return [sorted[0]?.number ?? 0, sorted[1]?.number ?? 0];
 }
 
@@ -32,6 +55,7 @@ export default function CompareDashboard({
   files,
   initialSession,
 }: CompareDashboardProps) {
+  const favoriteDriverIds = usePreferencesStore((s) => s.favoriteDriverIds);
   const [session, setSession] = useState<TelemetrySession | null>(
     initialSession,
   );
@@ -44,10 +68,10 @@ export default function CompareDashboard({
   const [loadingSession, setLoadingSession] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [driverA, setDriverA] = useState<number>(() =>
-    initialSession ? getDefaultDrivers(initialSession)[0] : 0,
+    initialSession ? getDefaultDrivers(initialSession, favoriteDriverIds)[0] : 0,
   );
   const [driverB, setDriverB] = useState<number>(() =>
-    initialSession ? getDefaultDrivers(initialSession)[1] : 0,
+    initialSession ? getDefaultDrivers(initialSession, favoriteDriverIds)[1] : 0,
   );
 
   const cacheRef = useRef(new Map<string, TelemetrySession>());
@@ -75,7 +99,7 @@ export default function CompareDashboard({
     const cached = cacheRef.current.get(filename);
     if (cached) {
       setSession(cached);
-      const [a, b] = getDefaultDrivers(cached);
+      const [a, b] = getDefaultDrivers(cached, favoriteDriverIds);
       setDriverA(a);
       setDriverB(b);
       return;
@@ -98,7 +122,7 @@ export default function CompareDashboard({
       const data: TelemetrySession = await res.json();
       cacheRef.current.set(filename, data);
       setSession(data);
-      const [a, b] = getDefaultDrivers(data);
+      const [a, b] = getDefaultDrivers(data, favoriteDriverIds);
       setDriverA(a);
       setDriverB(b);
     } catch {

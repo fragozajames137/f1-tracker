@@ -116,15 +116,15 @@ export default function GridPredictor({ data }: GridPredictorProps) {
       </div>
 
       {selectedDriverId && (
-        <div className="mb-4 flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2">
+        <div className="mb-4 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg border border-white/10 bg-white/5 px-4 py-2">
           <span className="text-sm text-white/50">Selected:</span>
           <span className="text-sm font-medium text-white">{drivers[selectedDriverId]?.name}</span>
-          <span className="text-sm text-white/30">— click a seat to place, or click driver again to deselect</span>
+          <span className="hidden text-sm text-white/30 sm:inline">— click a seat to place, or click driver again to deselect</span>
         </div>
       )}
 
       <div ref={gridRef}>
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           {data.teams.map((team) => (
             <TeamSlot
               key={team.id}

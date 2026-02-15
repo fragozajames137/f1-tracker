@@ -1,6 +1,7 @@
 "use client";
 
 import { Race } from "@/app/types";
+import { generateICS, downloadICS } from "@/app/lib/ics";
 import RaceCard from "./RaceCard";
 import type { RaceEnrichment } from "./RaceCard";
 
@@ -39,8 +40,35 @@ export default function RaceSchedule({ races, enrichments }: RaceScheduleProps) 
 
   let raceCounter = 0;
 
+  const handleExportAll = () => {
+    const season = races[0]?.season ?? "2026";
+    const ics = generateICS(races);
+    downloadICS(ics, `f1-${season}-calendar.ics`);
+  };
+
   return (
     <div className="space-y-8">
+      <button
+        onClick={handleExportAll}
+        className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-2 text-sm font-medium text-white/70 transition-colors hover:bg-white/[0.08] hover:text-white"
+      >
+        <svg
+          aria-hidden="true"
+          className="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+          />
+        </svg>
+        Add All Races to Calendar
+      </button>
+
       {Array.from(grouped.entries()).map(([month, monthRaces]) => (
         <section key={month}>
           <h2 className="font-display mb-3 text-lg font-bold text-white/70">{month}</h2>

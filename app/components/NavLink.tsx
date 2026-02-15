@@ -16,7 +16,7 @@ export default function NavLink({ href, children }: NavLinkProps) {
     <Link
       href={href}
       aria-current={isActive ? "page" : undefined}
-      className={`block px-3 py-2.5 text-center text-sm font-medium transition-colors ${
+      className={`block shrink-0 px-3 py-2.5 text-center text-xs font-medium transition-colors sm:text-sm ${
         isActive
           ? "border-b-2 border-red-500 text-white"
           : "border-b-2 border-transparent text-white/50 hover:text-white hover:border-white/20"

@@ -61,7 +61,7 @@ export default function DriverHeader({ driver, team }: DriverHeaderProps) {
           )}
           <span className="text-sm font-medium text-white/60">{team.name}</span>
         </Link>
-        <h1 className="font-display text-2xl font-bold text-white mt-1">{driver.name}</h1>
+        <h1 className="font-display text-xl font-bold text-white mt-1 sm:text-2xl">{driver.name}</h1>
         <div className="mt-2 flex items-center gap-3 flex-wrap">
           {driver.number && (
             <span className="text-xl font-mono font-bold" style={{ color: accentColor }}>

@@ -31,12 +31,12 @@ export default function ContractGrid({ data }: ContractGridProps) {
   return (
     <div>
       {/* Filters */}
-      <div className="mb-4 flex gap-2">
+      <div className="mb-4 flex flex-wrap gap-2">
         {FILTERS.map((f) => (
           <button
             key={f.key}
             onClick={() => setFilter(f.key)}
-            className={`cursor-pointer rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+            className={`cursor-pointer rounded-full px-4 py-2 text-xs font-medium transition-colors ${
               filter === f.key
                 ? "bg-white/20 text-white"
                 : "border border-white/10 text-white/40 hover:text-white/70"
