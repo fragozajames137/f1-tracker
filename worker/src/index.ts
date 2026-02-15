@@ -11,10 +11,9 @@ import { ingestStaleSessions } from "./post-session-ingest.js";
 // ---------------------------------------------------------------------------
 
 const DISCOVERY_POLL_MS = 60_000;     // Check for live session every 60s (once awake)
-const FLUSH_INTERVAL_MS = 3_000;      // Flush to Turso every 3s
+const FLUSH_INTERVAL_MS = 5_000;      // Flush to Turso every 5s
 const SESSION_END_GRACE_MS = 30_000;  // Wait 30s after session ends before stopping
 const SCHEDULE_RETRY_MS = 600_000;    // Retry schedule fetch every 10min on failure
-const INGEST_DELAY_MS = 24 * 60 * 60 * 1000; // Wait 24h before ingesting archived data
 
 // ---------------------------------------------------------------------------
 // Main loop
@@ -31,7 +30,9 @@ async function main(): Promise<void> {
 
   const writer = new TursoWriter();
   const stateManager = new StateManager();
-  let lastSessionEndTime: number | null = null;
+
+  // Ingest any stale sessions from previous weekends before doing anything else
+  await ingestStaleSessions();
 
   // Graceful shutdown
   let shutdownRequested = false;
@@ -58,12 +59,11 @@ async function main(): Promise<void> {
         continue;
       }
 
-      // Phase 2: Sleep until 1 hour before the next race weekend
+      // Phase 2: Find the next race weekend
       const wakeup = findNextWakeup(schedule);
       if (!wakeup) {
-        log("No more sessions this season. Sleeping 24h then rechecking...");
-        await sleep(24 * 60 * 60 * 1000);
-        continue;
+        log("No more sessions this season. Exiting — machine will stop.");
+        break;
       }
 
       if (wakeup.sleepMs > 0) {
@@ -72,30 +72,6 @@ async function main(): Promise<void> {
           `Next weekend: ${wakeup.session.raceName} ` +
           `at ${wakeup.session.startTime.toUTCString()}`,
         );
-
-        // Check if we need to wake up early for post-session ingest
-        if (lastSessionEndTime) {
-          const ingestTime = lastSessionEndTime + INGEST_DELAY_MS;
-          const now = Date.now();
-
-          if (now >= ingestTime) {
-            // 24h already passed — ingest now before sleeping
-            log("24h since last session — running archive ingest...");
-            await ingestStaleSessions();
-            lastSessionEndTime = null;
-          } else if (ingestTime < now + wakeup.sleepMs) {
-            // Ingest time falls during our sleep — wake up early for it
-            const sleepUntilIngest = ingestTime - now;
-            const ingestHours = Math.round(sleepUntilIngest / (1000 * 60 * 60) * 10) / 10;
-            log(`Sleeping ${ingestHours}h then running archive ingest...`);
-            await sleep(sleepUntilIngest);
-            if (!shutdownRequested) {
-              await ingestStaleSessions();
-              lastSessionEndTime = null;
-            }
-          }
-        }
-
         log(`Sleeping ${hours}h until 1h before weekend...`);
         await sleep(wakeup.sleepMs);
 
@@ -177,14 +153,13 @@ async function main(): Promise<void> {
         signalR.disconnect();
 
         log(`Session ${session.sessionKey} processing complete`);
-        lastSessionEndTime = Date.now();
 
-        // Don't sleep — stay in the weekend loop to catch the next session
+        // Stay in the weekend loop to catch the next session
         log("Staying awake for next session in this weekend...");
       }
 
-      log("Race weekend complete");
-      // Loop back to Phase 1 — fetch schedule for the next weekend
+      log("Race weekend complete. Exiting — machine will stop until next weekend.");
+      break;
     } catch (err) {
       logError("Main loop error:", err);
       await sleep(10_000);

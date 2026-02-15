@@ -20,7 +20,8 @@ const NodeClient = (pkg as any).client as {
 
 const SIGNALR_URL = "https://livetiming.formula1.com/signalr";
 const HUB_NAME = "Streaming";
-const RECONNECT_DELAY_MS = 5_000;
+const INITIAL_RECONNECT_MS = 5_000;
+const MAX_RECONNECT_MS = 60_000;
 
 const TOPICS = [
   "TimingData",
@@ -42,6 +43,7 @@ export class SignalRClient {
   private onFeed: FeedCallback;
   private shouldReconnect = true;
   private connected = false;
+  private reconnectAttempt = 0;
 
   constructor(onFeed: FeedCallback) {
     this.onFeed = onFeed;
@@ -69,6 +71,7 @@ export class SignalRClient {
       client.on("connected", () => {
         log("SignalR connected");
         this.connected = true;
+        this.reconnectAttempt = 0;
 
         // Subscribe to all topics
         client
@@ -120,8 +123,13 @@ export class SignalRClient {
   }
 
   private async _scheduleReconnect(): Promise<void> {
-    log(`Reconnecting in ${RECONNECT_DELAY_MS / 1000}s...`);
-    await sleep(RECONNECT_DELAY_MS);
+    const delay = Math.min(
+      INITIAL_RECONNECT_MS * Math.pow(2, this.reconnectAttempt),
+      MAX_RECONNECT_MS,
+    );
+    this.reconnectAttempt++;
+    log(`Reconnecting in ${delay / 1000}s (attempt ${this.reconnectAttempt})...`);
+    await sleep(delay);
     if (this.shouldReconnect) {
       await this._connect();
     }

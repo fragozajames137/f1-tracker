@@ -4,9 +4,13 @@ primary_region = 'lhr'
 [build]
   dockerfile = "Dockerfile"
 
-# No HTTP service — this is a background worker process
+# No HTTP service — this is a background worker that runs during race weekends only.
+# GitHub Actions starts the machine before each weekend; the worker exits when done.
 [processes]
   worker = "node dist/index.js"
+
+[restart]
+  policy = "no"
 
 [[vm]]
   size = 'shared-cpu-1x'

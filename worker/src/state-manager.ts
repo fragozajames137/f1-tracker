@@ -189,8 +189,9 @@ export class StateManager {
 
   private appendWeather(msg: WeatherDataMessage): void {
     if (!msg) return;
-    // Weather comes as a single snapshot, not a collection
-    this.state.weatherSnapshots.push({ ...msg });
+    // Keep only the latest weather snapshot — they arrive ~every 60s
+    // and only the most recent is needed for the live dashboard
+    this.state.weatherSnapshots = [{ ...msg }];
     this.state.dirty = true;
   }
 
