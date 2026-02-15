@@ -2,6 +2,7 @@ import Link from "next/link";
 import NavLink from "./NavLink";
 import SettingsDropdown from "./SettingsDropdown";
 import WelcomeModal from "./WelcomeModal";
+import EmailBanner from "./EmailBanner";
 import gridData from "@/app/data/grid-2026.json";
 import type { GridData } from "@/app/types";
 
@@ -53,6 +54,7 @@ export default function Header({ season, isHome }: HeaderProps) {
         </div>
       </div>
       <WelcomeModal teams={grid.teams} />
+      <EmailBanner />
     </header>
   );
 }

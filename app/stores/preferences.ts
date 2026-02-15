@@ -26,7 +26,9 @@ interface PreferencesState {
 
   // Welcome flow
   hasCompletedWelcome: boolean;
+  hasEmailSubscribed: boolean;
   completeWelcome: () => void;
+  markEmailSubscribed: () => void;
 }
 
 export const usePreferencesStore = create<PreferencesState>()(
@@ -62,7 +64,9 @@ export const usePreferencesStore = create<PreferencesState>()(
 
       // Welcome flow
       hasCompletedWelcome: false,
+      hasEmailSubscribed: false,
       completeWelcome: () => set({ hasCompletedWelcome: true }),
+      markEmailSubscribed: () => set({ hasEmailSubscribed: true }),
     }),
     { name: "f1-preferences" },
   ),

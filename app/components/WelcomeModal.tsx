@@ -31,13 +31,18 @@ function buildWelcomeTeams(teams: Team[]): WelcomeTeam[] {
 }
 
 // ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+const SHOW_DELAY_MS = 15_000; // 15 seconds before showing modal
+
+// ---------------------------------------------------------------------------
 // Props
 // ---------------------------------------------------------------------------
 interface WelcomeModalProps {
   teams: Team[];
 }
 
-type Step = "email" | "team" | "drivers";
+type Step = "team" | "drivers" | "email";
 
 // ---------------------------------------------------------------------------
 // Component
@@ -45,13 +50,15 @@ type Step = "email" | "team" | "drivers";
 export default function WelcomeModal({ teams }: WelcomeModalProps) {
   const hasCompleted = usePreferencesStore((s) => s.hasCompletedWelcome);
   const completeWelcome = usePreferencesStore((s) => s.completeWelcome);
+  const markEmailSubscribed = usePreferencesStore((s) => s.markEmailSubscribed);
   const setFavoriteTeam = usePreferencesStore((s) => s.setFavoriteTeam);
   const toggleFavoriteDriver = usePreferencesStore((s) => s.toggleFavoriteDriver);
   const favoriteDriverIds = usePreferencesStore((s) => s.favoriteDriverIds);
 
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [hydrated, setHydrated] = useState(false);
-  const [step, setStep] = useState<Step>("email");
+  const [ready, setReady] = useState(false); // delayed show
+  const [step, setStep] = useState<Step>("team");
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
   const [submittingEmail, setSubmittingEmail] = useState(false);
@@ -64,11 +71,19 @@ export default function WelcomeModal({ teams }: WelcomeModalProps) {
     setHydrated(true);
   }, []);
 
+  // Delay showing the modal by 15 seconds
   useEffect(() => {
-    if (hydrated && !hasCompleted) {
+    if (!hydrated || hasCompleted) return;
+    const timer = setTimeout(() => setReady(true), SHOW_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [hydrated, hasCompleted]);
+
+  // Open the dialog once ready
+  useEffect(() => {
+    if (ready && !hasCompleted) {
       dialogRef.current?.showModal();
     }
-  }, [hydrated, hasCompleted]);
+  }, [ready, hasCompleted]);
 
   const dismiss = useCallback(() => {
     completeWelcome();
@@ -78,12 +93,52 @@ export default function WelcomeModal({ teams }: WelcomeModalProps) {
   if (!hydrated || hasCompleted) return null;
 
   // -------------------------------------------------------------------------
-  // Email step
+  // Personalized copy helpers
   // -------------------------------------------------------------------------
-  async function handleEmailContinue() {
+  const selectedTeamName = welcomeTeams.find((t) => t.id === selectedTeam)?.name;
+  const selectedDriverNames = favoriteDriverIds
+    .map((id) => {
+      for (const t of welcomeTeams) {
+        const d = t.drivers.find((d) => d.id === id);
+        if (d) return d.name.split(" ").pop() ?? null;
+      }
+      return null;
+    })
+    .filter((n): n is string => n !== null);
+
+  // Build personalized email subtitle
+  function getEmailSubtitle(): string {
+    const parts: string[] = [];
+    if (selectedTeamName) parts.push(selectedTeamName);
+    if (selectedDriverNames.length > 0) parts.push(...selectedDriverNames);
+    if (parts.length > 0) {
+      return `We'll send you updates about ${parts.join(" & ")} — race results, breaking news, and more.`;
+    }
+    return "Get race weekend reminders, qualifying results & breaking driver news.";
+  }
+
+  // -------------------------------------------------------------------------
+  // Step 1: Team
+  // -------------------------------------------------------------------------
+  function handleTeamContinue() {
+    setFavoriteTeam(selectedTeam);
+    setStep("drivers");
+  }
+
+  // -------------------------------------------------------------------------
+  // Step 2: Drivers
+  // -------------------------------------------------------------------------
+  function handleDriversContinue() {
+    setStep("email");
+  }
+
+  // -------------------------------------------------------------------------
+  // Step 3: Email
+  // -------------------------------------------------------------------------
+  async function handleEmailSubmit() {
     if (!email.trim()) {
-      // Skip email, move to team step
-      setStep("team");
+      // Skip — finish without email
+      dismiss();
       return;
     }
     const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -98,32 +153,18 @@ export default function WelcomeModal({ teams }: WelcomeModalProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim() }),
       });
+      markEmailSubscribed();
     } catch {
       // Silently fail — email is optional
     }
     setSubmittingEmail(false);
-    setStep("team");
-  }
-
-  // -------------------------------------------------------------------------
-  // Team step
-  // -------------------------------------------------------------------------
-  function handleTeamContinue() {
-    setFavoriteTeam(selectedTeam);
-    setStep("drivers");
-  }
-
-  // -------------------------------------------------------------------------
-  // Drivers step
-  // -------------------------------------------------------------------------
-  function handleDone() {
     dismiss();
   }
 
   // -------------------------------------------------------------------------
   // Step indicator
   // -------------------------------------------------------------------------
-  const steps: Step[] = ["email", "team", "drivers"];
+  const steps: Step[] = ["team", "drivers", "email"];
   const stepIndex = steps.indexOf(step);
 
   return (
@@ -156,48 +197,7 @@ export default function WelcomeModal({ teams }: WelcomeModalProps) {
           ))}
         </div>
 
-        {/* Step 1: Email */}
-        {step === "email" && (
-          <div className="space-y-4">
-            <div className="text-center">
-              <h2 className="text-xl font-bold">Welcome to Pole to Paddock</h2>
-              <p className="mt-1 text-sm text-white/50">
-                Get race alerts and updates straight to your inbox.
-              </p>
-            </div>
-            <div>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setEmailError(null);
-                }}
-                placeholder="you@example.com"
-                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-white/30 focus:outline-none"
-                autoFocus
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleEmailContinue();
-                  }
-                }}
-              />
-              {emailError && (
-                <p className="mt-1 text-xs text-red-400">{emailError}</p>
-              )}
-            </div>
-            <button
-              onClick={handleEmailContinue}
-              disabled={submittingEmail}
-              className="w-full cursor-pointer rounded-lg bg-white/10 py-3 text-sm font-medium text-white transition-colors hover:bg-white/15 disabled:opacity-50"
-            >
-              {submittingEmail ? "..." : "Continue"}
-            </button>
-          </div>
-        )}
-
-        {/* Step 2: Team */}
+        {/* Step 1: Team */}
         {step === "team" && (
           <div className="space-y-4">
             <div className="text-center">
@@ -261,7 +261,7 @@ export default function WelcomeModal({ teams }: WelcomeModalProps) {
           </div>
         )}
 
-        {/* Step 3: Drivers */}
+        {/* Step 2: Drivers */}
         {step === "drivers" && (
           <div className="space-y-4">
             <div className="text-center">
@@ -342,11 +342,59 @@ export default function WelcomeModal({ teams }: WelcomeModalProps) {
               )}
             </div>
             <button
-              onClick={handleDone}
+              onClick={handleDriversContinue}
               className="w-full cursor-pointer rounded-lg bg-white/10 py-3 text-sm font-medium text-white transition-colors hover:bg-white/15"
             >
-              Done
+              Continue
             </button>
+          </div>
+        )}
+
+        {/* Step 3: Email */}
+        {step === "email" && (
+          <div className="space-y-4">
+            <div className="text-center">
+              <h2 className="text-xl font-bold">Save Your Picks</h2>
+              <p className="mt-2 text-sm text-white/50 leading-relaxed">
+                {getEmailSubtitle()}
+              </p>
+            </div>
+            <div>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setEmailError(null);
+                }}
+                placeholder="you@example.com"
+                className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-white/30 focus:outline-none"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleEmailSubmit();
+                  }
+                }}
+              />
+              {emailError && (
+                <p className="mt-1 text-xs text-red-400">{emailError}</p>
+              )}
+            </div>
+            <button
+              onClick={handleEmailSubmit}
+              disabled={submittingEmail}
+              className="w-full cursor-pointer rounded-lg bg-white/10 py-3 text-sm font-medium text-white transition-colors hover:bg-white/15 disabled:opacity-50"
+            >
+              {submittingEmail
+                ? "..."
+                : email.trim()
+                  ? "Subscribe & Finish"
+                  : "Skip & Finish"}
+            </button>
+            <p className="text-center text-[11px] text-white/25">
+              No spam, ever. Unsubscribe anytime.
+            </p>
           </div>
         )}
       </div>
