@@ -137,7 +137,7 @@ export default function RaceCard({ race, isNext, enrichment }: RaceCardProps) {
               const slug = race.raceName.toLowerCase().replace(/\s+/g, "-");
               downloadICS(ics, `f1-${race.season}-${slug}.ics`);
             }}
-            className="mt-2 inline-flex items-center gap-1.5 rounded border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-white/50 transition-colors hover:bg-white/[0.08] hover:text-white"
+            className="cursor-pointer mt-2 inline-flex items-center gap-1.5 rounded border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-white/50 transition-colors hover:bg-white/[0.08] hover:text-white"
           >
             <svg
               aria-hidden="true"

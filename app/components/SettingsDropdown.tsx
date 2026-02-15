@@ -103,9 +103,20 @@ export default function SettingsDropdown({ teams }: SettingsDropdownProps) {
       {/* Dropdown panel */}
       {open && (
         <div className="absolute right-0 top-full z-50 mt-2 w-72 rounded-xl border border-white/10 bg-[#1a1a1a] p-4 shadow-2xl sm:w-80">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-white/40">
-            Preferences
-          </h3>
+          <div className="mb-3 flex items-center justify-between">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-white/40">
+              Preferences
+            </h3>
+            <button
+              onClick={() => { setOpen(false); setDriverPickerOpen(false); }}
+              className="cursor-pointer rounded-full p-1 text-white/30 transition-colors hover:text-white/70"
+              aria-label="Close settings"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
 
           {/* Favorite Team */}
           <div className="mb-3">
