@@ -7,6 +7,7 @@ Live race timing, telemetry overlays, driver comparisons, contract tracker, grid
 ## Features
 
 - **Live Race Dashboard** — Real-time positions, gaps, pit stops, tire strategy, race control messages, team radio, weather, and rain radar
+- **Penalty Tracker** — Active penalty points, consistency analysis, and FIA stewards decision database (2,200+ decisions from 2019–present, auto-synced)
 - **Telemetry** — Speed traces, throttle/brake/gear data, and track maps for every session (2018–present)
 - **Driver Comparison** — Head-to-head career and season stats with visual breakdowns
 - **Driver & Team Profiles** — Full career histories, contract details, salary data, social links, and team heritage timelines
@@ -23,7 +24,8 @@ Live race timing, telemetry overlays, driver comparisons, contract tracker, grid
 - Turso (serverless SQLite) + Drizzle ORM
 - Zustand for client state
 - Cloudflare R2 for media storage (telemetry, team radio)
-- Live timing via SignalR with schedule-aware sleep/wake
+- Fly.io worker for live timing via SignalR (auto-starts/stops per race weekend)
+- GitHub Actions for automated penalty sync, FIA document enrichment, and telemetry fetching
 
 ## Getting Started
 
