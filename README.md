@@ -24,7 +24,6 @@ Live race timing, telemetry overlays, driver comparisons, contract tracker, grid
 - Turso (serverless SQLite) + Drizzle ORM
 - Zustand for client state
 - Cloudflare R2 for media storage (telemetry, team radio)
-- Fly.io worker for live timing via SignalR (auto-starts/stops per race weekend)
 - GitHub Actions for automated penalty sync, FIA document enrichment, and telemetry fetching
 
 ## Getting Started
